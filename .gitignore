@@ -5,6 +5,7 @@ web/.next
 .env*
 !.env.example
 !web/.env.example
+!web/.env.local
 *.tsbuildinfo
 web/test-results
 web/playwright-report
