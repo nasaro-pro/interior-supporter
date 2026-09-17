@@ -1,0 +1,94 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+
+    # ARCHITECTURE.md 19.5 — 실행 환경까지 포함해 구성한다.
+    # 이것이 없으면 lib/db/client 가 모듈 로드 시점에 getEnv() 를 호출해
+    # test:unit 조차 통과하지 못한다.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: interior_supporter
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      # ARCHITECTURE.md 20.2 — 시간대 결함은 개발 환경(KST)에서 드러나지 않는다.
+      TZ: UTC
+      NODE_ENV: development
+      NEXT_PUBLIC_APP_URL: http://localhost:3100
+      SESSION_COOKIE_NAME: better-auth.session_token
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/interior_supporter
+      BETTER_AUTH_SECRET: ci-secret-ci-secret-ci-secret-32
+      BETTER_AUTH_URL: http://localhost:3100
+      STORAGE_PROVIDER: r2
+      STORAGE_ENDPOINT: http://localhost:9000
+      STORAGE_REGION: auto
+      STORAGE_ACCESS_KEY_ID: ci
+      STORAGE_SECRET_ACCESS_KEY: ci
+      STORAGE_BUCKET: ci
+      NOTIFY_EMAIL_PROVIDER: console
+      NOTIFY_FROM_EMAIL: noreply@example.com
+      PAYMENT_PROVIDER: none
+      CRON_SECRET: ci-cron-secret
+      PLAYWRIGHT_PORT: "3100"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.24.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm selfcheck
+
+      # 마이그레이션은 빌드와 분리한다 (18.2)
+      - run: pnpm db:migrate
+      - run: pnpm db:seed
+
+      - run: pnpm test:unit
+      - run: pnpm test:integration
+      - run: pnpm db:check
+
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e -- --grep @critical
+
+      - run: pnpm build
+
+      - name: 실패 시 Playwright 산출물 보관
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            web/test-results
+            web/playwright-report
+          retention-days: 7

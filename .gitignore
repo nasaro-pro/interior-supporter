@@ -1,0 +1,13 @@
+node_modules
+web/node_modules
+.next
+web/.next
+.env*
+!.env.example
+!web/.env.example
+*.tsbuildinfo
+web/test-results
+web/playwright-report
+web/.dev-mail.log
+web/.pgdata
+.DS_Store

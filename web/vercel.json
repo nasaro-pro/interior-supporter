@@ -1,0 +1,8 @@
+{
+  "crons": [
+    { "path": "/api/cron/publish-scheduled", "schedule": "* * * * *" },
+    { "path": "/api/cron/notification-retry", "schedule": "*/5 * * * *" },
+    { "path": "/api/cron/retention", "schedule": "0 18 * * *" },
+    { "path": "/api/cron/storage-recalc", "schedule": "0 19 * * *" }
+  ]
+}

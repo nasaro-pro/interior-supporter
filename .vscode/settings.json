@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/test-results": true,
+    "**/playwright-report": true,
+    "**/*.tsbuildinfo": true,
+    "web/.pgdata": true
+  }
+}
