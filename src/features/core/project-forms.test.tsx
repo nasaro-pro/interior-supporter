@@ -36,6 +36,8 @@ const project = (over: Partial<ProjectDetail> = {}): ProjectDetail => ({
   isPublic: false,
   homeMessage: '안내',
   homeSections: DEFAULT_HOME_SECTIONS,
+  homeTheme: 'brand',
+  homeCoverFileId: null,
   createdAt: '2026-10-01T00:00:00Z',
   updatedAt: '2026-10-01T00:00:00Z',
   archivedAt: null,
@@ -139,6 +141,8 @@ describe('A-06 HomeEditor', () => {
         version={version}
         homeMessage="안내"
         homeSections={DEFAULT_HOME_SECTIONS}
+        homeTheme="brand"
+        homeCoverFileId={null}
         doneHref="/done"
       />,
     );

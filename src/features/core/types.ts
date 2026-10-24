@@ -5,6 +5,7 @@ import type {
   ParticipantRole,
   ProjectStatus,
 } from '@/shared/contracts/domain';
+import type { HomeTheme } from './home-theme';
 
 export interface ProjectListItem {
   id: string;
@@ -22,6 +23,8 @@ export interface ProjectDetail extends ProjectListItem {
   companyId: string;
   homeMessage: string;
   homeSections: HomeSections;
+  homeTheme: HomeTheme;
+  homeCoverFileId: string | null;
   createdAt: string;
   updatedAt: string;
   version: number;

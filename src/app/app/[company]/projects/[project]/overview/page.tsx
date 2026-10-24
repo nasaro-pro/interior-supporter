@@ -64,6 +64,8 @@ export default async function OverviewPage({
             version={project.version}
             homeMessage={project.homeMessage}
             homeSections={project.homeSections}
+            homeTheme={project.homeTheme}
+            homeCoverFileId={project.homeCoverFileId}
             doneHref={here}
           />
         ) : (

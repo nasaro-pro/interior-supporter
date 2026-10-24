@@ -109,7 +109,7 @@ export async function updateProject(
   return ok({ version: data.version });
 }
 
-// ── REQ-014 고객 홈 편집 (안내문 + 4영역 순서·표시, 저장 즉시 반영) ─────────────
+// ── REQ-014 고객 홈 편집 (안내문 + 4영역 순서·표시 + 테마·커버, 저장 즉시 반영) ─────────────
 export async function updateHome(raw: unknown): Promise<ActionResult<{ version: number }>> {
   const parsed = parseInput(homeUpdateSchema, raw);
   if (!parsed.ok) return parsed.result;
@@ -120,7 +120,12 @@ export async function updateHome(raw: unknown): Promise<ActionResult<{ version: 
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('projects')
-    .update({ home_message: v.homeMessage, home_sections: v.homeSections })
+    .update({
+      home_message: v.homeMessage,
+      home_sections: v.homeSections,
+      home_theme: v.homeTheme,
+      home_cover_file_id: v.homeCoverFileId,
+    })
     .eq('id', v.projectId)
     .eq('version', v.baseVersion)
     .select('version')

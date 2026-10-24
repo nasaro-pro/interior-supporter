@@ -17,7 +17,10 @@
     "logo": "Logo",
     "defaultHomeMessage": "Default customer home message",
     "role": "Role",
-    "joinedAt": "Joined"
+    "joinedAt": "Joined",
+    "homeSections": "Customer home section order and visibility",
+    "homeTheme": "Color theme",
+    "homeCover": "Cover image"
   },
   "members": {
     "invite": "Invite member",
@@ -58,6 +61,14 @@
     }
   },
   "templates": {
-    "hint": "Used as the default customer home message for new projects. Existing projects aren’t changed."
+    "hint": "Used as the default customer home message for new projects. Existing projects are not changed.",
+    "intro": "When you create a project, this template (message, cover image, color theme and sections) is applied to its customer home. Existing projects are not changed, and each project can be adjusted from its overview.",
+    "coverHint": "Shown at the top of the customer home. {exts}, up to 1MB. A wide image (about 16:5) works best.",
+    "noCover": "No cover image",
+    "removeCover": "Remove cover",
+    "coverUploaded": "Cover image uploaded. Save to apply it to the template.",
+    "previewTitle": "New project customer home preview",
+    "previewNotice": "The real customer home also shows each project's recent updates, schedule and documents.",
+    "saved": "Default template saved. It applies to projects you create from now on."
   }
 }

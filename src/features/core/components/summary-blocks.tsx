@@ -7,6 +7,9 @@ import { DateText, PeriodText } from '@/shared/ui/date-text';
 import { ErrorState } from '@/shared/ui/states';
 import type { SummaryItem } from '@/shared/contracts/integration';
 import type { HomeSectionKey } from '@/shared/contracts/domain';
+import { routes } from '@/shared/contracts/routes';
+import { cn } from '@/shared/lib/utils';
+import { HOME_THEME_CLASS } from '../home-theme';
 import type { Block } from '../server/overview-queries';
 import type { ProjectDetail } from '../types';
 
@@ -82,7 +85,7 @@ export function OverviewBlocks({ recent, schedule }: { recent: Block; schedule: 
 
 /**
  * 고객 홈 본문 (CL-03 과 PM-03 미리보기가 같은 컴포넌트 — 02 문서 6.6).
- * 안내문 + 설정된 순서·표시의 4영역. 비공개 항목은 provider(RLS)가 이미 제외한 결과만 받는다.
+ * 커버 이미지 + 테마 색 안내문 + 설정된 순서·표시의 4영역. 비공개 항목은 provider(RLS)가 이미 제외한 결과만 받는다.
  */
 export function CustomerHomeBody({
   project,
@@ -90,7 +93,13 @@ export function CustomerHomeBody({
 }: {
   project: Pick<
     ProjectDetail,
-    'homeMessage' | 'homeSections' | 'currentPhase' | 'startDate' | 'endDate'
+    | 'homeMessage'
+    | 'homeSections'
+    | 'homeTheme'
+    | 'homeCoverFileId'
+    | 'currentPhase'
+    | 'startDate'
+    | 'endDate'
   >;
   blocks: Record<'recent' | 'schedule' | 'documents', Block>;
 }) {
@@ -140,7 +149,19 @@ export function CustomerHomeBody({
   };
   return (
     <div className="flex flex-col gap-4">
-      <section className="bg-tone-brand-bg text-tone-brand-fg rounded-lg p-4 whitespace-pre-line">
+      {project.homeCoverFileId ? (
+        // eslint-disable-next-line @next/next/no-img-element -- /api/files 302 서명 URL (next/image 최적화 대상 아님)
+        <img
+          src={routes.file(project.homeCoverFileId)}
+          alt=""
+          className="bg-muted aspect-[16/5] w-full rounded-lg border object-cover"
+          data-ui-key="home-cover"
+        />
+      ) : null}
+      <section
+        className={cn('rounded-lg p-4 whitespace-pre-line', HOME_THEME_CLASS[project.homeTheme])}
+        data-theme-key={project.homeTheme}
+      >
         {project.homeMessage || t('home.empty')}
       </section>
       {project.homeSections.filter((s) => s.visible).map((s) => render(s.key))}

@@ -1,7 +1,14 @@
 # CR 제안 · 고객 홈 템플릿 확장 (PM-63) — 설계안
 
-> 상태: 설계안(코드·마이그레이션 미변경) · 근거: 헌법 5.9 (새 마이그레이션·새 메시지 키·새 오류 코드는 CR)
+> 상태: **구현 완료(로컬 검증)** — 2026-10-24. 아래 '구현 반영' 참고. 원래 상태: 설계안 · 근거: 헌법 5.9 (새 마이그레이션·새 메시지 키·새 오류 코드는 CR)
 > 범위 결정: **고객 홈 템플릿** (안내문 + 커버 이미지 + 4영역 순서·표시 + 포인트 색상)
+
+## 0. 구현 반영 (설계안과 다른 점)
+
+- 커버 파일 종류: 새 `home_cover` 대신 **기존 `company_logo` kind 재사용** — 계약(`FileKind`·`FILE_RULES`, 고정 파일)과 B 파일 어댑터를 바꾸지 않기 위해. 규격은 로고와 같은 png/jpg/webp 1MB, 열람 범위는 `can_view_file` 의 company_logo 규칙(업체 구성원 + 참여 고객).
+- 테마 키: `brand·info·positive·caution·attention·neutral` (디자인 토큰 `tone-*` 그대로).
+- 프로젝트별 편집(PM-03): 테마 변경, 템플릿에서 복사된 커버 표시/제거. 프로젝트별 커버 업로드는 없음(업로드 권한이 owner/manager 라서).
+- 마이그레이션 `supabase/migrations/20261024000100_a_home_template.sql`, pgTAP `supabase/tests/a_home_template.test.sql`.
 
 ## 1. 배경
 
@@ -56,4 +63,4 @@
 
 | CR ID | 요청자 | 사유 | 변경 전 → 후 | 적용 위치 |
 |---|---|---|---|---|
-| CR-A-제안 | A | 업체 기본 템플릿이 안내문뿐이라 고객 홈 모양(커버·영역·색상)을 일괄 지정 불가 | `company_settings` 3컬럼·`projects` 2컬럼·`file_kind 'home_cover'` 추가, `project_defaults()` 확장 | 신규 마이그레이션 `*_a_home_template.sql`, PM-63, CL-03 |
+| CR-A-10 | A | 업체 기본 템플릿이 안내문뿐이라 고객 홈 모양(커버·영역·색상)을 일괄 지정 불가 | `company_settings` 3컬럼·`projects` 2컬럼·`file_kind 'home_cover'` 추가, `project_defaults()` 확장 | 신규 마이그레이션 `*_a_home_template.sql`, PM-63, CL-03 |

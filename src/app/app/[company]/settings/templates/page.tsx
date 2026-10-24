@@ -1,4 +1,4 @@
-// src/app/app/[company]/settings/templates/page.tsx (A · TASK-016, REQ-052) — PM-63 기본 템플릿 (신규 프로젝트 고객 홈 안내문 기본값)
+// src/app/app/[company]/settings/templates/page.tsx (A · TASK-016, REQ-052) — PM-63 기본 템플릿 (신규 프로젝트 고객 홈 안내문·커버·테마·4영역 기본값, CR-A-10)
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { requireCompanyStaff } from '@/features/core';
@@ -27,8 +27,13 @@ export default async function TemplatesPage({ params }: { params: Promise<{ comp
       <Panel title={t('screen.templates')}>
         <TemplateForm
           companyId={settings.id}
-          value={settings.defaultHomeMessage}
           version={settings.settingsVersion}
+          value={{
+            homeMessage: settings.defaultHomeMessage,
+            homeSections: settings.defaultHomeSections,
+            homeTheme: settings.defaultHomeTheme,
+            homeCoverFileId: settings.defaultHomeCoverFileId,
+          }}
         />
       </Panel>
     </main>

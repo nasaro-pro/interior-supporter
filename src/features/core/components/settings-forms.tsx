@@ -1,10 +1,10 @@
 'use client';
-// src/features/core/components/settings-forms.tsx (A · TASK-015·016) — 업체 정보·로고·템플릿·구성원 초대·재설정 링크
+// src/features/core/components/settings-forms.tsx (A · TASK-015·016) — 업체 정보·로고·템플릿(고객 홈 전체, CR-A-10)·구성원 초대·재설정 링크
 import { useActionState, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { KeyRound, Upload, UserPlus } from 'lucide-react';
+import { Eye, KeyRound, Upload, UserPlus, X } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
@@ -14,12 +14,18 @@ import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { useActionErrorText } from '@/shared/ui/action-error';
 import { createBrowserSupabase } from '@/shared/lib/supabase/browser';
 import { FILE_RULES } from '@/shared/contracts/domain';
-import type { ActionResult } from '@/shared/contracts/errors';
+import type { ActionResult, AppError } from '@/shared/contracts/errors';
+import type { HomeSections } from '@/shared/contracts/domain';
+import { routes } from '@/shared/contracts/routes';
+import { ConflictState } from '@/shared/ui/states';
 import { createUploadIntent, finalizeUpload } from '@/features/files';
 import { setCompanyLogo, updateCompany, updateTemplate } from '../server/company-actions';
 import { changeMemberRole, createMemberInvite } from '../server/participant-actions';
 import { createPasswordResetLink } from '../server/auth-actions';
+import type { HomeTheme } from '../home-theme';
 import { FormSheet } from './form-sheet';
+import { HomeSectionsField, HomeThemeField } from './home-template-fields';
+import { CustomerHomeBody } from './summary-blocks';
 import { OneTimeLinkDialog } from './one-time-link';
 
 type V = ActionResult<{ version: number }> | null;
@@ -82,23 +88,15 @@ export function CompanyInfoForm({
   );
 }
 
-/** 로고(1MB) — 업로드는 B 의 FilesApi(개발 중 STUB) 시그니처로만 (헌법 4.1 ④) */
-export function LogoUploader({
-  companyId,
-  version,
-  logoUrl,
-}: {
-  companyId: string;
-  version: number;
-  logoUrl: string | null;
-}) {
+/**
+ * 업체 이미지(company_logo kind, 1MB) 업로드 — 서명 URL → finalize. 성공 시 fileId.
+ * 로고와 고객 홈 커버(CR-A-10)가 같이 쓴다. 업로드는 B 의 FilesApi 시그니처로만 (헌법 4.1 ④)
+ */
+function useCompanyImageUpload(companyId: string) {
   const t = useTranslations();
-  const router = useRouter();
-  const input = useRef<HTMLInputElement>(null);
   const [pending, start] = useTransition();
   const rule = FILE_RULES.company_logo;
-
-  const upload = (file: File) =>
+  const upload = (file: File, onReady: (fileId: string) => Promise<void> | void) =>
     start(async () => {
       const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
       if (!rule.exts.includes(ext)) return void toast.error(t('errors.FILE_TYPE_REJECTED'));
@@ -118,11 +116,30 @@ export function LogoUploader({
       if (up.error) return void toast.error(t('files.queue.interrupted'));
       const fin = await finalizeUpload(intent.data.fileId);
       if (!fin.ok || fin.data.status !== 'ready') return void toast.error(t('errors.FILE_CORRUPT'));
-      const res = await setCompanyLogo({
-        companyId,
-        baseVersion: version,
-        fileId: intent.data.fileId,
-      });
+      await onReady(intent.data.fileId);
+    });
+  return { upload, pending, rule };
+}
+
+/** 로고(1MB) — 업로드는 B 의 FilesApi(개발 중 STUB) 시그니처로만 (헌법 4.1 ④) */
+export function LogoUploader({
+  companyId,
+  version,
+  logoUrl,
+}: {
+  companyId: string;
+  version: number;
+  logoUrl: string | null;
+}) {
+  const t = useTranslations();
+  const router = useRouter();
+  const input = useRef<HTMLInputElement>(null);
+
+  const { upload: uploadImage, pending, rule } = useCompanyImageUpload(companyId);
+
+  const upload = (file: File) =>
+    uploadImage(file, async (fileId) => {
+      const res = await setCompanyLogo({ companyId, baseVersion: version, fileId });
       if (!res.ok) return void toast.error(t(`errors.${res.error.code}`));
       toast.success(t('settings.toast.logoUpdated'));
       router.refresh();
@@ -169,45 +186,200 @@ export function LogoUploader({
   );
 }
 
+/** REQ-052 기본 템플릿 — 신규 프로젝트 고객 홈(안내문·커버·테마·4영역) 기본값 + 미리보기 (CR-A-10) */
 export function TemplateForm({
   companyId,
-  value,
   version,
+  value,
 }: {
   companyId: string;
-  value: string;
   version: number;
+  value: {
+    homeMessage: string;
+    homeSections: HomeSections;
+    homeTheme: HomeTheme;
+    homeCoverFileId: string | null;
+  };
 }) {
   const t = useTranslations();
-  const [state, action] = useSaved(updateTemplate);
-  const fe = state && !state.ok ? state.error.fieldErrors : undefined;
-  const current = state?.ok ? state.data.version : version;
+  const router = useRouter();
+  const input = useRef<HTMLInputElement>(null);
+  const [message, setMessage] = useState(value.homeMessage);
+  const [sections, setSections] = useState(value.homeSections);
+  const [theme, setTheme] = useState(value.homeTheme);
+  const [cover, setCover] = useState(value.homeCoverFileId);
+  const [error, setError] = useState<AppError | null>(null);
+  const [saving, start] = useTransition();
+  const { upload, pending: uploading, rule } = useCompanyImageUpload(companyId);
+  const fe = error?.fieldErrors;
+
+  const save = () =>
+    start(async () => {
+      setError(null);
+      const res = await updateTemplate({
+        companyId,
+        baseVersion: version,
+        defaultHomeMessage: message,
+        defaultHomeSections: sections,
+        defaultHomeTheme: theme,
+        defaultHomeCoverFileId: cover,
+      });
+      if (res.ok) {
+        toast.success(t('settings.templates.saved'));
+        router.refresh();
+      } else setError(res.error);
+    });
+
+  if (error?.code === 'VERSION_CONFLICT') {
+    return (
+      <ConflictState
+        action={
+          <Button
+            onClick={() => {
+              // 입력은 그대로 두고 최신 version 만 다시 받는다 (HomeEditor A-06 과 같은 방식)
+              setError(null);
+              router.refresh();
+            }}
+            data-ui-key="template-reload"
+          >
+            {t('common.action.loadLatest')}
+          </Button>
+        }
+      />
+    );
+  }
+
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
-      <input type="hidden" name="companyId" value={companyId} />
-      <input type="hidden" name="baseVersion" value={current} />
-      <FormRow
-        label={t('settings.field.defaultHomeMessage')}
-        htmlFor="tpl-msg"
-        errors={fe?.defaultHomeMessage}
-        hint={t('settings.templates.hint')}
-      >
-        <Textarea
-          id="tpl-msg"
-          name="defaultHomeMessage"
-          defaultValue={value}
-          maxLength={2000}
-          rows={8}
-          aria-describedby="tpl-msg-error"
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className="flex min-w-0 flex-col gap-5">
+        <p className="text-muted-foreground text-sm">{t('settings.templates.intro')}</p>
+        <FormRow
+          label={t('settings.field.homeCover')}
+          htmlFor="tpl-cover-file"
+          hint={t('settings.templates.coverHint', { exts: rule.exts.join(', ') })}
+        >
+          <div className="flex flex-col gap-2">
+            <div className="bg-muted grid aspect-[16/5] w-full place-items-center overflow-hidden rounded-md border">
+              {cover ? (
+                // eslint-disable-next-line @next/next/no-img-element -- /api/files 302 서명 URL (next/image 최적화 대상 아님)
+                <img src={routes.file(cover)} alt="" className="size-full object-cover" />
+              ) : (
+                <span className="text-muted-foreground text-meta">
+                  {t('settings.templates.noCover')}
+                </span>
+              )}
+            </div>
+            <input
+              ref={input}
+              type="file"
+              accept={rule.exts.join(',')}
+              className="sr-only"
+              id="tpl-cover-file"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f)
+                  upload(f, (fileId) => {
+                    setCover(fileId);
+                    toast.success(t('settings.templates.coverUploaded'));
+                  });
+                e.target.value = '';
+              }}
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                disabled={uploading}
+                aria-busy={uploading}
+                onClick={() => input.current?.click()}
+                data-ui-key="template-cover-upload"
+              >
+                <Upload aria-hidden />
+                {t('common.action.upload')}
+              </Button>
+              {cover ? (
+                <Button
+                  variant="ghost"
+                  onClick={() => setCover(null)}
+                  data-ui-key="template-cover-remove"
+                >
+                  <X aria-hidden />
+                  {t('settings.templates.removeCover')}
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </FormRow>
+        <FormRow
+          label={t('settings.field.defaultHomeMessage')}
+          htmlFor="tpl-msg"
+          errors={fe?.defaultHomeMessage}
+          hint={t('settings.templates.hint')}
+        >
+          <Textarea
+            id="tpl-msg"
+            name="defaultHomeMessage"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            maxLength={2000}
+            rows={6}
+            aria-describedby="tpl-msg-error"
+          />
+        </FormRow>
+        <HomeThemeField
+          name="tpl-theme"
+          value={theme}
+          onChange={setTheme}
+          label={t('settings.field.homeTheme')}
         />
-      </FormRow>
-      {state && !state.ok && !fe ? <FormError error={state.error} /> : null}
-      <div>
-        <SubmitButton data-ui-key="template-submit">{t('common.action.save')}</SubmitButton>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium">{t('settings.field.homeSections')}</span>
+          <HomeSectionsField
+            sections={sections}
+            onChange={setSections}
+            label={t('settings.field.homeSections')}
+          />
+        </div>
+        {error && !fe ? <FormError error={error} /> : null}
+        <div>
+          <Button
+            onClick={save}
+            disabled={saving || uploading}
+            aria-busy={saving}
+            data-ui-key="template-submit"
+          >
+            {t('common.action.save')}
+          </Button>
+        </div>
       </div>
-    </form>
+      <section className="flex min-w-0 flex-col gap-2" aria-labelledby="tpl-preview-title">
+        <h3 id="tpl-preview-title" className="font-semibold">
+          {t('settings.templates.previewTitle')}
+        </h3>
+        <div className="rounded-lg border border-dashed p-3">
+          <p className="text-muted-foreground text-meta mb-3 flex items-center gap-1.5">
+            <Eye aria-hidden className="size-4" />
+            {t('settings.templates.previewNotice')}
+          </p>
+          <CustomerHomeBody
+            project={{
+              homeMessage: message,
+              homeSections: sections,
+              homeTheme: theme,
+              homeCoverFileId: cover,
+              currentPhase: '',
+              startDate: null,
+              endDate: null,
+            }}
+            blocks={PREVIEW_BLOCKS}
+          />
+        </div>
+      </section>
+    </div>
   );
 }
+
+const EMPTY_BLOCK = { items: [], failed: false };
+const PREVIEW_BLOCKS = { recent: EMPTY_BLOCK, schedule: EMPTY_BLOCK, documents: EMPTY_BLOCK };
 
 /** REQ-051 구성원 초대 (PM: owner/manager, 관리자: owner) — 링크 1회 표시 */
 export function MemberInviteSheet({

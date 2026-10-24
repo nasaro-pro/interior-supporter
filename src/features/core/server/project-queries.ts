@@ -7,11 +7,12 @@ import type { ProjectHeaderData } from '@/shared/contracts/integration';
 import { logger } from '@/shared/lib/logger';
 import { isWithin, todayKst } from '@/shared/lib/dates';
 import { normalizeHomeSections } from '../home-sections';
+import { normalizeHomeTheme } from '../home-theme';
 import { decodeCursor, encodeCursor, sanitizeSearch } from './list-utils';
 import type { ProjectDetail, ProjectListItem } from '../types';
 
 const PROJECT_COLUMNS =
-  'id, company_id, name, site_address, start_date, end_date, status, current_phase, is_public, home_message, home_sections, created_at, updated_at, archived_at, version';
+  'id, company_id, name, site_address, start_date, end_date, status, current_phase, is_public, home_message, home_sections, home_theme, home_cover_file_id, created_at, updated_at, archived_at, version';
 
 type ProjectRow = {
   id: string;
@@ -25,6 +26,8 @@ type ProjectRow = {
   is_public: boolean;
   home_message: string;
   home_sections: unknown;
+  home_theme: string;
+  home_cover_file_id: string | null;
   created_at: string;
   updated_at: string;
   archived_at: string | null;
@@ -43,6 +46,8 @@ const toDetail = (r: ProjectRow): ProjectDetail => ({
   isPublic: r.is_public,
   homeMessage: r.home_message,
   homeSections: normalizeHomeSections(r.home_sections),
+  homeTheme: normalizeHomeTheme(r.home_theme),
+  homeCoverFileId: r.home_cover_file_id,
   createdAt: r.created_at,
   updatedAt: r.updated_at,
   archivedAt: r.archived_at,

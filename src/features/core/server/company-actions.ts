@@ -65,11 +65,9 @@ export async function setCompanyLogo(raw: unknown): Promise<ActionResult<{ versi
   return ok({ version: data.version });
 }
 
-export async function updateTemplate(
-  _prev: ActionResult<{ version: number }> | null,
-  form: FormData,
-): Promise<ActionResult<{ version: number }>> {
-  const parsed = parseInput(templateUpdateSchema, formToObject(form));
+/** REQ-052 기본 템플릿 (안내문 + 4영역 + 테마 + 커버) — 커버 파일은 DB 트리거 company_settings_cover_check 가 검사 */
+export async function updateTemplate(raw: unknown): Promise<ActionResult<{ version: number }>> {
+  const parsed = parseInput(templateUpdateSchema, raw);
   if (!parsed.ok) return parsed.result;
   const v = parsed.data;
   const auth = await managerOf(v.companyId);
@@ -77,7 +75,12 @@ export async function updateTemplate(
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('company_settings')
-    .update({ default_home_message: v.defaultHomeMessage })
+    .update({
+      default_home_message: v.defaultHomeMessage,
+      default_home_sections: v.defaultHomeSections,
+      default_home_theme: v.defaultHomeTheme,
+      default_home_cover_file_id: v.defaultHomeCoverFileId,
+    })
     .eq('company_id', v.companyId)
     .eq('version', v.baseVersion)
     .select('version')
