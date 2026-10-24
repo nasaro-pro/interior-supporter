@@ -1,0 +1,116 @@
+{
+  "screen": {
+    "list": "현장 사진",
+    "detail": "사진 상세",
+    "field": "현장 사진",
+    "upload": "사진 올리기"
+  },
+  "phase": {
+    "demolition": "철거",
+    "plumbing": "설비",
+    "electrical": "전기",
+    "carpentry": "목공",
+    "tile": "타일",
+    "paint": "도장",
+    "film": "필름",
+    "wallpaper": "도배",
+    "flooring": "바닥",
+    "furniture": "가구",
+    "lighting": "조명",
+    "finishing": "마감",
+    "other": "기타"
+  },
+  "uploaderRole": {
+    "staff": "업체",
+    "field": "시공팀"
+  },
+  "field": {
+    "phase": "공정",
+    "capturedOn": "촬영일",
+    "description": "설명",
+    "uploader": "올린 사람",
+    "uploadedAt": "올린 시각",
+    "site": "현장",
+    "visibility": "고객 공개"
+  },
+  "action": {
+    "upload": "사진 올리기",
+    "edit": "정보 수정",
+    "downloadOriginal": "원본 다운로드"
+  },
+  "filter": {
+    "phase": "공정",
+    "capturedOn": "촬영일",
+    "uploader": "올린 사람",
+    "label": "사진 필터",
+    "allPhases": "전체 공정",
+    "allUploaders": "모든 사람",
+    "from": "촬영일 시작",
+    "to": "촬영일 끝",
+    "apply": "적용"
+  },
+  "summary": {
+    "phase": "{phase, select, demolition {철거} plumbing {설비} electrical {전기} carpentry {목공} tile {타일} paint {도장} film {필름} wallpaper {도배} flooring {바닥} furniture {가구} lighting {조명} finishing {마감} other {기타}}"
+  },
+  "list": {
+    "empty": "올린 현장 사진이 없습니다. 사진을 올려 공정을 기록하세요.",
+    "emptyCustomer": "공개된 현장 사진이 아직 없습니다.",
+    "noDate": "촬영일 없음",
+    "label": "현장 사진 목록",
+    "unknownUploader": "알 수 없는 사용자"
+  },
+  "crew": {
+    "selectSite": "사진을 볼 현장을 선택하세요.",
+    "noSites": "배정된 현장이 없습니다. 업체에 배정 여부를 확인하세요.",
+    "privateNotice": "올린 사진은 업체가 공개하기 전까지 고객에게 보이지 않습니다.",
+    "chooseSite": "현장 선택",
+    "move": "이동",
+    "uploadNeedsSite": "현장을 선택해야 사진을 올릴 수 있습니다."
+  },
+  "toast": {
+    "uploaded": "사진 {count}장을 올렸습니다.",
+    "published": "사진을 공개했습니다.",
+    "unpublished": "사진 공개를 해제했습니다.",
+    "saved": "사진 정보를 저장했습니다.",
+    "archived": "사진을 보관했습니다.",
+    "restored": "사진을 복원했습니다."
+  },
+  "form": {
+    "capturedOnSuggested": "사진 정보에서 읽은 촬영일입니다. 다르면 고치세요.",
+    "capturedOnMissing": "촬영일을 찾지 못했습니다. 직접 입력하세요.",
+    "editTitle": "사진 정보 수정",
+    "commonHint": "공정·촬영일·설명은 이번에 올리는 사진 모두에 적용됩니다.",
+    "capturedOnCommonHint": "비워 두면 사진마다 사진 정보(EXIF)의 촬영일을 씁니다.",
+    "publicHint": "공개하면 고객이 이 사진을 볼 수 있습니다. 나중에 사진마다 바꿀 수 있습니다."
+  },
+  "detail": {
+    "editOwnOnly": "본인이 올린 사진의 공정·촬영일·설명만 고칠 수 있습니다.",
+    "thumbFailed": "미리보기 이미지를 만들지 못했습니다. 원본은 볼 수 있습니다.",
+    "imageAlt": "{phase} 공정 현장 사진",
+    "noDescription": "설명이 없습니다.",
+    "info": "사진 정보",
+    "manage": "관리"
+  },
+  "upload": {
+    "batchHint": "한 번에 최대 {max}장, 장당 {size}까지 올릴 수 있습니다.",
+    "choose": "사진 선택",
+    "start": "올리기",
+    "siteFixed": "올릴 현장: {name}",
+    "exifDate": "사진 정보 촬영일: {date}",
+    "noExifDate": "사진 정보에 촬영일이 없습니다.",
+    "retry": "다시 시도",
+    "remove": "빼기",
+    "progressLabel": "{name} 진행 상태",
+    "networkError": "연결이 끊겨 올리지 못했습니다. 다시 시도하세요.",
+    "allDone": "모든 사진을 올렸습니다.",
+    "queueLabel": "올릴 사진 목록",
+    "stage": {
+      "queued": "대기",
+      "uploading": "올리는 중",
+      "finalizing": "확인 중",
+      "saving": "저장 중",
+      "done": "완료",
+      "failed": "실패"
+    }
+  }
+}

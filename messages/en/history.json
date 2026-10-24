@@ -1,0 +1,61 @@
+{
+  "screen": {
+    "list": "History",
+    "detail": "Change details"
+  },
+  "eventType": {
+    "created": "Created",
+    "updated": "Updated",
+    "archived": "Archived",
+    "restored": "Restored",
+    "published": "Made visible",
+    "unpublished": "Hidden",
+    "revoked": "Revoked"
+  },
+  "objectType": {
+    "profiles": "Profile",
+    "files": "File",
+    "companies": "Company",
+    "company_settings": "Company settings",
+    "company_members": "Member",
+    "projects": "Project",
+    "project_participants": "Participant",
+    "invitations": "Invitation link",
+    "clients": "Client card",
+    "client_projects": "Client link",
+    "designs": "Design",
+    "design_versions": "Design version",
+    "design_previews": "Preview image",
+    "materials": "Material",
+    "estimates": "Estimate",
+    "estimate_versions": "Estimate version",
+    "confirmations": "Confirmation",
+    "requests": "Request",
+    "request_corrections": "Correction",
+    "request_replies": "Reply",
+    "photos": "Photo",
+    "schedule_events": "Schedule event"
+  },
+  "field": {
+    "actor": "Changed by",
+    "occurredAt": "Changed at",
+    "object": "Item",
+    "project": "Project",
+    "before": "Before",
+    "after": "After",
+    "eventType": "Change type",
+    "from": "From",
+    "to": "To"
+  },
+  "actor": {
+    "system": "System"
+  },
+  "list": {
+    "empty": "No changes recorded yet.",
+    "staffOnly": "History is visible only to company members and can’t be edited or deleted."
+  },
+  "detail": {
+    "noDiff": "No changed values to show.",
+    "column": "Field"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "screen": {
+    "list": "견적",
+    "detail": "견적 상세"
+  },
+  "field": {
+    "title": "견적 이름",
+    "versionLabel": "버전 표시명",
+    "changeNote": "변경 설명",
+    "version": "버전 {no}",
+    "publishedAt": "최초 공개",
+    "file": "PDF 파일",
+    "versions": "버전"
+  },
+  "action": {
+    "create": "견적 등록",
+    "newVersion": "새 버전 올리기",
+    "preview": "미리보기",
+    "download": "PDF 다운로드",
+    "selectVersion": "버전 선택"
+  },
+  "label": {
+    "noPublicVersion": "공개된 버전 없음",
+    "noVersion": "버전 없음"
+  },
+  "summary": {
+    "published": "{label} 공개",
+    "added": "{label} 등록"
+  },
+  "list": {
+    "empty": "등록된 견적이 없습니다. 견적 PDF를 올려 시작하세요.",
+    "emptyCustomer": "공개된 견적이 아직 없습니다.",
+    "versionCount": "버전 {count}개"
+  },
+  "toast": {
+    "created": "견적을 등록했습니다. 버전을 공개하기 전까지 고객에게 보이지 않습니다.",
+    "versionAdded": "새 버전을 올렸습니다.",
+    "published": "{label} 버전을 공개했습니다.",
+    "unpublished": "버전 공개를 해제했습니다. 고객에게 더 이상 보이지 않습니다."
+  },
+  "form": {
+    "versionLabelHint": "예: 1차 견적, 2차 수정",
+    "changeNoteHint": "이전 버전과 달라진 점을 적으세요(필수, 1,000자 이내).",
+    "noReplace": "올린 PDF는 바꿀 수 없습니다. 내용이 바뀌면 새 버전으로 올리세요."
+  },
+  "publish": {
+    "title": "이 버전을 고객에게 공개할까요?",
+    "body": "공개하면 고객이 이 버전의 PDF를 보고 내려받을 수 있습니다."
+  },
+  "preview": {
+    "failed": "PDF 미리보기를 표시하지 못했습니다. 내려받아 확인하세요.",
+    "truncated": "앞 {max}쪽까지만 표시합니다. 전체는 내려받아 확인하세요."
+  },
+  "detail": {
+    "versionMatch": "선택한 버전의 PDF를 표시하고 내려받습니다.",
+    "privateVersion": "비공개 버전입니다. 고객에게 보이지 않습니다.",
+    "noVersion": "올린 버전이 없습니다. 새 버전을 올리세요."
+  }
+}

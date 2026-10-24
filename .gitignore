@@ -1,14 +1,18 @@
-node_modules
-web/node_modules
-.next
-web/.next
-.env*
+# 배포용 저장소: github.com/nasaro-pro/interior-supporter
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
 !.env.example
-!web/.env.example
-!web/.env.local
 *.tsbuildinfo
-web/test-results
-web/playwright-report
-web/.dev-mail.log
-web/.pgdata
+next-env.d.ts
+# database.types.ts 는 Render 빌드에 필요해 커밋한다
+supabase/.temp/
+supabase/.branches/
+_submit/
 .DS_Store
+Thumbs.db

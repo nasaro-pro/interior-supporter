@@ -1,0 +1,63 @@
+{
+  "screen": {
+    "root": "설정",
+    "company": "업체 정보",
+    "members": "구성원",
+    "templates": "기본 템플릿",
+    "storage": "저장공간"
+  },
+  "memberRole": {
+    "owner": "소유자",
+    "manager": "업체 관리자",
+    "pm": "PM"
+  },
+  "field": {
+    "companyName": "업체 이름",
+    "slug": "업체 주소명",
+    "logo": "로고",
+    "defaultHomeMessage": "고객 홈 기본 안내문",
+    "role": "역할",
+    "joinedAt": "가입일"
+  },
+  "members": {
+    "invite": "구성원 초대",
+    "remove": "구성원에서 제거",
+    "createResetLink": "재설정 링크 만들기",
+    "ownerLocked": "소유자의 역할은 바꾸거나 제거할 수 없습니다.",
+    "resetLinkCreated": "재설정 링크를 만들었습니다. 지금 복사해 본인에게 직접 전달하세요. 1시간 안에 한 번만 쓸 수 있습니다.",
+    "resetOwnerHint": "소유자의 비밀번호는 운영 절차로만 재설정할 수 있습니다.",
+    "empty": "아직 초대한 구성원이 없습니다. PM을 초대해 함께 일하세요."
+  },
+  "storage": {
+    "used": "{used} / {total} 사용 중",
+    "byKind": "파일 종류별 용량",
+    "hint": "이 업체가 올린 파일 용량의 합계입니다.",
+    "warning": "저장공간을 80% 이상 사용했습니다. 필요 없는 파일을 정리하거나 업체 관리자와 상의하세요."
+  },
+  "state": {
+    "managerOnly": "업체 설정은 소유자와 업체 관리자만 바꿀 수 있습니다."
+  },
+  "company": {
+    "slugLocked": "업체 주소명은 바꿀 수 없습니다.",
+    "noLogo": "로고 없음"
+  },
+  "toast": {
+    "logoUpdated": "로고를 바꿨습니다.",
+    "memberRemoved": "구성원을 제거했습니다.",
+    "roleChanged": "역할을 바꿨습니다."
+  },
+  "confirm": {
+    "removeMember": {
+      "title": "{name}님을 구성원에서 제거할까요?",
+      "body": "제거하면 이 업체의 프로젝트에 더 이상 접근할 수 없습니다. 기록은 남습니다."
+    },
+    "changeRole": {
+      "title": "{name}님의 역할을 바꿀까요?",
+      "body": "{from} → {to}. 업체 관리자는 업체 설정과 구성원 초대를 할 수 있습니다.",
+      "confirm": "역할 바꾸기"
+    }
+  },
+  "templates": {
+    "hint": "새 프로젝트의 고객 홈 안내문 기본값으로 쓰입니다. 이미 만든 프로젝트에는 적용되지 않습니다."
+  }
+}

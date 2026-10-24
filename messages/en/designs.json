@@ -1,0 +1,113 @@
+{
+  "screen": {
+    "list": "Designs",
+    "detail": "Design details"
+  },
+  "confirmState": {
+    "none": "Not confirmed",
+    "confirmed": "Confirmed",
+    "needs_reconfirm": "Needs reconfirm"
+  },
+  "field": {
+    "title": "Title",
+    "description": "Description",
+    "version": "Version {no}",
+    "currentVersion": "Current version",
+    "note": "Version note",
+    "original": "Original file",
+    "previews": "Preview images",
+    "previewLabel": "Image name",
+    "pdfPage": "PDF page {page}",
+    "linkedVersion": "Linked version",
+    "wholeDesign": "Whole design",
+    "reason": "Reason",
+    "pageNumber": "Page number"
+  },
+  "action": {
+    "create": "Upload design",
+    "newVersion": "Upload new version",
+    "addPreview": "Add preview image",
+    "extractPdf": "Create from PDF page",
+    "compare": "Compare",
+    "downloadOriginal": "Download original",
+    "confirm": "Confirm this design",
+    "requestReconfirm": "Request reconfirmation",
+    "versionHistory": "Version history",
+    "reconfirm": "Changed — confirm again"
+  },
+  "compare": {
+    "sideA": "A",
+    "sideB": "B",
+    "handle": "Comparison position",
+    "valueText": "A {a}% / B {b}%",
+    "needTwo": "At least 2 images are needed to compare.",
+    "keyboardHint": "Drag the handle or use the left and right arrow keys to compare.",
+    "sameImage": "You picked the same image twice. Choose a different image to compare.",
+    "choose": "Select an image",
+    "disabled": {
+      "needTwo": "At least two images are needed to compare.",
+      "unselected": "Select two different images for A and B.",
+      "loadFailed": "The image could not be loaded. Select another image or try again.",
+      "denied": "This image is not available. You may not have access or it is no longer shared."
+    },
+    "retry": "Try again"
+  },
+  "summary": {
+    "newVersion": "Version {no} uploaded"
+  },
+  "list": {
+    "empty": "No designs yet. Upload an original file (SKP, PDF, or DWG) to get started.",
+    "emptyCustomer": "No designs have been shared yet."
+  },
+  "toast": {
+    "created": "Design uploaded. Customers won’t see it until you make it visible.",
+    "versionAdded": "New version uploaded. Current version: {no}",
+    "versionAddedReconfirm": "New version uploaded, so this design now needs reconfirmation. Customers with the confirm right were notified.",
+    "confirmed": "Design confirmed.",
+    "reconfirmRequested": "Reconfirmation requested.",
+    "previewAdded": "Comparison image added."
+  },
+  "preview": {
+    "empty": "No preview images. You can still download the original.",
+    "loadFailed": "Couldn’t load the image. Choose another image or try again.",
+    "cadHint": "SKP and DWG files can’t be previewed in the browser. Link a preview image instead.",
+    "modeImage": "Upload image",
+    "none": "No comparison image"
+  },
+  "pdf": {
+    "extracting": "Creating an image from PDF page {page}…",
+    "extractFailed": "Couldn’t create an image from the PDF page. Upload a page image instead.",
+    "password": "Password-protected PDFs cannot be converted. Upload an unlocked PDF or a page image.",
+    "pageOutOfRange": "That page does not exist in the PDF. Check the number."
+  },
+  "confirm": {
+    "title": "Confirm this design?",
+    "body": "This records your agreement to the current version ({no}). You can’t undo a confirmation yourself.",
+    "stale": "The content has changed. Refresh and review it again."
+  },
+  "state": {
+    "needsReconfirm": "This design changed and needs your confirmation again. Review the current version, then confirm.",
+    "pmNeedsReconfirm": "Waiting for the customer to confirm again. Only the customer can change the confirmation."
+  },
+  "reconfirm": {
+    "title": "Request reconfirmation?",
+    "body": "Enter a reason. The design will be marked as needing reconfirmation and customers with the confirm right will be notified."
+  },
+  "publish": {
+    "hint": "Customers will see only the current version and its linked preview images.",
+    "title": "Share this design with the customer?"
+  },
+  "version": {
+    "olderNotice": "This is an older version. Customers see only the current version.",
+    "reconfirmWarning": "This design is confirmed. A new version will require reconfirmation and notify the deciding customer."
+  },
+  "record": {
+    "title": "Confirmation record",
+    "line": "{name} confirmed on {at} (revision {revision})",
+    "someone": "Customer",
+    "invalidated": "Invalidated: {reason}",
+    "reasonCoreChanged": "core details changed",
+    "reasonNewVersion": "new version uploaded",
+    "reasonPm": "reconfirmation requested — {reason}"
+  }
+}

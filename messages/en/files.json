@@ -1,0 +1,56 @@
+{
+  "kind": {
+    "design_original": "Design file",
+    "design_preview": "Preview image",
+    "material_image": "Material image",
+    "estimate_pdf": "Estimate PDF",
+    "photo_original": "Site photo",
+    "photo_thumb": "Photo thumbnail",
+    "company_logo": "Company logo"
+  },
+  "status": {
+    "pending": "Checking",
+    "ready": "Ready",
+    "rejected": "Rejected"
+  },
+  "queue": {
+    "title": "Uploads",
+    "remove": "Remove from list",
+    "cancel": "Cancel upload",
+    "uploading": "Uploading {percent}%",
+    "processing": "Checking the uploaded file.",
+    "done": "Upload complete.",
+    "failedItem": "Couldn’t upload {name}: {reason}",
+    "partial": "{failed} of {total} files couldn’t be uploaded. Retry just the failed files.",
+    "interrupted": "The upload was interrupted. Please try again.",
+    "leaveWarning": "Uploads are still in progress. If you leave, unfinished files won’t be saved.",
+    "uploadingIndeterminate": "Uploading…",
+    "retry": "Retry failed files",
+    "retryHint": "The file could not be uploaded. Try again."
+  },
+  "dropzone": {
+    "choose": "Choose files",
+    "spec": "Allowed: {exts} · Max {size}",
+    "prompt": "Drag files here, or click to choose.",
+    "heic": "HEIC photos aren’t supported. On iPhone, go to Settings > Camera > Formats and choose “Most Compatible”, or convert the photo to JPG.",
+    "tooMany": "You can upload up to {max} files at once.",
+    "renamedExt": "Files with only a changed extension can’t be uploaded. Upload the file in its original format.",
+    "metadataNotice": "To protect privacy, photo metadata such as location isn’t stored."
+  },
+  "size": {
+    "kb": "{value} KB",
+    "mb": "{value} MB"
+  },
+  "download": {
+    "denied": "This file can’t be downloaded. You may not have access, or it’s no longer available."
+  },
+  "confirm": {
+    "cancel": "Cancel the upload? Files in progress won’t be saved."
+  },
+  "rejectReason": {
+    "type": "Rejected: the file type doesn’t match.",
+    "size": "Rejected: the file is over the size limit.",
+    "corrupt": "Rejected: the file is damaged.",
+    "pixels": "Rejected: the image resolution is too high (max 40 megapixels)."
+  }
+}

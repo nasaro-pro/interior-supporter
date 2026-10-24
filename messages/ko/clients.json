@@ -1,0 +1,44 @@
+{
+  "screen": {
+    "list": "고객 관리",
+    "detail": "고객 카드"
+  },
+  "field": {
+    "name": "이름",
+    "phone": "연락처",
+    "email": "이메일",
+    "memo": "메모",
+    "linkedAccount": "연결된 계정",
+    "projects": "관련 프로젝트"
+  },
+  "list": {
+    "create": "고객 카드 등록",
+    "searchPlaceholder": "이름·연락처·이메일 검색",
+    "empty": "등록된 고객 카드가 없습니다. 고객 카드를 등록해 연락처를 관리하세요."
+  },
+  "detail": {
+    "linkProject": "프로젝트 연결",
+    "cardVsAccount": "고객 카드는 연락처 정보입니다. 고객이 프로젝트를 보려면 프로젝트 설정에서 초대해야 합니다.",
+    "noProjects": "연결된 프로젝트가 없습니다.",
+    "noLinkable": "연결할 수 있는 프로젝트가 없습니다. 프로젝트는 고객 카드 하나에만 연결됩니다.",
+    "oneCardPerProject": "프로젝트 하나는 고객 카드 하나에만 연결할 수 있습니다."
+  },
+  "toast": {
+    "created": "고객 카드를 등록했습니다.",
+    "projectLinked": "프로젝트를 연결했습니다.",
+    "projectUnlinked": "프로젝트 연결을 해제했습니다."
+  },
+  "confirm": {
+    "restore": {
+      "title": "고객 카드를 복원할까요?",
+      "body": "복원하면 고객 관리 목록에 다시 표시됩니다."
+    },
+    "unlink": {
+      "title": "프로젝트 연결을 해제할까요?",
+      "body": "\"{project}\" 프로젝트와 이 고객 카드의 연결을 해제합니다. 프로젝트와 고객 카드는 그대로 남고, 필요하면 다시 연결할 수 있습니다."
+    }
+  },
+  "action": {
+    "unlink": "연결 해제"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "screen": {
+    "list": "Requests",
+    "detail": "Request details"
+  },
+  "status": {
+    "open": "Received",
+    "in_progress": "In progress",
+    "resolved": "Resolved"
+  },
+  "field": {
+    "title": "Title",
+    "body": "Details",
+    "author": "Author",
+    "createdAt": "Submitted",
+    "status": "Status"
+  },
+  "thread": {
+    "original": "Original",
+    "correction": "Correction",
+    "reply": "Reply",
+    "label": "Request history"
+  },
+  "action": {
+    "create": "New request",
+    "submit": "Submit request",
+    "addCorrection": "Add correction",
+    "reply": "Post reply",
+    "changeStatus": "Change status"
+  },
+  "summary": {
+    "status": "{status, select, open {Received} in_progress {In progress} resolved {Resolved} other {}}"
+  },
+  "list": {
+    "empty": "No customer requests yet.",
+    "emptyCustomer": "No requests yet. Submit a request for anything you’d like to ask or change.",
+    "replied": "Replied",
+    "notReplied": "Awaiting reply",
+    "lastActivity": "Last activity",
+    "label": "Request list"
+  },
+  "filter": {
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "search": "Search titles",
+    "searchPlaceholder": "Search by title",
+    "apply": "Search",
+    "label": "Request filters"
+  },
+  "author": {
+    "unknown": "Unknown user",
+    "staff": "Studio staff",
+    "me": "Me"
+  },
+  "form": {
+    "immutableHint": "The title and details can’t be edited after submission. Add a correction if something changes.",
+    "correctionLabel": "Correction",
+    "replyLabel": "Reply"
+  },
+  "toast": {
+    "created": "Request submitted. You’ll be notified when there’s a reply.",
+    "correctionAdded": "Correction added.",
+    "replyAdded": "Reply posted.",
+    "statusChanged": "Status changed to {status}.",
+    "archived": "Request archived.",
+    "restored": "Request restored."
+  },
+  "submit": {
+    "title": "Submit this request?",
+    "body": "You won’t be able to edit the title or details after submitting."
+  },
+  "reply": {
+    "hint": "Replies can’t be edited or deleted after posting. Post a new reply to add more."
+  },
+  "detail": {
+    "correctionNoStatus": "Adding a correction doesn’t change the status automatically. Update it yourself if needed.",
+    "correctionAuthorOnly": "Only the person who submitted the request can add corrections.",
+    "noReplies": "No replies yet.",
+    "ownOnly": "Only you and the studio staff can see your requests.",
+    "statusTransitionHint": "Only statuses you can switch to from the current one are shown.",
+    "archivedNoCorrection": "You can’t add corrections to an archived request.",
+    "manage": "Handling"
+  }
+}

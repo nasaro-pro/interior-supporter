@@ -1,0 +1,63 @@
+{
+  "screen": {
+    "root": "Settings",
+    "company": "Company",
+    "members": "Members",
+    "templates": "Templates",
+    "storage": "Storage"
+  },
+  "memberRole": {
+    "owner": "Owner",
+    "manager": "Manager",
+    "pm": "PM"
+  },
+  "field": {
+    "companyName": "Company name",
+    "slug": "Company handle",
+    "logo": "Logo",
+    "defaultHomeMessage": "Default customer home message",
+    "role": "Role",
+    "joinedAt": "Joined"
+  },
+  "members": {
+    "invite": "Invite member",
+    "remove": "Remove member",
+    "createResetLink": "Create reset link",
+    "ownerLocked": "The owner’s role can’t be changed or removed.",
+    "resetLinkCreated": "Reset link created. Copy it now and give it directly to the person. It can be used once within 1 hour.",
+    "resetOwnerHint": "The owner’s password can only be reset through the operations procedure.",
+    "empty": "No members invited yet. Invite PMs to work together."
+  },
+  "storage": {
+    "used": "{used} of {total} used",
+    "byKind": "Usage by file type",
+    "hint": "Total size of files uploaded by this company.",
+    "warning": "You have used 80% or more of your storage. Clean up unneeded files or talk to your company admin."
+  },
+  "state": {
+    "managerOnly": "Only the owner and managers can change company settings."
+  },
+  "company": {
+    "slugLocked": "The company handle can’t be changed.",
+    "noLogo": "No logo"
+  },
+  "toast": {
+    "logoUpdated": "Logo updated.",
+    "memberRemoved": "Member removed.",
+    "roleChanged": "Role updated."
+  },
+  "confirm": {
+    "removeMember": {
+      "title": "Remove {name} from the company?",
+      "body": "They will lose access to this company’s projects. Their past activity stays on record."
+    },
+    "changeRole": {
+      "title": "Change {name}’s role?",
+      "body": "{from} → {to}. Managers can change company settings and invite members.",
+      "confirm": "Change role"
+    }
+  },
+  "templates": {
+    "hint": "Used as the default customer home message for new projects. Existing projects aren’t changed."
+  }
+}

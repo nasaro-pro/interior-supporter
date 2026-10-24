@@ -1,0 +1,44 @@
+{
+  "screen": {
+    "list": "Clients",
+    "detail": "Client card"
+  },
+  "field": {
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "memo": "Notes",
+    "linkedAccount": "Linked account",
+    "projects": "Related projects"
+  },
+  "list": {
+    "create": "Add client card",
+    "searchPlaceholder": "Search by name, phone, or email",
+    "empty": "No client cards yet. Add one to keep track of contacts."
+  },
+  "detail": {
+    "linkProject": "Link project",
+    "cardVsAccount": "A client card is contact information only. To give a customer access, invite them from project settings.",
+    "noProjects": "No linked projects.",
+    "noLinkable": "No projects can be linked. A project can belong to only one client card.",
+    "oneCardPerProject": "A project can be linked to only one client card."
+  },
+  "toast": {
+    "created": "Client card added.",
+    "projectLinked": "Project linked.",
+    "projectUnlinked": "Project unlinked."
+  },
+  "confirm": {
+    "restore": {
+      "title": "Restore this client card?",
+      "body": "It will appear in the client list again."
+    },
+    "unlink": {
+      "title": "Unlink this project?",
+      "body": "This removes the link between “{project}” and this client card. Both the project and the card stay, and you can link them again later."
+    }
+  },
+  "action": {
+    "unlink": "Unlink"
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "screen": {
+    "list": "Site photos",
+    "detail": "Photo details",
+    "field": "Site photos",
+    "upload": "Upload photos"
+  },
+  "phase": {
+    "demolition": "Demolition",
+    "plumbing": "Plumbing",
+    "electrical": "Electrical",
+    "carpentry": "Carpentry",
+    "tile": "Tile",
+    "paint": "Painting",
+    "film": "Film",
+    "wallpaper": "Wallpaper",
+    "flooring": "Flooring",
+    "furniture": "Furniture",
+    "lighting": "Lighting",
+    "finishing": "Finishing",
+    "other": "Other"
+  },
+  "uploaderRole": {
+    "staff": "Studio",
+    "field": "Field crew"
+  },
+  "field": {
+    "phase": "Phase",
+    "capturedOn": "Taken on",
+    "description": "Description",
+    "uploader": "Uploaded by",
+    "uploadedAt": "Uploaded",
+    "site": "Site",
+    "visibility": "Customer visibility"
+  },
+  "action": {
+    "upload": "Upload photos",
+    "edit": "Edit details",
+    "downloadOriginal": "Download original"
+  },
+  "filter": {
+    "phase": "Phase",
+    "capturedOn": "Taken on",
+    "uploader": "Uploaded by",
+    "label": "Photo filters",
+    "allPhases": "All phases",
+    "allUploaders": "Everyone",
+    "from": "Taken from",
+    "to": "Taken until",
+    "apply": "Apply"
+  },
+  "summary": {
+    "phase": "{phase, select, demolition {Demolition} plumbing {Plumbing} electrical {Electrical} carpentry {Carpentry} tile {Tile} paint {Painting} film {Film} wallpaper {Wallpaper} flooring {Flooring} furniture {Furniture} lighting {Lighting} finishing {Finishing} other {Other}}"
+  },
+  "list": {
+    "empty": "No site photos yet. Upload photos to record progress.",
+    "emptyCustomer": "No photos have been shared yet.",
+    "noDate": "No date",
+    "label": "Site photo list",
+    "unknownUploader": "Unknown user"
+  },
+  "crew": {
+    "selectSite": "Choose a site to see its photos.",
+    "noSites": "You haven’t been assigned to any site. Check with the studio.",
+    "privateNotice": "Photos you upload stay hidden from customers until the studio shares them.",
+    "chooseSite": "Choose site",
+    "move": "Go",
+    "uploadNeedsSite": "Choose a site before uploading photos."
+  },
+  "toast": {
+    "uploaded": "Uploaded {count} photos.",
+    "published": "Photo shared with the customer.",
+    "unpublished": "Photo is now private.",
+    "saved": "Photo details saved.",
+    "archived": "Photo archived.",
+    "restored": "Photo restored."
+  },
+  "form": {
+    "capturedOnSuggested": "Date read from the photo’s info. Change it if it’s wrong.",
+    "capturedOnMissing": "No date found in the photo. Enter it yourself.",
+    "editTitle": "Edit photo details",
+    "commonHint": "Phase, date and description apply to every photo in this upload.",
+    "capturedOnCommonHint": "Leave blank to use each photo’s own date from its info (EXIF).",
+    "publicHint": "Shared photos are visible to the customer. You can change this per photo later."
+  },
+  "detail": {
+    "editOwnOnly": "You can only edit the phase, date and description of photos you uploaded.",
+    "thumbFailed": "Couldn’t create a preview. The original is still available.",
+    "imageAlt": "Site photo, {phase} phase",
+    "noDescription": "No description.",
+    "info": "Photo details",
+    "manage": "Manage"
+  },
+  "upload": {
+    "batchHint": "Up to {max} photos at a time, {size} each.",
+    "choose": "Choose photos",
+    "start": "Upload",
+    "siteFixed": "Uploading to: {name}",
+    "exifDate": "Date from photo info: {date}",
+    "noExifDate": "No date in photo info.",
+    "retry": "Retry",
+    "remove": "Remove",
+    "progressLabel": "{name} progress",
+    "networkError": "Upload interrupted by a connection problem. Try again.",
+    "allDone": "All photos uploaded.",
+    "queueLabel": "Photos to upload",
+    "stage": {
+      "queued": "Waiting",
+      "uploading": "Uploading",
+      "finalizing": "Checking",
+      "saving": "Saving",
+      "done": "Done",
+      "failed": "Failed"
+    }
+  }
+}

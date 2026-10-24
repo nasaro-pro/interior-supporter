@@ -1,0 +1,106 @@
+{
+  "screen": {
+    "list": "Schedule",
+    "detail": "Event details",
+    "calendar": "All projects calendar"
+  },
+  "view": {
+    "month": "Month",
+    "timeline": "Timeline",
+    "today": "Today",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "label": "View",
+    "monthTitle": "{month}/{year}",
+    "weekTitle": "{start} – {end}",
+    "weekdays": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    }
+  },
+  "field": {
+    "title": "Title",
+    "description": "Description",
+    "startDate": "Start date",
+    "startTime": "Start time",
+    "endDate": "End date",
+    "endTime": "End time",
+    "allDay": "All day",
+    "related": "Related item",
+    "project": "Project",
+    "when": "When",
+    "relatedType": "Item type",
+    "visibility": "Customer visibility"
+  },
+  "relatedType": {
+    "designs": "Design",
+    "materials": "Material",
+    "estimate_versions": "Estimate version",
+    "requests": "Request",
+    "photos": "Site photo"
+  },
+  "action": {
+    "create": "Add event",
+    "edit": "Edit event"
+  },
+  "filter": {
+    "projects": "Projects",
+    "allProjects": "All projects",
+    "apply": "Apply"
+  },
+  "summary": {
+    "when": "{date}"
+  },
+  "list": {
+    "empty": "No events yet. Add events to share the work schedule.",
+    "emptyCustomer": "No events have been shared yet."
+  },
+  "month": {
+    "empty": "No events this month.",
+    "moreEvents": "{count} more",
+    "invalid": "That period isn’t valid. Showing this month instead.",
+    "dayTitle": "Events on {date}",
+    "dayEmpty": "No events on this day.",
+    "closeDay": "Clear selected day"
+  },
+  "toast": {
+    "created": "Event added.",
+    "updated": "Event saved.",
+    "archived": "Event archived.",
+    "restored": "Event restored."
+  },
+  "form": {
+    "timeHint": "Leave times blank for an all-day event. All dates and times are Korea time.",
+    "publishHint": "Only shared events appear in the customer’s schedule and the next-event card on their home.",
+    "endDateHint": "Leave the end date blank for a one-day event. The end date is included.",
+    "relatedNone": "None",
+    "relatedItem": "Item to link",
+    "relatedEmpty": "There are no items to link.",
+    "currentProject": "{name} (this project)"
+  },
+  "calendar": {
+    "filterEmpty": "The selected projects have no events this month.",
+    "scopeHint": "Shows events from every project you can edit. Select an event to open it in its project.",
+    "noProjects": "You don’t have any projects you can edit."
+  },
+  "detail": {
+    "relatedUnavailable": "The linked item isn’t available to you.",
+    "noDescription": "No description.",
+    "range": "{start} – {end}",
+    "otherProject": "Other project: {name}",
+    "info": "Event details",
+    "manage": "Manage"
+  },
+  "timeline": {
+    "empty": "Nothing to show yet. Enter the project period or add events.",
+    "label": "Schedule timeline",
+    "projectPeriod": "Project period"
+  }
+}

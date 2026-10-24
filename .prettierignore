@@ -1,0 +1,13 @@
+# 문서·생성물·SQL 은 Prettier 대상이 아니다 (형식은 각 문서 규칙을 따른다)
+node_modules/
+.next/
+ai/
+docs/
+supabase/
+_submit/
+_starter/
+**/*.md
+package-lock.json
+src/shared/contracts/database.types.ts
+playwright-report/
+test-results/

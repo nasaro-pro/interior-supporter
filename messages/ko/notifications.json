@@ -1,0 +1,35 @@
+{
+  "screen": {
+    "list": "알림"
+  },
+  "action": {
+    "markAllRead": "모두 읽음으로 표시"
+  },
+  "label": {
+    "unread": "읽지 않음",
+    "bell": "알림, 읽지 않은 알림 {count}건"
+  },
+  "type": {
+    "assignment_changed": "프로젝트 참여 정보가 바뀌었습니다.",
+    "item_published": "새 항목이 공개되었습니다.",
+    "item_confirmed": "고객이 항목을 확정했습니다.",
+    "reconfirm_requested": "다시 확정이 필요한 항목이 있습니다.",
+    "request_created": "새 요청이 등록되었습니다.",
+    "request_corrected": "요청에 정정 내용이 추가되었습니다.",
+    "request_replied": "요청에 답변이 등록되었습니다.",
+    "request_status_changed": "요청 처리 상태가 바뀌었습니다.",
+    "photo_uploaded": "새 현장 사진이 올라왔습니다.",
+    "photo_published": "현장 사진이 공개되었습니다.",
+    "schedule_changed": "일정이 등록되거나 바뀌었습니다."
+  },
+  "target": {
+    "unavailable": "더 이상 볼 수 없는 항목입니다."
+  },
+  "list": {
+    "empty": "새 알림이 없습니다.",
+    "retention": "알림은 90일 동안 보관됩니다."
+  },
+  "toast": {
+    "allRead": "모든 알림을 읽음으로 표시했습니다."
+  }
+}

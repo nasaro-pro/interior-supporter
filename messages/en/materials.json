@@ -1,0 +1,86 @@
+{
+  "screen": {
+    "list": "Materials",
+    "detail": "Material details"
+  },
+  "space": {
+    "living": "Living room",
+    "kitchen": "Kitchen",
+    "bathroom": "Bathroom",
+    "bedroom": "Bedroom",
+    "entrance": "Entrance",
+    "balcony": "Balcony",
+    "utility": "Utility room",
+    "common": "Common area",
+    "other": "Other"
+  },
+  "confirmState": {
+    "none": "Not confirmed",
+    "confirmed": "Confirmed",
+    "needs_reconfirm": "Needs reconfirm"
+  },
+  "field": {
+    "name": "Name",
+    "category": "Category",
+    "space": "Space",
+    "spec": "Specification",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "unitPrice": "Unit price",
+    "image": "Image",
+    "locationNote": "Location note",
+    "description": "Description",
+    "revision": "Revision {no}",
+    "reason": "Reason"
+  },
+  "action": {
+    "create": "Add material",
+    "confirm": "Confirm this material",
+    "requestReconfirm": "Request reconfirmation",
+    "reconfirm": "Changed — confirm again"
+  },
+  "filter": {
+    "category": "Category",
+    "space": "Space",
+    "searchPlaceholder": "Search by name or specification"
+  },
+  "summary": {
+    "updated": "Material updated"
+  },
+  "list": {
+    "empty": "No materials yet. Add materials to organize specifications and quantities.",
+    "emptyCustomer": "No materials have been shared yet."
+  },
+  "toast": {
+    "created": "Material added.",
+    "updated": "Material saved.",
+    "savedReconfirm": "Key details changed, so this material now needs reconfirmation. Customers with the confirm right were notified.",
+    "confirmed": "Material confirmed.",
+    "reconfirmRequested": "Reconfirmation requested."
+  },
+  "form": {
+    "coreChangeWarning": "Changing the name, category, space, specification, quantity, unit, unit price, or image will mark a confirmed material as needing reconfirmation.",
+    "priceHint": "Unit price is in whole Korean won. Note in the description whether VAT is included.",
+    "categoryHint": "Pick an existing category or type a new one (up to 40 characters)."
+  },
+  "confirm": {
+    "title": "Confirm this material?",
+    "body": "This records your agreement to the specification, quantity, and price shown. You can’t undo a confirmation yourself.",
+    "stale": "The content has changed. Refresh and review it again."
+  },
+  "state": {
+    "needsReconfirm": "This material changed and needs your confirmation again. Review the changes, then confirm.",
+    "pmNeedsReconfirm": "Waiting for the customer to confirm again. Only the customer can change the confirmation."
+  },
+  "reconfirm": {
+    "title": "Request reconfirmation?",
+    "body": "Enter a reason. The material will be marked as needing reconfirmation and customers with the confirm right will be notified."
+  },
+  "image": {
+    "empty": "No image."
+  },
+  "publish": {
+    "title": "Share this material with the customer?",
+    "body": "The customer will see the spec, quantity and unit price. Sharing is not confirmation."
+  }
+}

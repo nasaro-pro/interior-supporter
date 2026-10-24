@@ -1,0 +1,106 @@
+{
+  "screen": {
+    "list": "일정",
+    "detail": "일정 상세",
+    "calendar": "전체 캘린더"
+  },
+  "view": {
+    "month": "월간",
+    "timeline": "타임라인",
+    "today": "오늘",
+    "prevMonth": "이전 달",
+    "nextMonth": "다음 달",
+    "prevWeek": "이전 주",
+    "nextWeek": "다음 주",
+    "label": "보기 방식",
+    "monthTitle": "{year}년 {month}월",
+    "weekTitle": "{start} ~ {end}",
+    "weekdays": {
+      "0": "일",
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토"
+    }
+  },
+  "field": {
+    "title": "제목",
+    "description": "설명",
+    "startDate": "시작일",
+    "startTime": "시작 시각",
+    "endDate": "종료일",
+    "endTime": "종료 시각",
+    "allDay": "종일",
+    "related": "관련 항목",
+    "project": "프로젝트",
+    "when": "일시",
+    "relatedType": "항목 종류",
+    "visibility": "고객 공개"
+  },
+  "relatedType": {
+    "designs": "도안",
+    "materials": "자재",
+    "estimate_versions": "견적 버전",
+    "requests": "요청",
+    "photos": "현장 사진"
+  },
+  "action": {
+    "create": "일정 등록",
+    "edit": "일정 수정"
+  },
+  "filter": {
+    "projects": "프로젝트",
+    "allProjects": "모든 프로젝트",
+    "apply": "적용"
+  },
+  "summary": {
+    "when": "{date}"
+  },
+  "list": {
+    "empty": "등록된 일정이 없습니다. 일정을 등록해 공사 흐름을 공유하세요.",
+    "emptyCustomer": "공개된 일정이 아직 없습니다."
+  },
+  "month": {
+    "empty": "이 달에는 일정이 없습니다.",
+    "moreEvents": "{count}건 더 보기",
+    "invalid": "잘못된 기간입니다. 이번 달로 이동했습니다.",
+    "dayTitle": "{date} 일정",
+    "dayEmpty": "이 날에는 일정이 없습니다.",
+    "closeDay": "날짜 선택 해제"
+  },
+  "toast": {
+    "created": "일정을 등록했습니다.",
+    "updated": "일정을 저장했습니다.",
+    "archived": "일정을 보관했습니다.",
+    "restored": "일정을 복원했습니다."
+  },
+  "form": {
+    "timeHint": "시각을 비우면 종일 일정입니다. 모든 날짜와 시각은 한국 시간 기준입니다.",
+    "publishHint": "공개한 일정만 고객 일정 화면과 고객 홈의 다음 일정에 표시됩니다.",
+    "endDateHint": "종료일을 비우면 시작일 하루 일정입니다. 종료일도 일정에 포함됩니다.",
+    "relatedNone": "연결 안 함",
+    "relatedItem": "연결할 항목",
+    "relatedEmpty": "연결할 수 있는 항목이 없습니다.",
+    "currentProject": "{name} (현재 프로젝트)"
+  },
+  "calendar": {
+    "filterEmpty": "선택한 프로젝트에 이 달 일정이 없습니다.",
+    "scopeHint": "편집할 수 있는 프로젝트의 일정만 모아 보여 줍니다. 일정을 누르면 해당 프로젝트로 이동합니다.",
+    "noProjects": "편집할 수 있는 프로젝트가 없습니다."
+  },
+  "detail": {
+    "relatedUnavailable": "연결된 항목을 볼 수 없습니다.",
+    "noDescription": "설명이 없습니다.",
+    "range": "{start} ~ {end}",
+    "otherProject": "다른 프로젝트: {name}",
+    "info": "일정 정보",
+    "manage": "관리"
+  },
+  "timeline": {
+    "empty": "표시할 기간이 없습니다. 프로젝트 공사 기간을 입력하거나 일정을 등록하세요.",
+    "label": "일정 타임라인",
+    "projectPeriod": "공사 기간"
+  }
+}

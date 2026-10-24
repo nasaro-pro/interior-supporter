@@ -1,0 +1,34 @@
+# render.yaml — Render Blueprint (ADR-003, docs/03_아키텍처_데이터_보안.md)
+# 소유: 통합 책임자 · 운영 배포는 통합 책임자만. Render 는 Git 저장소가 필요하므로 배포 때만 통합본을 배포 전용 비공개 저장소에 올려 연결한다 (00 헌법 15장).
+# 사용법: Render 대시보드 → New → Blueprint → 배포 전용 저장소 연결 → sync:false 값 입력 → Apply
+# sync: false 항목은 Blueprint 최초 생성 때 대시보드에서 값을 묻는다. 값은 이 파일에 쓰지 않는다.
+# 배포 순서: prod 마이그레이션 먼저(통합 책임자, npm run db:push) → Render 수동 배포. 그래서 자동 배포를 끈다.
+services:
+  - type: web
+    name: interior-supporter
+    runtime: node
+    region: singapore
+    plan: free
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: NODE_VERSION
+        value: '24'
+      - key: LOG_LEVEL
+        value: info
+      # 공개 값이지만 빌드 시점에 번들에 들어가므로 바꾸면 재빌드(Manual Deploy)가 필요하다
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: NEXT_PUBLIC_APP_NAME
+        sync: false
+      # 서비스 주소. Render 가 이름 뒤에 접미어를 붙였으면 실제 주소로 넣는다 (예: https://interior-supporter.onrender.com)
+      - key: APP_ORIGIN
+        sync: false
+      # 비밀 (서버 전용)
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

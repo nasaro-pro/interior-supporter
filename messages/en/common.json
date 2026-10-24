@@ -1,0 +1,165 @@
+{
+  "state": {
+    "loading": "Loading…",
+    "empty": "Nothing to show yet.",
+    "error": "We couldn’t load this content. Please try again.",
+    "forbidden": "You don’t have access to this page. Check that you’re signed in with the right account.",
+    "notFound": "Page not found. The address may have changed, or it’s outside what you can view.",
+    "filterEmpty": "No results match your filters. Change or reset the filters.",
+    "versionConflict": "Someone changed this while you were editing. Copy your changes somewhere safe, then load the latest version.",
+    "offline": "You’re offline. Check your connection and try again.",
+    "coldStart": "Starting the server. After a period of inactivity this can take up to a minute.",
+    "errorRef": "If you contact support, include error code {ref}.",
+    "archivedItem": "This item is archived. Customers and field crews can’t see it until it’s restored.",
+    "privateItem": "This item is hidden from customers.",
+    "readOnly": "View only. You don’t have permission to change this item.",
+    "sessionRefreshing": "Checking your session…",
+    "preparing": "This screen is being built. It will appear here once implemented."
+  },
+  "toast": {
+    "saved": "Saved.",
+    "copied": "Copied.",
+    "copyFailed": "Couldn’t copy. Select the link and copy it manually.",
+    "archived": "Archived.",
+    "restored": "Restored.",
+    "published": "Now visible to customers.",
+    "unpublished": "Hidden from customers."
+  },
+  "confirm": {
+    "discard": {
+      "title": "Close without saving?",
+      "body": "Your changes won’t be saved."
+    },
+    "archive": {
+      "title": "Archive this item?",
+      "body": "Archived items are hidden from customers and field crews. You can restore them from the archive at any time."
+    }
+  },
+  "appName": "Interior Supporter",
+  "screen": {
+    "landing": "Interior Supporter",
+    "forbidden": "No access",
+    "notFound": "Page not found"
+  },
+  "landing": {
+    "headline": "From drawings to site photos, all in one project",
+    "subline": "Your company, customers, and field crews see the same information, each within their own access.",
+    "ctaSignup": "Sign up your company",
+    "ctaLogin": "Sign in",
+    "feature": {
+      "one": {
+        "title": "Everything in one project",
+        "body": "Designs, materials, estimates, requests, photos and schedules per project."
+      },
+      "two": {
+        "title": "Requests on the record",
+        "body": "Customer requests and replies are kept in time order."
+      },
+      "three": {
+        "title": "Site photos by site",
+        "body": "Field crews upload only to the sites they are assigned to."
+      },
+      "four": {
+        "title": "Share only what you allow",
+        "body": "Customers see only published items, and every change is recorded."
+      }
+    },
+    "footer": "© Interior Supporter · Companies, customers and field crews see the same source."
+  },
+  "nav": {
+    "projects": "Projects",
+    "clients": "Clients",
+    "calendar": "Company calendar",
+    "history": "History",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "myProjects": "My projects",
+    "photos": "Site photos",
+    "account": "Account",
+    "more": "More",
+    "menu": "Menu",
+    "breadcrumb": "Breadcrumb",
+    "skipToContent": "Skip to content",
+    "switchArea": "Switch area",
+    "changePassword": "Change password",
+    "language": "Language",
+    "logout": "Sign out",
+    "mainNav": "Main navigation",
+    "projectNav": "Project navigation"
+  },
+  "action": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "edit": "Edit",
+    "retry": "Try again",
+    "back": "Back",
+    "loadMore": "Load more",
+    "search": "Search",
+    "resetFilters": "Reset filters",
+    "apply": "Apply",
+    "archive": "Archive",
+    "restore": "Restore",
+    "copy": "Copy",
+    "copyLink": "Copy link",
+    "download": "Download",
+    "upload": "Upload",
+    "publish": "Show to customer",
+    "unpublish": "Hide from customer",
+    "refresh": "Refresh",
+    "loadLatest": "Load latest",
+    "viewAll": "View all",
+    "add": "Add",
+    "select": "Select",
+    "clear": "Clear",
+    "keepEditing": "Keep editing",
+    "discard": "Discard and close",
+    "goHome": "Go to start",
+    "moreActions": "More actions",
+    "openMenu": "Open menu"
+  },
+  "visibility": {
+    "public": "Visible to customer",
+    "private": "Hidden from customer",
+    "label": "Visible to customer"
+  },
+  "area": {
+    "app": "PM area",
+    "portal": "Customer area",
+    "field": "Field crew area"
+  },
+  "locale": {
+    "ko": "한국어",
+    "en": "English"
+  },
+  "filter": {
+    "all": "All",
+    "archived": "Archive",
+    "active": "Active"
+  },
+  "field": {
+    "title": "Title",
+    "description": "Description",
+    "status": "Status",
+    "createdAt": "Created",
+    "updatedAt": "Updated",
+    "createdBy": "Created by",
+    "optional": "Optional",
+    "required": "Required"
+  },
+  "list": {
+    "count": "{count, plural, one {# item} other {# items}}",
+    "searchPlaceholder": "Search"
+  },
+  "format": {
+    "krw": "₩{amount}"
+  },
+  "a11y": {
+    "newWindow": "Opens in a new window",
+    "loading": "Loading",
+    "selected": "Selected"
+  },
+  "time": {
+    "justNow": "Just now"
+  }
+}

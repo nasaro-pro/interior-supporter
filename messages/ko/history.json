@@ -1,0 +1,61 @@
+{
+  "screen": {
+    "list": "변경이력",
+    "detail": "변경 상세"
+  },
+  "eventType": {
+    "created": "생성",
+    "updated": "수정",
+    "archived": "보관",
+    "restored": "복원",
+    "published": "공개",
+    "unpublished": "비공개",
+    "revoked": "회수"
+  },
+  "objectType": {
+    "profiles": "프로필",
+    "files": "파일",
+    "companies": "업체",
+    "company_settings": "업체 설정",
+    "company_members": "구성원",
+    "projects": "프로젝트",
+    "project_participants": "참여자",
+    "invitations": "초대 링크",
+    "clients": "고객 카드",
+    "client_projects": "고객 카드 연결",
+    "designs": "도안",
+    "design_versions": "도안 버전",
+    "design_previews": "비교 이미지",
+    "materials": "자재",
+    "estimates": "견적",
+    "estimate_versions": "견적 버전",
+    "confirmations": "확정",
+    "requests": "고객 요청",
+    "request_corrections": "정정",
+    "request_replies": "답변",
+    "photos": "현장 사진",
+    "schedule_events": "일정"
+  },
+  "field": {
+    "actor": "변경한 사람",
+    "occurredAt": "변경 시각",
+    "object": "대상",
+    "project": "프로젝트",
+    "before": "변경 전",
+    "after": "변경 후",
+    "eventType": "변경 종류",
+    "from": "시작일",
+    "to": "종료일"
+  },
+  "actor": {
+    "system": "시스템"
+  },
+  "list": {
+    "empty": "기록된 변경이 없습니다.",
+    "staffOnly": "변경이력은 업체 구성원만 볼 수 있으며 수정하거나 삭제할 수 없습니다."
+  },
+  "detail": {
+    "noDiff": "표시할 변경 값이 없습니다.",
+    "column": "항목"
+  }
+}

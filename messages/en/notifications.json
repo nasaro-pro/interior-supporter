@@ -1,0 +1,35 @@
+{
+  "screen": {
+    "list": "Notifications"
+  },
+  "action": {
+    "markAllRead": "Mark all as read"
+  },
+  "label": {
+    "unread": "Unread",
+    "bell": "{count, plural, =0 {Notifications} one {Notifications, # unread} other {Notifications, # unread}}"
+  },
+  "type": {
+    "assignment_changed": "Your project access was updated.",
+    "item_published": "A new item is now visible to you.",
+    "item_confirmed": "A customer confirmed an item.",
+    "reconfirm_requested": "An item needs your confirmation again.",
+    "request_created": "A new request was submitted.",
+    "request_corrected": "A correction was added to a request.",
+    "request_replied": "A reply was added to a request.",
+    "request_status_changed": "A request status changed.",
+    "photo_uploaded": "New site photos were uploaded.",
+    "photo_published": "Site photos are now visible to you.",
+    "schedule_changed": "A schedule event was added or changed."
+  },
+  "target": {
+    "unavailable": "This item is no longer available to you."
+  },
+  "list": {
+    "empty": "No notifications.",
+    "retention": "Notifications are kept for 90 days."
+  },
+  "toast": {
+    "allRead": "All notifications marked as read."
+  }
+}

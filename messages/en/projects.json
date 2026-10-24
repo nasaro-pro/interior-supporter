@@ -1,0 +1,149 @@
+{
+  "screen": {
+    "list": "Projects",
+    "container": "Project",
+    "overview": "Overview",
+    "settings": "Project settings",
+    "myProjects": "My projects",
+    "home": "Home"
+  },
+  "tab": {
+    "overview": "Overview",
+    "home": "Home",
+    "designs": "Designs",
+    "materials": "Materials",
+    "requests": "Requests",
+    "photos": "Photos",
+    "schedule": "Schedule",
+    "estimates": "Estimates",
+    "settings": "Settings"
+  },
+  "status": {
+    "planned": "Planned",
+    "active": "In progress",
+    "on_hold": "On hold",
+    "completed": "Completed"
+  },
+  "participantRole": {
+    "pm": "PM",
+    "customer": "Customer",
+    "field": "Field crew"
+  },
+  "homeSection": {
+    "overview": "Progress summary",
+    "recent": "Recent updates",
+    "schedule": "Upcoming schedule",
+    "documents": "Documents"
+  },
+  "field": {
+    "name": "Project name",
+    "siteAddress": "Site address",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "period": "Construction period",
+    "currentPhase": "Current phase",
+    "isPublic": "Visible to customer",
+    "homeMessage": "Customer home message"
+  },
+  "list": {
+    "create": "New project",
+    "searchPlaceholder": "Search by project name or site address",
+    "summaryTitle": "Project summary",
+    "summaryItem": "{status}: {count}",
+    "empty": "No projects yet. Create a new project to get started.",
+    "statusLabel": "Status",
+    "createHint": "New projects are private by default. The customer home message starts from the company template.",
+    "noPeriod": "No dates"
+  },
+  "switcher": {
+    "label": "Switch project",
+    "archivedOption": "(Archived) {name}"
+  },
+  "home": {
+    "editTitle": "Edit customer home",
+    "preview": "Customer preview",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "show": "Show",
+    "saved": "Customer home saved. Customers see the change right away.",
+    "previewNotice": "The preview shows only what customers can see.",
+    "empty": "Nothing to share yet.",
+    "sectionsLabel": "Customer home section order and visibility",
+    "privateProjectNotice": "This project is still private, so customers cannot open it yet."
+  },
+  "settings": {
+    "basic": "Basic information",
+    "visibility": "Visibility",
+    "participants": "Participants",
+    "archive": "Archive",
+    "publicHint": "Turn this on so invited customers can open this project.",
+    "phaseHint": "The current phase shown on the customer home. It is not calculated from photos or schedules.",
+    "archiveHint": "Archived projects are hidden from customers and field crews. You can restore them at any time."
+  },
+  "participants": {
+    "inviteCustomer": "Invite customer",
+    "inviteField": "Invite field crew",
+    "assignPm": "Assign PM",
+    "pendingInvites": "Pending invitations",
+    "revokeInvite": "Revoke invitation",
+    "revokeParticipant": "Remove from project",
+    "canConfirm": "Confirm right",
+    "validFrom": "From",
+    "validUntil": "Until",
+    "unlimited": "No limit",
+    "empty": "No participants yet. Invite a customer or field crew.",
+    "confirmRightHint": "Only customers with the confirm right can confirm designs and materials.",
+    "periodHint": "Leave blank for no limit. Dates use Korea time and include both the start and end dates.",
+    "expired": "Participation period has ended.",
+    "stateRevoked": "Revoked",
+    "statePending": "Not started",
+    "stateActive": "Active",
+    "yes": "Yes",
+    "no": "No",
+    "noPendingInvites": "No pending invites.",
+    "expiresLabel": "Expires"
+  },
+  "toast": {
+    "created": "Project created.",
+    "inviteRevoked": "Invitation link revoked.",
+    "participantRevoked": "Participant removed."
+  },
+  "myProjects": {
+    "empty": "No projects to show. Projects appear here once your company makes them visible."
+  },
+  "confirm": {
+    "archive": {
+      "title": "Archive this project?",
+      "body": "Customers and field crews will no longer see this project. You can restore it from the archive at any time."
+    },
+    "revokeInvite": {
+      "title": "Revoke this invitation link?",
+      "body": "No one will be able to join using this link."
+    },
+    "revokeParticipant": {
+      "title": "Remove {name} from this project?",
+      "body": "They will lose access immediately. Their past activity stays on record."
+    },
+    "restore": {
+      "title": "Restore this project?",
+      "body": "Once restored, customers and field crews can see it again according to its visibility."
+    }
+  },
+  "state": {
+    "archived": "This project is archived. Customers and field crews can’t see it until it’s restored."
+  },
+  "overview": {
+    "recentEmpty": "No recent updates.",
+    "scheduleEmpty": "No upcoming schedule.",
+    "documentsEmpty": "No shared documents.",
+    "phaseEmpty": "Current phase not set."
+  },
+  "invite": {
+    "created": "Invitation link created. Copy and share it now — you won’t be able to see it again.",
+    "expiresAt": "Single-use link, valid until {datetime}.",
+    "reissueHint": "Creating a new link for the same email automatically revokes the previous one.",
+    "noEmailHint": "No email is sent. Copy the link and share it yourself, for example via a messenger.",
+    "closeWarning": "You cannot see this link again after closing. Copy it now.",
+    "create": "Create invite link"
+  }
+}

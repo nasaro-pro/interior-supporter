@@ -1,0 +1,258 @@
+/* src/app/globals.css — 디자인 토큰 원본 (docs/02_화면구조_뎁스_디자인.md 2·3장). 소유: A
+   다크 모드 = OS 설정(prefers-color-scheme). Tailwind 4 기본 dark: 변형도 같은 미디어 쿼리를 쓴다. */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+:root {
+  color-scheme: light dark;
+  --radius: 0.5rem;
+  --background: #faf9f7;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+  --muted: #f1efec;
+  --muted-foreground: #5e5852;
+  --border: #e3dfd9;
+  --input: #8f877e;
+  --ring: #0f766e;
+  --primary: #0f766e;
+  --primary-foreground: #ffffff;
+  --secondary: #edeae5;
+  --secondary-foreground: #292524;
+  --accent: #e3f1ee;
+  --accent-foreground: #134e4a;
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+  --success: #15803d;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --info: #1d4ed8;
+  --info-foreground: #ffffff;
+  --tone-neutral-bg: #edeae5;
+  --tone-neutral-fg: #57534e;
+  --tone-brand-bg: #e3f1ee;
+  --tone-brand-fg: #115e59;
+  --tone-positive-bg: #e6f4ea;
+  --tone-positive-fg: #166534;
+  --tone-caution-bg: #fbf0d3;
+  --tone-caution-fg: #854d0e;
+  --tone-attention-bg: #fdeedc;
+  --tone-attention-fg: #9a3412;
+  --tone-info-bg: #e6edfb;
+  --tone-info-fg: #1e40af;
+  --tone-critical-bg: #fbe9e7;
+  --tone-critical-fg: #b42318;
+  --elevation-1: 0 1px 2px 0 rgb(28 25 23 / 0.06), 0 1px 3px 0 rgb(28 25 23 / 0.1);
+  --elevation-2: 0 8px 24px -4px rgb(28 25 23 / 0.12), 0 2px 8px -2px rgb(28 25 23 / 0.08);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #161412;
+    --foreground: #edeae6;
+    --card: #1e1c19;
+    --card-foreground: #edeae6;
+    --popover: #1e1c19;
+    --popover-foreground: #edeae6;
+    --muted: #292623;
+    --muted-foreground: #a9a29b;
+    --border: #37332f;
+    --input: #6e6760;
+    --ring: #2dd4bf;
+    --primary: #2dd4bf;
+    --primary-foreground: #042f2e;
+    --secondary: #2a2724;
+    --secondary-foreground: #edeae6;
+    --accent: #123430;
+    --accent-foreground: #99f6e4;
+    --destructive: #f87171;
+    --destructive-foreground: #2b0b09;
+    --success: #4ade80;
+    --success-foreground: #052e16;
+    --warning: #fbbf24;
+    --warning-foreground: #2a1a03;
+    --info: #60a5fa;
+    --info-foreground: #0b1b3a;
+    --tone-neutral-bg: #2e2a27;
+    --tone-neutral-fg: #c9c2ba;
+    --tone-brand-bg: #123430;
+    --tone-brand-fg: #5eead4;
+    --tone-positive-bg: #12301d;
+    --tone-positive-fg: #86efac;
+    --tone-caution-bg: #33270a;
+    --tone-caution-fg: #fcd34d;
+    --tone-attention-bg: #3a2010;
+    --tone-attention-fg: #fdba74;
+    --tone-info-bg: #15233f;
+    --tone-info-fg: #93c5fd;
+    --tone-critical-bg: #3a1512;
+    --tone-critical-fg: #fca5a5;
+    --elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+    --elevation-2: 0 8px 24px -4px rgb(0 0 0 / 0.55), 0 2px 8px -2px rgb(0 0 0 / 0.4);
+  }
+}
+
+/* 변수 → Tailwind 유틸리티 (bg-primary, text-muted-foreground, bg-tone-brand-bg …) — shadcn 변수 체계 호환 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-tone-neutral-bg: var(--tone-neutral-bg);
+  --color-tone-neutral-fg: var(--tone-neutral-fg);
+  --color-tone-brand-bg: var(--tone-brand-bg);
+  --color-tone-brand-fg: var(--tone-brand-fg);
+  --color-tone-positive-bg: var(--tone-positive-bg);
+  --color-tone-positive-fg: var(--tone-positive-fg);
+  --color-tone-caution-bg: var(--tone-caution-bg);
+  --color-tone-caution-fg: var(--tone-caution-fg);
+  --color-tone-attention-bg: var(--tone-attention-bg);
+  --color-tone-attention-fg: var(--tone-attention-fg);
+  --color-tone-info-bg: var(--tone-info-bg);
+  --color-tone-info-fg: var(--tone-info-fg);
+  --color-tone-critical-bg: var(--tone-critical-bg);
+  --color-tone-critical-fg: var(--tone-critical-fg);
+  --font-sans:
+    var(--font-pretendard), 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow-sm: var(--elevation-1);
+  --shadow-md: var(--elevation-2);
+}
+
+/* 정적 테마 값 */
+@theme {
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.75rem;
+  --text-5xl: initial;
+  --text-6xl: initial;
+  --text-7xl: initial;
+  --text-8xl: initial;
+  --text-9xl: initial;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: initial;
+  --radius-3xl: initial;
+  --radius-4xl: initial;
+  --breakpoint-xs: 22.5rem; /* 360 */
+  --breakpoint-sm: 40rem; /* 640 */
+  --breakpoint-md: 48rem; /* 768 */
+  --breakpoint-lg: 64rem; /* 1024 */
+  --breakpoint-xl: 80rem; /* 1280 */
+  --breakpoint-2xl: initial;
+  --container-app: 80rem; /* max-w-app = 1280 */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans text-sm antialiased;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  table,
+  time,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-foreground);
+  }
+  /* iOS 입력 확대 방지: 모바일 입력 글자 16px */
+  @media (width < 48rem) {
+    input,
+    select,
+    textarea {
+      font-size: 1rem;
+    }
+  }
+}
+
+@utility page-container {
+  width: 100%;
+  max-width: var(--container-app);
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "screen": {
+    "list": "자재",
+    "detail": "자재 상세"
+  },
+  "space": {
+    "living": "거실",
+    "kitchen": "주방",
+    "bathroom": "욕실",
+    "bedroom": "침실",
+    "entrance": "현관",
+    "balcony": "발코니",
+    "utility": "다용도실",
+    "common": "공용",
+    "other": "기타"
+  },
+  "confirmState": {
+    "none": "미확정",
+    "confirmed": "확정",
+    "needs_reconfirm": "재확인 필요"
+  },
+  "field": {
+    "name": "자재명",
+    "category": "카테고리",
+    "space": "공간",
+    "spec": "사양",
+    "quantity": "수량",
+    "unit": "단위",
+    "unitPrice": "단가",
+    "image": "이미지",
+    "locationNote": "적용 위치",
+    "description": "설명",
+    "revision": "리비전 {no}",
+    "reason": "사유"
+  },
+  "action": {
+    "create": "자재 등록",
+    "confirm": "이 자재 확정",
+    "requestReconfirm": "재확인 요청",
+    "reconfirm": "변경됨 — 다시 확정"
+  },
+  "filter": {
+    "category": "카테고리",
+    "space": "공간",
+    "searchPlaceholder": "자재명·사양 검색"
+  },
+  "summary": {
+    "updated": "자재 정보 변경"
+  },
+  "list": {
+    "empty": "등록된 자재가 없습니다. 자재를 등록해 사양과 수량을 정리하세요.",
+    "emptyCustomer": "공개된 자재가 아직 없습니다."
+  },
+  "toast": {
+    "created": "자재를 등록했습니다.",
+    "updated": "자재 정보를 저장했습니다.",
+    "savedReconfirm": "핵심 정보가 바뀌어 확정 상태가 재확인 필요로 바뀌었습니다. 확정권 고객에게 알림을 보냈습니다.",
+    "confirmed": "자재를 확정했습니다.",
+    "reconfirmRequested": "재확인을 요청했습니다."
+  },
+  "form": {
+    "coreChangeWarning": "이름·카테고리·공간·사양·수량·단위·단가·이미지를 바꾸면 확정된 자재는 재확인 필요로 바뀝니다.",
+    "priceHint": "단가는 원 단위 정수입니다. 부가세 포함 여부는 설명에 적으세요.",
+    "categoryHint": "기존 카테고리에서 고르거나 새로 입력하세요(40자 이내)."
+  },
+  "confirm": {
+    "title": "이 자재를 확정할까요?",
+    "body": "지금 보이는 사양·수량·단가에 동의한다는 기록이 남습니다. 확정한 뒤에는 직접 취소할 수 없습니다.",
+    "stale": "내용이 바뀌었습니다. 새로고침 후 다시 확인하세요."
+  },
+  "state": {
+    "needsReconfirm": "자재 정보가 바뀌어 다시 확정이 필요합니다. 바뀐 내용을 확인한 뒤 확정하세요.",
+    "pmNeedsReconfirm": "고객의 다시 확정을 기다리고 있습니다. 확정 상태는 고객만 바꿀 수 있습니다."
+  },
+  "reconfirm": {
+    "title": "재확인을 요청할까요?",
+    "body": "사유를 적으면 확정 상태가 재확인 필요로 바뀌고 확정권 고객에게 알림이 갑니다."
+  },
+  "image": {
+    "empty": "등록된 이미지가 없습니다."
+  },
+  "publish": {
+    "title": "이 자재를 고객에게 공개할까요?",
+    "body": "공개하면 고객이 사양·수량·단가를 볼 수 있습니다. 공개는 확정이 아닙니다."
+  }
+}

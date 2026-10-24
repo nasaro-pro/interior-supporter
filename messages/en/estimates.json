@@ -1,0 +1,59 @@
+{
+  "screen": {
+    "list": "Estimates",
+    "detail": "Estimate details"
+  },
+  "field": {
+    "title": "Estimate name",
+    "versionLabel": "Version label",
+    "changeNote": "Change note",
+    "version": "Version {no}",
+    "publishedAt": "First shared",
+    "file": "PDF file",
+    "versions": "Versions"
+  },
+  "action": {
+    "create": "Add estimate",
+    "newVersion": "Upload new version",
+    "preview": "Preview",
+    "download": "Download PDF",
+    "selectVersion": "Select version"
+  },
+  "label": {
+    "noPublicVersion": "No shared version",
+    "noVersion": "No versions"
+  },
+  "summary": {
+    "published": "{label} shared",
+    "added": "{label} added"
+  },
+  "list": {
+    "empty": "No estimates yet. Upload an estimate PDF to get started.",
+    "emptyCustomer": "No estimates have been shared yet.",
+    "versionCount": "{count} versions"
+  },
+  "toast": {
+    "created": "Estimate added. Customers won’t see it until you share a version.",
+    "versionAdded": "New version uploaded.",
+    "published": "Version “{label}” is now visible to customers.",
+    "unpublished": "Version hidden. Customers can no longer see it."
+  },
+  "form": {
+    "versionLabelHint": "e.g. First estimate, Revision 2",
+    "changeNoteHint": "Describe what changed from the previous version (required, up to 1,000 characters).",
+    "noReplace": "An uploaded PDF can’t be replaced. Upload a new version if the content changes."
+  },
+  "publish": {
+    "title": "Share this version with customers?",
+    "body": "Customers will be able to view and download this version’s PDF."
+  },
+  "preview": {
+    "failed": "Couldn’t display the PDF preview. Download it to view.",
+    "truncated": "Only the first {max} pages are shown. Download to see the rest."
+  },
+  "detail": {
+    "versionMatch": "The selected version’s PDF is shown and downloaded.",
+    "privateVersion": "This version is hidden from customers.",
+    "noVersion": "No versions yet. Upload a new version."
+  }
+}
