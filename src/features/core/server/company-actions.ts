@@ -65,7 +65,7 @@ export async function setCompanyLogo(raw: unknown): Promise<ActionResult<{ versi
   return ok({ version: data.version });
 }
 
-/** REQ-052 기본 템플릿 (안내문 + 4영역 + 테마 + 배경) — 배경 파일은 DB 트리거 company_settings_background_check 가 검사 */
+/** REQ-052 기본 템플릿 (안내문 + 4영역 + 테마 + 페이지별 이미지 + 분위기) — 이미지 파일은 DB 트리거 company_settings_page_images_check 가 검사 */
 export async function updateTemplate(raw: unknown): Promise<ActionResult<{ version: number }>> {
   const parsed = parseInput(templateUpdateSchema, raw);
   if (!parsed.ok) return parsed.result;
@@ -79,7 +79,8 @@ export async function updateTemplate(raw: unknown): Promise<ActionResult<{ versi
       default_home_message: v.defaultHomeMessage,
       default_home_sections: v.defaultHomeSections,
       default_home_theme: v.defaultHomeTheme,
-      default_home_background_file_id: v.defaultHomeBackgroundFileId,
+      default_page_images: v.defaultPageImages,
+      default_page_tone: v.defaultPageTone,
     })
     .eq('company_id', v.companyId)
     .eq('version', v.baseVersion)

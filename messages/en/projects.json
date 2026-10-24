@@ -71,9 +71,10 @@
     "sectionsLabel": "Customer home section order and visibility",
     "privateProjectNotice": "This project is still private, so customers cannot open it yet.",
     "themeLabel": "Color theme",
-    "backgroundLabel": "Background image",
-    "showBackground": "Show background image",
-    "backgroundHint": "Change the background image in Settings > Templates."
+    "pageToneLabel": "Page mood",
+    "pageImagesLabel": "Images by page",
+    "pageImagesHint": "Change page images in Settings > Templates. Here you only choose whether to show them.",
+    "showImage": "Show"
   },
   "settings": {
     "basic": "Basic information",
@@ -157,5 +158,14 @@
     "caution": "Yellow",
     "attention": "Orange",
     "neutral": "Gray"
+  },
+  "pageTone": {
+    "default": "Default",
+    "ivory": "Ivory",
+    "sand": "Sand",
+    "greige": "Greige",
+    "sage": "Sage",
+    "mist": "Mist",
+    "clay": "Clay"
   }
 }

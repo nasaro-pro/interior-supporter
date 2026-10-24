@@ -12,6 +12,12 @@
 
 - 2026-10-24 변경: 이미지를 홈 맨 위 배너 → **고객 홈 전체 배경**으로 바꿈 (요청). 글은 불투명 카드·테마 상자 위에 표시, 권장 비율 16:9. 컬럼·함수 이름도 cover → background 로 통일(아직 어느 DB 에도 적용 전이라 같은 마이그레이션 파일에서 변경).
 
+- 2026-10-25 변경 (요청): 홈 배경 1장 → **고객 포털 탭(홈·도안·자재·요청·현장 사진·일정·견적)별 이미지** + **페이지 분위기(바탕색 프리셋)**.
+  - DB: 새 마이그레이션 `20261025000100_a_page_theme.sql` — `default_page_images`·`default_page_tone`, `page_images`·`page_tone`(jsonb 탭→파일 id, 프리셋 키 CHECK). 기존 홈 배경 값은 `page_images.home` 으로 옮기고 컬럼 제거. (`20261024…` 는 dev DB 적용본이라 수정하지 않음)
+  - 화면: 포털 프로젝트 레이아웃(A)에서 `PortalPageCanvas` 가 현재 탭 이미지를 화면 전체 배경으로 깔고, 헤더·탭·내용을 반투명 시트 위에 올림 → B·C 화면 파일은 수정 없음.
+  - 분위기 프리셋: 기본·아이보리·샌드·그레이지·세이지·미스트·클레이 (라이트/다크 각각). 임의 색 입력은 없음.
+  - 참고 사이트 4곳(apartmentary·normcph·studio-mcgee·muagonggan)은 환경 네트워크 정책으로 열지 못해, 웜 뉴트럴 바탕 + 페이지별 큰 사진 + 넉넉한 여백이라는 일반적인 방향만 따름.
+
 ## 1. 배경
 
 - 현재 PM-63 은 `company_settings.default_home_message`(안내문 2,000자) 하나만 저장하고, 신규 프로젝트 생성 시 트리거 `private.project_defaults()` 가 `projects.home_message` 로 복사한다 (POL-026, REQ-052).

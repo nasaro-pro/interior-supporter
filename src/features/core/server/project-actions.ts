@@ -124,7 +124,8 @@ export async function updateHome(raw: unknown): Promise<ActionResult<{ version: 
       home_message: v.homeMessage,
       home_sections: v.homeSections,
       home_theme: v.homeTheme,
-      home_background_file_id: v.homeBackgroundFileId,
+      page_images: v.pageImages,
+      page_tone: v.pageTone,
     })
     .eq('id', v.projectId)
     .eq('version', v.baseVersion)

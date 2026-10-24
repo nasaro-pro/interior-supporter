@@ -5,6 +5,7 @@ import type { FileKind } from '@/shared/contracts/domain';
 import { logger } from '@/shared/lib/logger';
 import { normalizeHomeSections } from '../home-sections';
 import { normalizeHomeTheme } from '../home-theme';
+import { normalizePageImages, normalizePageTone } from '../page-theme';
 
 export async function getCompanySettings(companyId: string) {
   const supabase = await createServerSupabase();
@@ -17,7 +18,7 @@ export async function getCompanySettings(companyId: string) {
     supabase
       .from('company_settings')
       .select(
-        'default_home_message, default_home_sections, default_home_theme, default_home_background_file_id, version',
+        'default_home_message, default_home_sections, default_home_theme, default_page_images, default_page_tone, version',
       )
       .eq('company_id', companyId)
       .maybeSingle(),
@@ -32,7 +33,8 @@ export async function getCompanySettings(companyId: string) {
     defaultHomeMessage: settings?.default_home_message ?? '',
     defaultHomeSections: normalizeHomeSections(settings?.default_home_sections),
     defaultHomeTheme: normalizeHomeTheme(settings?.default_home_theme),
-    defaultHomeBackgroundFileId: settings?.default_home_background_file_id ?? null,
+    defaultPageImages: normalizePageImages(settings?.default_page_images),
+    defaultPageTone: normalizePageTone(settings?.default_page_tone),
     settingsVersion: settings?.version ?? 1,
   };
 }

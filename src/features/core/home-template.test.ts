@@ -4,6 +4,7 @@ import { callOf, createFakeSupabase, type Responder } from './testing/fake-supab
 import { X, accessResponder, authOf, chain, type Who } from './testing/access-fixture';
 import { DEFAULT_HOME_SECTIONS } from './home-sections';
 import { normalizeHomeTheme } from './home-theme';
+import { normalizePageImages, normalizePageTone } from './page-theme';
 import { templateUpdateSchema } from './schema';
 
 const h = vi.hoisted(() => ({ client: null as unknown }));
@@ -20,7 +21,8 @@ const input = (over: Record<string, unknown> = {}) => ({
   defaultHomeMessage: '안내',
   defaultHomeSections: DEFAULT_HOME_SECTIONS,
   defaultHomeTheme: 'info',
-  defaultHomeBackgroundFileId: COVER,
+  defaultPageImages: { home: COVER, photos: COVER },
+  defaultPageTone: 'sage',
   ...over,
 });
 
@@ -40,11 +42,9 @@ const PM: Who = { members: [{ company_id: X, slug: 'x-co', role: 'pm' }] };
 beforeEach(() => vi.clearAllMocks());
 
 describe('REQ-052 templateUpdateSchema', () => {
-  it('정상: 안내문·4영역·테마·배경(null 포함)를 받는다', () => {
+  it('정상: 안내문·4영역·테마·페이지 이미지(빈 값 포함)·분위기를 받는다', () => {
     expect(templateUpdateSchema.safeParse(input()).success).toBe(true);
-    expect(
-      templateUpdateSchema.safeParse(input({ defaultHomeBackgroundFileId: null })).success,
-    ).toBe(true);
+    expect(templateUpdateSchema.safeParse(input({ defaultPageImages: {} })).success).toBe(true);
   });
   it('예외: 토큰 밖 테마·4영역 순열이 아닌 값·잘못된 파일 id 는 거절', () => {
     expect(templateUpdateSchema.safeParse(input({ defaultHomeTheme: '#ff00ff' })).success).toBe(
@@ -57,8 +57,30 @@ describe('REQ-052 templateUpdateSchema', () => {
         .success,
     ).toBe(false);
     expect(
-      templateUpdateSchema.safeParse(input({ defaultHomeBackgroundFileId: 'x' })).success,
+      templateUpdateSchema.safeParse(input({ defaultPageImages: { home: 'x' } })).success,
     ).toBe(false);
+  });
+  it('예외: 고객 포털 탭이 아닌 키·프리셋 밖 분위기는 거절', () => {
+    expect(
+      templateUpdateSchema.safeParse(input({ defaultPageImages: { overview: COVER } })).success,
+    ).toBe(false);
+    expect(templateUpdateSchema.safeParse(input({ defaultPageTone: '#ffeedd' })).success).toBe(
+      false,
+    );
+  });
+});
+
+describe('REQ-052 normalizePageImages · normalizePageTone', () => {
+  it('정상: 탭 키의 문자열 값만 남긴다, 예외: 잘못된 jsonb 는 빈 값', () => {
+    expect(normalizePageImages({ home: COVER, overview: COVER, photos: 3 })).toEqual({
+      home: COVER,
+    });
+    expect(normalizePageImages(null)).toEqual({});
+    expect(normalizePageImages([COVER])).toEqual({});
+  });
+  it('정상: 프리셋 값은 그대로, 예외: 그 밖은 default', () => {
+    expect(normalizePageTone('sand')).toBe('sand');
+    expect(normalizePageTone('hotpink')).toBe('default');
   });
 });
 
@@ -71,7 +93,7 @@ describe('REQ-052 normalizeHomeTheme', () => {
 });
 
 describe('REQ-052 updateTemplate', () => {
-  it('정상: owner 는 4종을 version 잠금으로 저장한다', async () => {
+  it('정상: owner 는 템플릿 전체를 version 잠금으로 저장한다', async () => {
     const fake = setup(OWNER, { data: { version: 4 } });
     expect(await updateTemplate(input())).toEqual({ ok: true, data: { version: 4 } });
     const [q] = updates(fake);
@@ -79,7 +101,8 @@ describe('REQ-052 updateTemplate', () => {
       default_home_message: '안내',
       default_home_sections: DEFAULT_HOME_SECTIONS,
       default_home_theme: 'info',
-      default_home_background_file_id: COVER,
+      default_page_images: { home: COVER, photos: COVER },
+      default_page_tone: 'sage',
     });
     expect(q!.calls).toContainEqual(['eq', 'version', 3]);
   });

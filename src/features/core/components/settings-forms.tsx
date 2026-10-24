@@ -4,7 +4,7 @@ import { useActionState, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { Eye, KeyRound, Upload, UserPlus, X } from 'lucide-react';
+import { Eye, ImageOff, KeyRound, Upload, UserPlus, X } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
@@ -16,6 +16,7 @@ import { createBrowserSupabase } from '@/shared/lib/supabase/browser';
 import { FILE_RULES } from '@/shared/contracts/domain';
 import type { ActionResult, AppError } from '@/shared/contracts/errors';
 import type { HomeSections } from '@/shared/contracts/domain';
+import { PORTAL_TABS, type PortalTab } from '@/shared/contracts/screens';
 import { routes } from '@/shared/contracts/routes';
 import { ConflictState } from '@/shared/ui/states';
 import { createUploadIntent, finalizeUpload } from '@/features/files';
@@ -23,9 +24,11 @@ import { setCompanyLogo, updateCompany, updateTemplate } from '../server/company
 import { changeMemberRole, createMemberInvite } from '../server/participant-actions';
 import { createPasswordResetLink } from '../server/auth-actions';
 import type { HomeTheme } from '../home-theme';
+import type { PageImages, PageTone } from '../page-theme';
 import { FormSheet } from './form-sheet';
-import { HomeSectionsField, HomeThemeField } from './home-template-fields';
-import { CustomerHomeBody } from './summary-blocks';
+import { HomeSectionsField, HomeThemeField, PageToneField } from './home-template-fields';
+import { PageCanvas } from './page-canvas';
+import { CustomerHomeBody, Panel } from './summary-blocks';
 import { OneTimeLinkDialog } from './one-time-link';
 
 type V = ActionResult<{ version: number }> | null;
@@ -186,7 +189,10 @@ export function LogoUploader({
   );
 }
 
-/** REQ-052 기본 템플릿 — 신규 프로젝트 고객 홈(안내문·배경·테마·4영역) 기본값 + 미리보기 (CR-A-10) */
+/**
+ * REQ-052 기본 템플릿 — 신규 프로젝트 고객 화면 기본값 (CR-A-10)
+ * 페이지 분위기(바탕색) + 페이지(탭)별 이미지 + 홈 안내문·색상 테마·4영역, 페이지별 미리보기
+ */
 export function TemplateForm({
   companyId,
   version,
@@ -198,7 +204,8 @@ export function TemplateForm({
     homeMessage: string;
     homeSections: HomeSections;
     homeTheme: HomeTheme;
-    homeBackgroundFileId: string | null;
+    pageImages: PageImages;
+    pageTone: PageTone;
   };
 }) {
   const t = useTranslations();
@@ -207,11 +214,23 @@ export function TemplateForm({
   const [message, setMessage] = useState(value.homeMessage);
   const [sections, setSections] = useState(value.homeSections);
   const [theme, setTheme] = useState(value.homeTheme);
-  const [background, setBackground] = useState(value.homeBackgroundFileId);
+  const [images, setImages] = useState<PageImages>(value.pageImages);
+  const [tone, setTone] = useState(value.pageTone);
+  const [target, setTarget] = useState<PortalTab>('home');
+  const [previewPage, setPreviewPage] = useState<PortalTab>('home');
   const [error, setError] = useState<AppError | null>(null);
   const [saving, start] = useTransition();
   const { upload, pending: uploading, rule } = useCompanyImageUpload(companyId);
   const fe = error?.fieldErrors;
+  const pageName = (tab: PortalTab) => t(`projects.tab.${tab}`);
+
+  const setImage = (tab: PortalTab, fileId: string | null) =>
+    setImages((prev) => {
+      const next = { ...prev };
+      if (fileId) next[tab] = fileId;
+      else delete next[tab];
+      return next;
+    });
 
   const save = () =>
     start(async () => {
@@ -222,7 +241,8 @@ export function TemplateForm({
         defaultHomeMessage: message,
         defaultHomeSections: sections,
         defaultHomeTheme: theme,
-        defaultHomeBackgroundFileId: background,
+        defaultPageImages: images,
+        defaultPageTone: tone,
       });
       if (res.ok) {
         toast.success(t('settings.templates.saved'));
@@ -251,64 +271,102 @@ export function TemplateForm({
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <div className="flex min-w-0 flex-col gap-5">
+      <div className="flex min-w-0 flex-col gap-6">
         <p className="text-muted-foreground text-sm">{t('settings.templates.intro')}</p>
-        <FormRow
-          label={t('settings.field.homeBackground')}
-          htmlFor="tpl-bg-file"
-          hint={t('settings.templates.backgroundHint', { exts: rule.exts.join(', ') })}
-        >
-          <div className="flex flex-col gap-2">
-            <div className="bg-muted grid aspect-video w-full place-items-center overflow-hidden rounded-md border">
-              {background ? (
-                // eslint-disable-next-line @next/next/no-img-element -- /api/files 302 서명 URL (next/image 최적화 대상 아님)
-                <img src={routes.file(background)} alt="" className="size-full object-cover" />
-              ) : (
-                <span className="text-muted-foreground text-meta">
-                  {t('settings.templates.noBackground')}
-                </span>
-              )}
-            </div>
-            <input
-              ref={input}
-              type="file"
-              accept={rule.exts.join(',')}
-              className="sr-only"
-              id="tpl-bg-file"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f)
-                  upload(f, (fileId) => {
-                    setBackground(fileId);
-                    toast.success(t('settings.templates.backgroundUploaded'));
-                  });
-                e.target.value = '';
-              }}
-            />
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                disabled={uploading}
-                aria-busy={uploading}
-                onClick={() => input.current?.click()}
-                data-ui-key="template-background-upload"
-              >
-                <Upload aria-hidden />
-                {t('common.action.upload')}
-              </Button>
-              {background ? (
-                <Button
-                  variant="ghost"
-                  onClick={() => setBackground(null)}
-                  data-ui-key="template-background-remove"
+        <PageToneField
+          name="tpl-tone"
+          value={tone}
+          onChange={setTone}
+          label={t('settings.field.pageTone')}
+          hint={t('settings.templates.pageToneHint')}
+        />
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium" id="tpl-images-label">
+            {t('settings.field.pageImages')}
+          </span>
+          <input
+            ref={input}
+            type="file"
+            accept={rule.exts.join(',')}
+            className="sr-only"
+            id="tpl-page-file"
+            aria-labelledby="tpl-images-label"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              const tab = target;
+              if (f)
+                upload(f, (fileId) => {
+                  setImage(tab, fileId);
+                  setPreviewPage(tab);
+                  toast.success(t('settings.templates.imageUploaded', { page: pageName(tab) }));
+                });
+              e.target.value = '';
+            }}
+          />
+          <ul className="flex flex-col gap-2" aria-labelledby="tpl-images-label">
+            {PORTAL_TABS.map((tab) => {
+              const fileId = images[tab];
+              return (
+                <li
+                  key={tab}
+                  data-key={tab}
+                  className="flex items-center gap-3 rounded-md border px-3 py-2"
                 >
-                  <X aria-hidden />
-                  {t('settings.templates.removeBackground')}
-                </Button>
-              ) : null}
-            </div>
-          </div>
-        </FormRow>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewPage(tab)}
+                    className="bg-muted grid aspect-video w-20 shrink-0 place-items-center overflow-hidden rounded border"
+                    aria-label={t('settings.templates.previewPage') + ': ' + pageName(tab)}
+                    data-ui-key="template-page-preview"
+                  >
+                    {fileId ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- /api/files 302 서명 URL (next/image 최적화 대상 아님)
+                      <img src={routes.file(fileId)} alt="" className="size-full object-cover" />
+                    ) : (
+                      <ImageOff aria-hidden className="text-muted-foreground size-4" />
+                    )}
+                  </button>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">{pageName(tab)}</span>
+                    {fileId ? null : (
+                      <span className="text-muted-foreground text-meta">
+                        {t('settings.templates.noImage')}
+                      </span>
+                    )}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    disabled={uploading}
+                    aria-busy={uploading && target === tab}
+                    aria-label={t('settings.templates.uploadFor', { page: pageName(tab) })}
+                    onClick={() => {
+                      setTarget(tab);
+                      input.current?.click();
+                    }}
+                    data-ui-key="template-page-upload"
+                  >
+                    <Upload aria-hidden />
+                  </Button>
+                  {fileId ? (
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={t('settings.templates.removeFor', { page: pageName(tab) })}
+                      onClick={() => setImage(tab, null)}
+                      data-ui-key="template-page-remove"
+                    >
+                      <X aria-hidden />
+                    </Button>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+          <p className="text-muted-foreground text-meta">
+            {t('settings.templates.pageImagesHint', { exts: rule.exts.join(', ') })}
+          </p>
+        </div>
         <FormRow
           label={t('settings.field.defaultHomeMessage')}
           htmlFor="tpl-msg"
@@ -321,7 +379,7 @@ export function TemplateForm({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             maxLength={2000}
-            rows={6}
+            rows={5}
             aria-describedby="tpl-msg-error"
           />
         </FormRow>
@@ -360,18 +418,45 @@ export function TemplateForm({
             <Eye aria-hidden className="size-4" />
             {t('settings.templates.previewNotice')}
           </p>
-          <CustomerHomeBody
-            project={{
-              homeMessage: message,
-              homeSections: sections,
-              homeTheme: theme,
-              homeBackgroundFileId: background,
-              currentPhase: '',
-              startDate: null,
-              endDate: null,
-            }}
-            blocks={PREVIEW_BLOCKS}
-          />
+          <div
+            className="mb-3 flex flex-wrap gap-1.5"
+            role="group"
+            aria-label={t('settings.templates.previewPage')}
+          >
+            {PORTAL_TABS.map((tab) => (
+              <Button
+                key={tab}
+                size="sm"
+                variant={tab === previewPage ? 'default' : 'outline'}
+                aria-pressed={tab === previewPage}
+                onClick={() => setPreviewPage(tab)}
+                data-ui-key="template-preview-tab"
+              >
+                {pageName(tab)}
+              </Button>
+            ))}
+          </div>
+          <PageCanvas tone={tone} imageFileId={images[previewPage]} variant="contained">
+            {previewPage === 'home' ? (
+              <CustomerHomeBody
+                project={{
+                  homeMessage: message,
+                  homeSections: sections,
+                  homeTheme: theme,
+                  currentPhase: '',
+                  startDate: null,
+                  endDate: null,
+                }}
+                blocks={PREVIEW_BLOCKS}
+              />
+            ) : (
+              <Panel title={pageName(previewPage)}>
+                <p className="text-muted-foreground py-6 text-center">
+                  {t('settings.templates.previewPlaceholder', { page: pageName(previewPage) })}
+                </p>
+              </Panel>
+            )}
+          </PageCanvas>
         </div>
       </section>
     </div>

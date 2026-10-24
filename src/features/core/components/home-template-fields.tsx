@@ -1,5 +1,5 @@
 'use client';
-// src/features/core/components/home-template-fields.tsx (A · REQ-014·052, CR-A-10) — 고객 홈 구성 입력 (PM-63 기본 템플릿 · PM-03 고객 홈 편집 공용)
+// src/features/core/components/home-template-fields.tsx (A · REQ-014·052, CR-A-10) — 고객 페이지 구성 입력 (PM-63 기본 템플릿 · PM-03 고객 홈 편집 공용)
 import { useTranslations } from 'next-intl';
 import { ArrowDown, ArrowUp, Check } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
@@ -7,6 +7,7 @@ import type { HomeSections } from '@/shared/contracts/domain';
 import { cn } from '@/shared/lib/utils';
 import { moveSection } from '../home-sections';
 import { HOME_THEMES, HOME_THEME_CLASS, type HomeTheme } from '../home-theme';
+import { PAGE_TONES, PAGE_TONE_SWATCH, type PageTone } from '../page-theme';
 
 /** 4영역 순서(위/아래)·표시 */
 export function HomeSectionsField({
@@ -122,6 +123,63 @@ export function HomeThemeField({
           );
         })}
       </div>
+    </fieldset>
+  );
+}
+
+/** 페이지 분위기(바탕색) — 네이티브 라디오 + 프리셋 견본 */
+export function PageToneField({
+  name,
+  value,
+  onChange,
+  label,
+  hint,
+}: {
+  name: string;
+  value: PageTone;
+  onChange: (next: PageTone) => void;
+  label: string;
+  hint?: string;
+}) {
+  const t = useTranslations('projects');
+  return (
+    <fieldset className="flex flex-col gap-1.5">
+      <legend className="mb-1.5 text-sm font-medium">{label}</legend>
+      <div className="flex flex-wrap gap-2">
+        {PAGE_TONES.map((tone) => {
+          const checked = tone === value;
+          return (
+            <label
+              key={tone}
+              className={cn(
+                'focus-within:ring-ring/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-1.5 text-sm focus-within:ring-[3px]',
+                checked && 'border-primary',
+              )}
+            >
+              <input
+                type="radio"
+                name={name}
+                value={tone}
+                checked={checked}
+                onChange={() => onChange(tone)}
+                className="sr-only"
+                data-ui-key="page-tone-option"
+              />
+              <span
+                aria-hidden
+                className={cn(
+                  'text-foreground grid size-5 place-items-center rounded-full border',
+                  PAGE_TONE_SWATCH[tone],
+                )}
+              >
+                {checked ? <Check className="size-3" /> : null}
+              </span>
+              {t(`pageTone.${tone}`)}
+            </label>
+          );
+        })}
+      </div>
+      {hint ? <p className="text-muted-foreground text-meta">{hint}</p> : null}
     </fieldset>
   );
 }

@@ -6,6 +6,7 @@ import type {
   ProjectStatus,
 } from '@/shared/contracts/domain';
 import type { HomeTheme } from './home-theme';
+import type { PageImages, PageTone } from './page-theme';
 
 export interface ProjectListItem {
   id: string;
@@ -24,7 +25,8 @@ export interface ProjectDetail extends ProjectListItem {
   homeMessage: string;
   homeSections: HomeSections;
   homeTheme: HomeTheme;
-  homeBackgroundFileId: string | null;
+  pageImages: PageImages;
+  pageTone: PageTone;
   createdAt: string;
   updatedAt: string;
   version: number;

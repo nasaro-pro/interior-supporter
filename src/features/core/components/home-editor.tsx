@@ -1,6 +1,6 @@
 'use client';
 // src/features/core/components/home-editor.tsx (A · TASK-012, REQ-014) — 고객 홈 편집 (화면 상태 ?mode=edit, D4/D5 없음)
-// 안내문 2,000자 + 4영역 순서(위/아래)·표시 + 색상 테마·배경 표시. 저장 실패 시 편집 내용 보존 (POL-026)
+// 안내문 2,000자 + 4영역 순서(위/아래)·표시 + 색상 테마 + 페이지 분위기·페이지 이미지 표시. 저장 실패 시 편집 내용 보존 (POL-026)
 import { useState, useTransition } from 'react';
 import { ButtonLink } from '@/shared/ui/button-link';
 import { useRouter } from 'next/navigation';
@@ -13,8 +13,11 @@ import { ConflictState } from '@/shared/ui/states';
 import type { AppError } from '@/shared/contracts/errors';
 import type { HomeSections } from '@/shared/contracts/domain';
 import { updateHome } from '../server/project-actions';
+import { routes } from '@/shared/contracts/routes';
+import { PORTAL_TABS } from '@/shared/contracts/screens';
 import type { HomeTheme } from '../home-theme';
-import { HomeSectionsField, HomeThemeField } from './home-template-fields';
+import type { PageImages, PageTone } from '../page-theme';
+import { HomeSectionsField, HomeThemeField, PageToneField } from './home-template-fields';
 
 export function HomeEditor({
   projectId,
@@ -22,7 +25,8 @@ export function HomeEditor({
   homeMessage,
   homeSections,
   homeTheme,
-  homeBackgroundFileId,
+  pageImages,
+  pageTone,
   doneHref,
 }: {
   projectId: string;
@@ -30,7 +34,8 @@ export function HomeEditor({
   homeMessage: string;
   homeSections: HomeSections;
   homeTheme: HomeTheme;
-  homeBackgroundFileId: string | null;
+  pageImages: PageImages;
+  pageTone: PageTone;
   doneHref: string;
 }) {
   const t = useTranslations();
@@ -38,7 +43,10 @@ export function HomeEditor({
   const [message, setMessage] = useState(homeMessage);
   const [sections, setSections] = useState(homeSections);
   const [theme, setTheme] = useState(homeTheme);
-  const [background, setBackground] = useState(homeBackgroundFileId);
+  const [tone, setTone] = useState(pageTone);
+  const [images, setImages] = useState<PageImages>(pageImages);
+  // 템플릿에서 복사된 이미지가 있는 탭만 (여기서는 표시 여부만 고른다)
+  const templateTabs = PORTAL_TABS.filter((tab) => pageImages[tab]);
   const [error, setError] = useState<AppError | null>(null);
   const [pending, start] = useTransition();
 
@@ -51,7 +59,8 @@ export function HomeEditor({
         homeMessage: message,
         homeSections: sections,
         homeTheme: theme,
-        homeBackgroundFileId: background,
+        pageImages: images,
+        pageTone: tone,
       });
       if (res.ok) {
         toast.success(t('projects.home.saved'));
@@ -112,20 +121,52 @@ export function HomeEditor({
         onChange={setTheme}
         label={t('projects.home.themeLabel')}
       />
-      {homeBackgroundFileId ? (
+      <PageToneField
+        name="home-page-tone"
+        value={tone}
+        onChange={setTone}
+        label={t('projects.home.pageToneLabel')}
+      />
+      {templateTabs.length > 0 ? (
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium">{t('projects.home.backgroundLabel')}</span>
-          <label className="inline-flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              className="accent-primary size-4"
-              checked={background !== null}
-              onChange={(e) => setBackground(e.target.checked ? homeBackgroundFileId : null)}
-              data-ui-key="home-background-toggle"
-            />
-            {t('projects.home.showBackground')}
-          </label>
-          <p className="text-muted-foreground text-meta">{t('projects.home.backgroundHint')}</p>
+          <span className="text-sm font-medium" id="home-page-images-label">
+            {t('projects.home.pageImagesLabel')}
+          </span>
+          <ul className="flex flex-col gap-2" aria-labelledby="home-page-images-label">
+            {templateTabs.map((tab) => (
+              <li
+                key={tab}
+                data-key={tab}
+                className="flex items-center gap-3 rounded-md border px-3 py-2"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- /api/files 302 서명 URL (next/image 최적화 대상 아님) */}
+                <img
+                  src={routes.file(pageImages[tab]!)}
+                  alt=""
+                  className="aspect-video w-20 shrink-0 rounded border object-cover"
+                />
+                <span className="min-w-0 flex-1 font-medium">{t(`projects.tab.${tab}`)}</span>
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    className="accent-primary size-4"
+                    checked={!!images[tab]}
+                    onChange={(e) =>
+                      setImages((prev) => {
+                        const next = { ...prev };
+                        if (e.target.checked) next[tab] = pageImages[tab];
+                        else delete next[tab];
+                        return next;
+                      })
+                    }
+                    data-ui-key="home-page-image-toggle"
+                  />
+                  {t('projects.home.showImage')}
+                </label>
+              </li>
+            ))}
+          </ul>
+          <p className="text-muted-foreground text-meta">{t('projects.home.pageImagesHint')}</p>
         </div>
       ) : null}
       <FormError error={error} />
