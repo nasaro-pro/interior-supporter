@@ -85,7 +85,7 @@ export function OverviewBlocks({ recent, schedule }: { recent: Block; schedule: 
 
 /**
  * 고객 홈 본문 (CL-03 과 PM-03 미리보기가 같은 컴포넌트 — 02 문서 6.6).
- * 커버 이미지 + 테마 색 안내문 + 설정된 순서·표시의 4영역. 비공개 항목은 provider(RLS)가 이미 제외한 결과만 받는다.
+ * 배경 이미지 + 테마 색 안내문 + 설정된 순서·표시의 4영역. 비공개 항목은 provider(RLS)가 이미 제외한 결과만 받는다.
  */
 export function CustomerHomeBody({
   project,
@@ -96,7 +96,7 @@ export function CustomerHomeBody({
     | 'homeMessage'
     | 'homeSections'
     | 'homeTheme'
-    | 'homeCoverFileId'
+    | 'homeBackgroundFileId'
     | 'currentPhase'
     | 'startDate'
     | 'endDate'
@@ -147,17 +147,17 @@ export function CustomerHomeBody({
         );
     }
   };
+  const background = project.homeBackgroundFileId;
   return (
-    <div className="flex flex-col gap-4">
-      {project.homeCoverFileId ? (
-        // eslint-disable-next-line @next/next/no-img-element -- /api/files 302 서명 URL (next/image 최적화 대상 아님)
-        <img
-          src={routes.file(project.homeCoverFileId)}
-          alt=""
-          className="bg-muted aspect-[16/5] w-full rounded-lg border object-cover"
-          data-ui-key="home-cover"
-        />
-      ) : null}
+    // 배경 이미지는 고객 홈 전체 뒤에 깔고, 글은 불투명 카드·테마 상자 위에 두어 사진과 무관하게 읽힌다
+    <div
+      className={cn(
+        'flex flex-col gap-4',
+        background && 'bg-muted min-h-[60vh] rounded-xl bg-cover bg-center p-3 sm:p-6',
+      )}
+      style={background ? { backgroundImage: `url(${routes.file(background)})` } : undefined}
+      data-ui-key={background ? 'home-background' : undefined}
+    >
       <section
         className={cn('rounded-lg p-4 whitespace-pre-line', HOME_THEME_CLASS[project.homeTheme])}
         data-theme-key={project.homeTheme}

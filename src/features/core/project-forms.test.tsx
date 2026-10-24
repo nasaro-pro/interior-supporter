@@ -37,7 +37,7 @@ const project = (over: Partial<ProjectDetail> = {}): ProjectDetail => ({
   homeMessage: '안내',
   homeSections: DEFAULT_HOME_SECTIONS,
   homeTheme: 'brand',
-  homeCoverFileId: null,
+  homeBackgroundFileId: null,
   createdAt: '2026-10-01T00:00:00Z',
   updatedAt: '2026-10-01T00:00:00Z',
   archivedAt: null,
@@ -142,7 +142,7 @@ describe('A-06 HomeEditor', () => {
         homeMessage="안내"
         homeSections={DEFAULT_HOME_SECTIONS}
         homeTheme="brand"
-        homeCoverFileId={null}
+        homeBackgroundFileId={null}
         doneHref="/done"
       />,
     );

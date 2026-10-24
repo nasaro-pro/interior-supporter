@@ -24,7 +24,7 @@ export interface ProjectDetail extends ProjectListItem {
   homeMessage: string;
   homeSections: HomeSections;
   homeTheme: HomeTheme;
-  homeCoverFileId: string | null;
+  homeBackgroundFileId: string | null;
   createdAt: string;
   updatedAt: string;
   version: number;

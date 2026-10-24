@@ -25,9 +25,9 @@ insert into public.projects (id, company_id, name, is_public, created_by) values
   ('b0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', '기존 현장', true, 'a0000000-0000-0000-0000-000000000002');
 insert into public.project_participants (project_id, company_id, user_id, role, can_confirm) values
   ('b0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000004', 'customer', false);
--- 커버 후보: e1 = 업체1 company_logo(ready) / e2 = 업체1 company_logo(pending) / e3 = 업체2 company_logo / e4 = 업체1 도면
+-- 배경 후보: e1 = 업체1 company_logo(ready) / e2 = 업체1 company_logo(pending) / e3 = 업체2 company_logo / e4 = 업체1 도면
 insert into public.files (id, company_id, project_id, kind, path, original_name, mime, size_bytes, status, uploaded_by) values
-  ('e0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', null, 'company_logo', 'test/cover.webp', 'cover.webp', 'image/webp', 1000, 'ready',   'a0000000-0000-0000-0000-000000000001'),
+  ('e0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', null, 'company_logo', 'test/background.webp', 'background.webp', 'image/webp', 1000, 'ready',   'a0000000-0000-0000-0000-000000000001'),
   ('e0000000-0000-0000-0000-000000000002', 'c0000000-0000-0000-0000-000000000001', null, 'company_logo', 'test/cover2.webp', 'cover2.webp', 'image/webp', 1000, 'pending', 'a0000000-0000-0000-0000-000000000001'),
   ('e0000000-0000-0000-0000-000000000003', 'c0000000-0000-0000-0000-000000000002', null, 'company_logo', 'test/other.webp', 'other.webp', 'image/webp', 1000, 'ready',   'a0000000-0000-0000-0000-000000000007'),
   ('e0000000-0000-0000-0000-000000000004', 'c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', 'design_original', 'test/plan.pdf', 'plan.pdf', 'application/pdf', 1000, 'ready', 'a0000000-0000-0000-0000-000000000002');
@@ -48,22 +48,22 @@ select throws_ok($$ update public.company_settings set default_home_sections = '
   where company_id = 'c0000000-0000-0000-0000-000000000001' $$,
   '23514', NULL, '4영역 순열이 아니면 거절');
 
--- ===== 커버 파일 검사 =====
-select throws_ok($$ update public.company_settings set default_home_cover_file_id = 'e0000000-0000-0000-0000-000000000003'
+-- ===== 배경 파일 검사 =====
+select throws_ok($$ update public.company_settings set default_home_background_file_id = 'e0000000-0000-0000-0000-000000000003'
   where company_id = 'c0000000-0000-0000-0000-000000000001' $$,
-  'P0001', 'file_kind_mismatch', '다른 업체 파일은 커버로 쓸 수 없다');
-select throws_ok($$ update public.company_settings set default_home_cover_file_id = 'e0000000-0000-0000-0000-000000000002'
+  'P0001', 'file_kind_mismatch', '다른 업체 파일은 배경으로 쓸 수 없다');
+select throws_ok($$ update public.company_settings set default_home_background_file_id = 'e0000000-0000-0000-0000-000000000002'
   where company_id = 'c0000000-0000-0000-0000-000000000001' $$,
-  'P0001', 'file_kind_mismatch', 'ready 가 아닌 파일은 커버로 쓸 수 없다');
-select throws_ok($$ update public.company_settings set default_home_cover_file_id = 'e0000000-0000-0000-0000-000000000004'
+  'P0001', 'file_kind_mismatch', 'ready 가 아닌 파일은 배경으로 쓸 수 없다');
+select throws_ok($$ update public.company_settings set default_home_background_file_id = 'e0000000-0000-0000-0000-000000000004'
   where company_id = 'c0000000-0000-0000-0000-000000000001' $$,
-  'P0001', 'file_kind_mismatch', 'company_logo 가 아닌 파일은 커버로 쓸 수 없다');
+  'P0001', 'file_kind_mismatch', 'company_logo 가 아닌 파일은 배경으로 쓸 수 없다');
 
 -- ===== owner 가 템플릿 저장 =====
 select lives_ok($$ update public.company_settings set
     default_home_message = '템플릿 안내문',
     default_home_theme = 'info',
-    default_home_cover_file_id = 'e0000000-0000-0000-0000-000000000001',
+    default_home_background_file_id = 'e0000000-0000-0000-0000-000000000001',
     default_home_sections = '[{"key":"schedule","visible":true},{"key":"overview","visible":true},{"key":"recent","visible":false},{"key":"documents","visible":true}]'::jsonb
   where company_id = 'c0000000-0000-0000-0000-000000000001' $$, 'owner 는 템플릿 4종 저장 가능');
 
@@ -81,8 +81,8 @@ insert into public.projects (id, company_id, name, created_by) values
   ('b0000000-0000-0000-0000-000000000010', 'c0000000-0000-0000-0000-000000000001', '새 현장', 'a0000000-0000-0000-0000-000000000002');
 select is((select home_message from public.projects where id = 'b0000000-0000-0000-0000-000000000010'), '템플릿 안내문', '신규: 안내문 복사');
 select is((select home_theme from public.projects where id = 'b0000000-0000-0000-0000-000000000010'), 'info', '신규: 테마 복사');
-select is((select home_cover_file_id from public.projects where id = 'b0000000-0000-0000-0000-000000000010'),
-  'e0000000-0000-0000-0000-000000000001'::uuid, '신규: 커버 복사');
+select is((select home_background_file_id from public.projects where id = 'b0000000-0000-0000-0000-000000000010'),
+  'e0000000-0000-0000-0000-000000000001'::uuid, '신규: 배경 복사');
 select is((select home_sections -> 0 ->> 'key' from public.projects where id = 'b0000000-0000-0000-0000-000000000010'),
   'schedule', '신규: 4영역 순서 복사');
 select is((select home_sections -> 2 ->> 'visible' from public.projects where id = 'b0000000-0000-0000-0000-000000000010'),
@@ -97,18 +97,18 @@ select is((select home_message from public.projects where id = 'b0000000-0000-00
 -- 이미 만든 프로젝트에는 적용되지 않는다
 select is((select home_theme from public.projects where id = 'b0000000-0000-0000-0000-000000000001'), 'brand', '기존 프로젝트는 그대로');
 
--- 프로젝트 커버에 다른 업체 파일 지정 거절
-select throws_ok($$ update public.projects set home_cover_file_id = 'e0000000-0000-0000-0000-000000000003'
+-- 프로젝트 배경에 다른 업체 파일 지정 거절
+select throws_ok($$ update public.projects set home_background_file_id = 'e0000000-0000-0000-0000-000000000003'
   where id = 'b0000000-0000-0000-0000-000000000010' $$,
-  'P0001', 'file_kind_mismatch', '프로젝트 커버도 같은 업체 파일만');
-select lives_ok($$ update public.projects set home_cover_file_id = null, home_theme = 'neutral'
-  where id = 'b0000000-0000-0000-0000-000000000010' $$, '편집자는 커버 제거·테마 변경 가능');
+  'P0001', 'file_kind_mismatch', '프로젝트 배경도 같은 업체 파일만');
+select lives_ok($$ update public.projects set home_background_file_id = null, home_theme = 'neutral'
+  where id = 'b0000000-0000-0000-0000-000000000010' $$, '편집자는 배경 제거·테마 변경 가능');
 
--- ===== 고객: 커버 파일 열람 가능, 타 업체 고객은 불가 =====
+-- ===== 고객: 배경 파일 열람 가능, 타 업체 고객은 불가 =====
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-000000000004","role":"authenticated"}', true);
-select is((select count(*)::int from public.files where id = 'e0000000-0000-0000-0000-000000000001'), 1, '참여 고객은 업체 커버 파일을 볼 수 있다');
+select is((select count(*)::int from public.files where id = 'e0000000-0000-0000-0000-000000000001'), 1, '참여 고객은 업체 배경 파일을 볼 수 있다');
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-000000000007","role":"authenticated"}', true);
-select is((select count(*)::int from public.files where id = 'e0000000-0000-0000-0000-000000000001'), 0, '타 업체 사용자는 커버 파일을 볼 수 없다');
+select is((select count(*)::int from public.files where id = 'e0000000-0000-0000-0000-000000000001'), 0, '타 업체 사용자는 배경 파일을 볼 수 없다');
 select is((select count(*)::int from public.company_settings where company_id = 'c0000000-0000-0000-0000-000000000001'), 0, '타 업체 사용자는 템플릿을 볼 수 없다');
 reset role;
 

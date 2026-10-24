@@ -1,4 +1,4 @@
-// REQ-052 TemplateForm (CR-A-10) — 미리보기 즉시 반영 · 저장 값 · 충돌 시 입력 보존 · 커버 제거
+// REQ-052 TemplateForm (CR-A-10) — 미리보기 즉시 반영 · 저장 값 · 충돌 시 입력 보존 · 배경 제거
 import { readFileSync } from 'node:fs';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
@@ -31,7 +31,7 @@ const messages = Object.fromEntries(
 const CO = '00000000-0000-4000-8000-0000000000c1';
 const COVER = '00000000-0000-4000-8000-0000000000e1';
 
-const ui = (version = 2, cover: string | null = COVER) => (
+const ui = (version = 2, background: string | null = COVER) => (
   <NextIntlClientProvider locale="ko" messages={messages}>
     <TemplateForm
       companyId={CO}
@@ -40,7 +40,7 @@ const ui = (version = 2, cover: string | null = COVER) => (
         homeMessage: '기본 안내',
         homeSections: DEFAULT_HOME_SECTIONS,
         homeTheme: 'brand',
-        homeCoverFileId: cover,
+        homeBackgroundFileId: background,
       }}
     />
   </NextIntlClientProvider>
@@ -65,7 +65,7 @@ describe('REQ-052 TemplateForm', () => {
     const preview = document.querySelector('[data-theme-key]') as HTMLElement;
     expect(preview.dataset.themeKey).toBe('info');
     expect(preview).toHaveTextContent('새 안내');
-    expect(document.querySelector('[data-ui-key="home-cover"]')).not.toBeNull();
+    expect(document.querySelector('[data-ui-key="home-background"]')).not.toBeNull();
     await act(async () => {
       fireEvent.click(byKey('template-submit'));
       await flush();
@@ -78,22 +78,22 @@ describe('REQ-052 TemplateForm', () => {
         s.key === 'recent' ? { ...s, visible: false } : s,
       ),
       defaultHomeTheme: 'info',
-      defaultHomeCoverFileId: COVER,
+      defaultHomeBackgroundFileId: COVER,
     });
     expect(refresh).toHaveBeenCalled();
   });
 
-  it('정상: 커버 제거는 미리보기에서 사라지고 null 로 저장된다', async () => {
+  it('정상: 배경 제거는 미리보기에서 사라지고 null 로 저장된다', async () => {
     updateTemplate.mockResolvedValueOnce({ ok: true, data: { version: 3 } });
     render(ui());
-    fireEvent.click(byKey('template-cover-remove'));
-    expect(document.querySelector('[data-ui-key="home-cover"]')).toBeNull();
+    fireEvent.click(byKey('template-background-remove'));
+    expect(document.querySelector('[data-ui-key="home-background"]')).toBeNull();
     await act(async () => {
       fireEvent.click(byKey('template-submit'));
       await flush();
     });
     expect(updateTemplate).toHaveBeenLastCalledWith(
-      expect.objectContaining({ defaultHomeCoverFileId: null }),
+      expect.objectContaining({ defaultHomeBackgroundFileId: null }),
     );
   });
 

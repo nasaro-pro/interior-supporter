@@ -71,9 +71,9 @@
     "sectionsLabel": "Customer home section order and visibility",
     "privateProjectNotice": "This project is still private, so customers cannot open it yet.",
     "themeLabel": "Color theme",
-    "coverLabel": "Cover image",
-    "showCover": "Show cover image",
-    "coverHint": "Change the cover image in Settings > Templates."
+    "backgroundLabel": "Background image",
+    "showBackground": "Show background image",
+    "backgroundHint": "Change the background image in Settings > Templates."
   },
   "settings": {
     "basic": "Basic information",

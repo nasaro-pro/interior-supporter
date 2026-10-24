@@ -182,8 +182,8 @@ export const homeUpdateSchema = z.object({
   homeMessage: z.string().max(2000, { message: 'field.tooLong|2000' }),
   homeSections: homeSectionsSchema,
   homeTheme: z.enum(HOME_THEMES, { message: 'field.select' }),
-  /** 커버는 템플릿에서 복사된 것만 — 프로젝트 화면에서는 유지(id) 또는 제거(null)만 */
-  homeCoverFileId: uuid.nullable(),
+  /** 배경은 템플릿에서 복사된 것만 — 프로젝트 화면에서는 유지(id) 또는 제거(null)만 */
+  homeBackgroundFileId: uuid.nullable(),
 });
 
 export const projectArchiveSchema = z.object({
@@ -278,7 +278,7 @@ export const templateUpdateSchema = z.object({
   defaultHomeMessage: z.string().max(2000, { message: 'field.tooLong|2000' }),
   defaultHomeSections: homeSectionsSchema,
   defaultHomeTheme: z.enum(HOME_THEMES, { message: 'field.select' }),
-  defaultHomeCoverFileId: uuid.nullable(),
+  defaultHomeBackgroundFileId: uuid.nullable(),
 });
 
 export const memberInviteSchema = z.object({

@@ -90,7 +90,7 @@ export function CompanyInfoForm({
 
 /**
  * 업체 이미지(company_logo kind, 1MB) 업로드 — 서명 URL → finalize. 성공 시 fileId.
- * 로고와 고객 홈 커버(CR-A-10)가 같이 쓴다. 업로드는 B 의 FilesApi 시그니처로만 (헌법 4.1 ④)
+ * 로고와 고객 홈 배경(CR-A-10)이 같이 쓴다. 업로드는 B 의 FilesApi 시그니처로만 (헌법 4.1 ④)
  */
 function useCompanyImageUpload(companyId: string) {
   const t = useTranslations();
@@ -186,7 +186,7 @@ export function LogoUploader({
   );
 }
 
-/** REQ-052 기본 템플릿 — 신규 프로젝트 고객 홈(안내문·커버·테마·4영역) 기본값 + 미리보기 (CR-A-10) */
+/** REQ-052 기본 템플릿 — 신규 프로젝트 고객 홈(안내문·배경·테마·4영역) 기본값 + 미리보기 (CR-A-10) */
 export function TemplateForm({
   companyId,
   version,
@@ -198,7 +198,7 @@ export function TemplateForm({
     homeMessage: string;
     homeSections: HomeSections;
     homeTheme: HomeTheme;
-    homeCoverFileId: string | null;
+    homeBackgroundFileId: string | null;
   };
 }) {
   const t = useTranslations();
@@ -207,7 +207,7 @@ export function TemplateForm({
   const [message, setMessage] = useState(value.homeMessage);
   const [sections, setSections] = useState(value.homeSections);
   const [theme, setTheme] = useState(value.homeTheme);
-  const [cover, setCover] = useState(value.homeCoverFileId);
+  const [background, setBackground] = useState(value.homeBackgroundFileId);
   const [error, setError] = useState<AppError | null>(null);
   const [saving, start] = useTransition();
   const { upload, pending: uploading, rule } = useCompanyImageUpload(companyId);
@@ -222,7 +222,7 @@ export function TemplateForm({
         defaultHomeMessage: message,
         defaultHomeSections: sections,
         defaultHomeTheme: theme,
-        defaultHomeCoverFileId: cover,
+        defaultHomeBackgroundFileId: background,
       });
       if (res.ok) {
         toast.success(t('settings.templates.saved'));
@@ -254,18 +254,18 @@ export function TemplateForm({
       <div className="flex min-w-0 flex-col gap-5">
         <p className="text-muted-foreground text-sm">{t('settings.templates.intro')}</p>
         <FormRow
-          label={t('settings.field.homeCover')}
-          htmlFor="tpl-cover-file"
-          hint={t('settings.templates.coverHint', { exts: rule.exts.join(', ') })}
+          label={t('settings.field.homeBackground')}
+          htmlFor="tpl-bg-file"
+          hint={t('settings.templates.backgroundHint', { exts: rule.exts.join(', ') })}
         >
           <div className="flex flex-col gap-2">
-            <div className="bg-muted grid aspect-[16/5] w-full place-items-center overflow-hidden rounded-md border">
-              {cover ? (
+            <div className="bg-muted grid aspect-video w-full place-items-center overflow-hidden rounded-md border">
+              {background ? (
                 // eslint-disable-next-line @next/next/no-img-element -- /api/files 302 서명 URL (next/image 최적화 대상 아님)
-                <img src={routes.file(cover)} alt="" className="size-full object-cover" />
+                <img src={routes.file(background)} alt="" className="size-full object-cover" />
               ) : (
                 <span className="text-muted-foreground text-meta">
-                  {t('settings.templates.noCover')}
+                  {t('settings.templates.noBackground')}
                 </span>
               )}
             </div>
@@ -274,13 +274,13 @@ export function TemplateForm({
               type="file"
               accept={rule.exts.join(',')}
               className="sr-only"
-              id="tpl-cover-file"
+              id="tpl-bg-file"
               onChange={(e) => {
                 const f = e.target.files?.[0];
                 if (f)
                   upload(f, (fileId) => {
-                    setCover(fileId);
-                    toast.success(t('settings.templates.coverUploaded'));
+                    setBackground(fileId);
+                    toast.success(t('settings.templates.backgroundUploaded'));
                   });
                 e.target.value = '';
               }}
@@ -291,19 +291,19 @@ export function TemplateForm({
                 disabled={uploading}
                 aria-busy={uploading}
                 onClick={() => input.current?.click()}
-                data-ui-key="template-cover-upload"
+                data-ui-key="template-background-upload"
               >
                 <Upload aria-hidden />
                 {t('common.action.upload')}
               </Button>
-              {cover ? (
+              {background ? (
                 <Button
                   variant="ghost"
-                  onClick={() => setCover(null)}
-                  data-ui-key="template-cover-remove"
+                  onClick={() => setBackground(null)}
+                  data-ui-key="template-background-remove"
                 >
                   <X aria-hidden />
-                  {t('settings.templates.removeCover')}
+                  {t('settings.templates.removeBackground')}
                 </Button>
               ) : null}
             </div>
@@ -365,7 +365,7 @@ export function TemplateForm({
               homeMessage: message,
               homeSections: sections,
               homeTheme: theme,
-              homeCoverFileId: cover,
+              homeBackgroundFileId: background,
               currentPhase: '',
               startDate: null,
               endDate: null,

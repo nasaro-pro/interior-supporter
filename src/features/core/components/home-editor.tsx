@@ -1,6 +1,6 @@
 'use client';
 // src/features/core/components/home-editor.tsx (A · TASK-012, REQ-014) — 고객 홈 편집 (화면 상태 ?mode=edit, D4/D5 없음)
-// 안내문 2,000자 + 4영역 순서(위/아래)·표시 + 색상 테마·커버 표시. 저장 실패 시 편집 내용 보존 (POL-026)
+// 안내문 2,000자 + 4영역 순서(위/아래)·표시 + 색상 테마·배경 표시. 저장 실패 시 편집 내용 보존 (POL-026)
 import { useState, useTransition } from 'react';
 import { ButtonLink } from '@/shared/ui/button-link';
 import { useRouter } from 'next/navigation';
@@ -22,7 +22,7 @@ export function HomeEditor({
   homeMessage,
   homeSections,
   homeTheme,
-  homeCoverFileId,
+  homeBackgroundFileId,
   doneHref,
 }: {
   projectId: string;
@@ -30,7 +30,7 @@ export function HomeEditor({
   homeMessage: string;
   homeSections: HomeSections;
   homeTheme: HomeTheme;
-  homeCoverFileId: string | null;
+  homeBackgroundFileId: string | null;
   doneHref: string;
 }) {
   const t = useTranslations();
@@ -38,7 +38,7 @@ export function HomeEditor({
   const [message, setMessage] = useState(homeMessage);
   const [sections, setSections] = useState(homeSections);
   const [theme, setTheme] = useState(homeTheme);
-  const [cover, setCover] = useState(homeCoverFileId);
+  const [background, setBackground] = useState(homeBackgroundFileId);
   const [error, setError] = useState<AppError | null>(null);
   const [pending, start] = useTransition();
 
@@ -51,7 +51,7 @@ export function HomeEditor({
         homeMessage: message,
         homeSections: sections,
         homeTheme: theme,
-        homeCoverFileId: cover,
+        homeBackgroundFileId: background,
       });
       if (res.ok) {
         toast.success(t('projects.home.saved'));
@@ -112,20 +112,20 @@ export function HomeEditor({
         onChange={setTheme}
         label={t('projects.home.themeLabel')}
       />
-      {homeCoverFileId ? (
+      {homeBackgroundFileId ? (
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium">{t('projects.home.coverLabel')}</span>
+          <span className="text-sm font-medium">{t('projects.home.backgroundLabel')}</span>
           <label className="inline-flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               className="accent-primary size-4"
-              checked={cover !== null}
-              onChange={(e) => setCover(e.target.checked ? homeCoverFileId : null)}
-              data-ui-key="home-cover-toggle"
+              checked={background !== null}
+              onChange={(e) => setBackground(e.target.checked ? homeBackgroundFileId : null)}
+              data-ui-key="home-background-toggle"
             />
-            {t('projects.home.showCover')}
+            {t('projects.home.showBackground')}
           </label>
-          <p className="text-muted-foreground text-meta">{t('projects.home.coverHint')}</p>
+          <p className="text-muted-foreground text-meta">{t('projects.home.backgroundHint')}</p>
         </div>
       ) : null}
       <FormError error={error} />
