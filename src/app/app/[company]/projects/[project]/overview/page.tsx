@@ -5,6 +5,7 @@ import { Eye, Pencil } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { requireProjectAccess } from '@/features/core';
 import { HomeEditor } from '@/features/core/components/home-editor';
+import { PageCanvas } from '@/features/core/components/page-canvas';
 import { CustomerHomeBody, OverviewBlocks, Panel } from '@/features/core/components/summary-blocks';
 import { loadProjectSummaries } from '@/features/core/server/overview-queries';
 import { getProject } from '@/features/core/server/project-queries';
@@ -64,6 +65,9 @@ export default async function OverviewPage({
             version={project.version}
             homeMessage={project.homeMessage}
             homeSections={project.homeSections}
+            homeTheme={project.homeTheme}
+            pageImages={project.pageImages}
+            pageTone={project.pageTone}
             doneHref={here}
           />
         ) : (
@@ -73,7 +77,13 @@ export default async function OverviewPage({
               {t('home.previewNotice')}
               {!project.isPublic ? ` ${t('home.privateProjectNotice')}` : ''}
             </p>
-            <CustomerHomeBody project={project} blocks={previewView} />
+            <PageCanvas
+              tone={project.pageTone}
+              imageFileId={project.pageImages.home}
+              variant="contained"
+            >
+              <CustomerHomeBody project={project} blocks={previewView} />
+            </PageCanvas>
           </div>
         )}
       </section>

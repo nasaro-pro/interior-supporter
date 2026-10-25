@@ -255,6 +255,10 @@ export type Database = {
         Row: {
           company_id: string
           default_home_message: string
+          default_home_sections: Json
+          default_home_theme: string
+          default_page_images: Json
+          default_page_tone: string
           updated_at: string
           version: number
           id: string | null
@@ -262,6 +266,10 @@ export type Database = {
         Insert: {
           company_id: string
           default_home_message?: string
+          default_home_sections?: Json
+          default_home_theme?: string
+          default_page_images?: Json
+          default_page_tone?: string
           updated_at?: string
           version?: number
           id?: never
@@ -269,6 +277,10 @@ export type Database = {
         Update: {
           company_id?: string
           default_home_message?: string
+          default_home_sections?: Json
+          default_home_theme?: string
+          default_page_images?: Json
+          default_page_tone?: string
           updated_at?: string
           version?: number
           id?: never
@@ -1170,6 +1182,9 @@ export type Database = {
           is_public: boolean
           home_message: string
           home_sections: Json
+          home_theme: string
+          page_images: Json
+          page_tone: string
           created_by: string
           created_at: string
           updated_at: string
@@ -1188,6 +1203,9 @@ export type Database = {
           is_public?: boolean
           home_message?: string
           home_sections?: Json
+          home_theme?: string
+          page_images?: Json
+          page_tone?: string
           created_by: string
           created_at?: string
           updated_at?: string
@@ -1206,6 +1224,9 @@ export type Database = {
           is_public?: boolean
           home_message?: string
           home_sections?: Json
+          home_theme?: string
+          page_images?: Json
+          page_tone?: string
           created_by?: string
           created_at?: string
           updated_at?: string

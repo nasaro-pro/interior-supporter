@@ -69,7 +69,12 @@
     "previewNotice": "The preview shows only what customers can see.",
     "empty": "Nothing to share yet.",
     "sectionsLabel": "Customer home section order and visibility",
-    "privateProjectNotice": "This project is still private, so customers cannot open it yet."
+    "privateProjectNotice": "This project is still private, so customers cannot open it yet.",
+    "themeLabel": "Color theme",
+    "pageToneLabel": "Page mood",
+    "pageImagesLabel": "Images by page",
+    "pageImagesHint": "Change page images in Settings > Templates. Here you only choose whether to show them.",
+    "showImage": "Show"
   },
   "settings": {
     "basic": "Basic information",
@@ -145,5 +150,22 @@
     "noEmailHint": "No email is sent. Copy the link and share it yourself, for example via a messenger.",
     "closeWarning": "You cannot see this link again after closing. Copy it now.",
     "create": "Create invite link"
+  },
+  "homeTheme": {
+    "brand": "Teal (default)",
+    "info": "Blue",
+    "positive": "Green",
+    "caution": "Yellow",
+    "attention": "Orange",
+    "neutral": "Gray"
+  },
+  "pageTone": {
+    "default": "Default",
+    "ivory": "Ivory",
+    "sand": "Sand",
+    "greige": "Greige",
+    "sage": "Sage",
+    "mist": "Mist",
+    "clay": "Clay"
   }
 }

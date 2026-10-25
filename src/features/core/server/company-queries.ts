@@ -3,6 +3,9 @@ import 'server-only';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
 import type { FileKind } from '@/shared/contracts/domain';
 import { logger } from '@/shared/lib/logger';
+import { normalizeHomeSections } from '../home-sections';
+import { normalizeHomeTheme } from '../home-theme';
+import { normalizePageImages, normalizePageTone } from '../page-theme';
 
 export async function getCompanySettings(companyId: string) {
   const supabase = await createServerSupabase();
@@ -14,7 +17,9 @@ export async function getCompanySettings(companyId: string) {
       .maybeSingle(),
     supabase
       .from('company_settings')
-      .select('default_home_message, version')
+      .select(
+        'default_home_message, default_home_sections, default_home_theme, default_page_images, default_page_tone, version',
+      )
       .eq('company_id', companyId)
       .maybeSingle(),
   ]);
@@ -26,6 +31,10 @@ export async function getCompanySettings(companyId: string) {
     logoFileId: company.logo_file_id,
     version: company.version,
     defaultHomeMessage: settings?.default_home_message ?? '',
+    defaultHomeSections: normalizeHomeSections(settings?.default_home_sections),
+    defaultHomeTheme: normalizeHomeTheme(settings?.default_home_theme),
+    defaultPageImages: normalizePageImages(settings?.default_page_images),
+    defaultPageTone: normalizePageTone(settings?.default_page_tone),
     settingsVersion: settings?.version ?? 1,
   };
 }

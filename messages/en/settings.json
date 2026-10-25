@@ -17,7 +17,11 @@
     "logo": "Logo",
     "defaultHomeMessage": "Default customer home message",
     "role": "Role",
-    "joinedAt": "Joined"
+    "joinedAt": "Joined",
+    "homeSections": "Customer home section order and visibility",
+    "homeTheme": "Color theme",
+    "pageImages": "Images by page",
+    "pageTone": "Page mood (background color)"
   },
   "members": {
     "invite": "Invite member",
@@ -58,6 +62,18 @@
     }
   },
   "templates": {
-    "hint": "Used as the default customer home message for new projects. Existing projects aren’t changed."
+    "hint": "Used as the default customer home message for new projects. Existing projects are not changed.",
+    "intro": "When you create a project, this template (page mood, images by page, message, color theme and home sections) is applied to its customer pages. Existing projects are not changed, and each project can be adjusted from its overview.",
+    "previewTitle": "New project customer home preview",
+    "previewNotice": "The real customer home also shows each project's recent updates, schedule and documents.",
+    "saved": "Default template saved. It applies to projects you create from now on.",
+    "pageToneHint": "The background color of every customer page. In dark mode it switches to a darker color with the same mood.",
+    "pageImagesHint": "Each customer page can have its own background image. Content sits on a translucent sheet above the image, so it stays readable on busy photos. {exts}, up to 1MB. A large landscape image (about 16:9) works best.",
+    "noImage": "No image",
+    "uploadFor": "Upload image for {page}",
+    "removeFor": "Remove image for {page}",
+    "imageUploaded": "Image for {page} uploaded. Save to apply it to the template.",
+    "previewPage": "Page to preview",
+    "previewPlaceholder": "{page} content appears here."
   }
 }

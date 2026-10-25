@@ -9,6 +9,9 @@ import {
   RESERVED_SLUGS,
   SLUG_PATTERN,
 } from '@/shared/contracts/domain';
+import { PORTAL_TABS } from '@/shared/contracts/screens';
+import { HOME_THEMES } from './home-theme';
+import { PAGE_TONES } from './page-theme';
 
 const YMD = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -175,11 +178,18 @@ export const homeSectionsSchema = z
   .length(4)
   .refine((v) => new Set(v.map((s) => s.key)).size === 4, { message: 'field.invalid' });
 
+/** 고객 포털 탭 → files.id (CR-A-10) */
+export const pageImagesSchema = z.partialRecord(z.enum(PORTAL_TABS), uuid);
+
 export const homeUpdateSchema = z.object({
   projectId: uuid,
   baseVersion: version,
   homeMessage: z.string().max(2000, { message: 'field.tooLong|2000' }),
   homeSections: homeSectionsSchema,
+  homeTheme: z.enum(HOME_THEMES, { message: 'field.select' }),
+  /** 페이지 이미지는 템플릿에서 복사된 것만 — 프로젝트 화면에서는 유지 또는 제거만 (DB 트리거가 파일 검사) */
+  pageImages: pageImagesSchema,
+  pageTone: z.enum(PAGE_TONES, { message: 'field.select' }),
 });
 
 export const projectArchiveSchema = z.object({
@@ -272,6 +282,10 @@ export const templateUpdateSchema = z.object({
   companyId: uuid,
   baseVersion: version,
   defaultHomeMessage: z.string().max(2000, { message: 'field.tooLong|2000' }),
+  defaultHomeSections: homeSectionsSchema,
+  defaultHomeTheme: z.enum(HOME_THEMES, { message: 'field.select' }),
+  defaultPageImages: pageImagesSchema,
+  defaultPageTone: z.enum(PAGE_TONES, { message: 'field.select' }),
 });
 
 export const memberInviteSchema = z.object({
