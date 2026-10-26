@@ -3,7 +3,7 @@
  * 소유: A · 변경 요청은 진행 기록의 변경 요청(CR)으로만 (docs/00_헌법_공통규칙.md 5.9). 문자열 리터럴로 경로를 직접 쓰는 코드는 리뷰에서 거절한다.
  * 근거: 02-뎁스구조-설계안 8절, docs/02_화면구조_뎁스_디자인.md
  */
-import type { PortalTab, ProjectTab } from './screens';
+import type { FieldTab, PortalTab, ProjectTab } from './screens';
 
 const enc = encodeURIComponent;
 
@@ -76,6 +76,12 @@ export const routes = {
 
   // 시공팀
   field: {
+    /** FW-00 내 현장 카드 (F1) */
+    home: () => '/field',
+    /** 현장 입구 — 켜진 첫 탭(없으면 현장 사진)으로 이동 */
+    siteHome: (project: string) => `/field/sites/${enc(project)}`,
+    /** FW-04~06 현장 탭 — 담당자가 켠 탭만 열린다 (F2) */
+    site: (project: string, tab: FieldTab) => `/field/sites/${enc(project)}/${tab}`,
     photos: (project?: string, upload = false) => {
       const s = new URLSearchParams();
       if (project) s.set('project', project);

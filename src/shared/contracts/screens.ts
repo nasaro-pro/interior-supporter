@@ -576,6 +576,51 @@ export const SCREENS = [
   },
 
   // ── 시공팀 영역 /field ──────────────────────────────────────────
+  // FW-00·04~06: 통합본 7장 F1·F2 (CR-11) — 내 현장 카드와 담당자가 켠 탭(보기만)
+  {
+    id: 'FW-00',
+    parent: null,
+    depth: 1,
+    area: 'field',
+    route: '/field',
+    owner: 'C',
+    reqs: ['F1'],
+    status: 'active',
+    titleKey: 'field.screen.sites',
+  },
+  {
+    id: 'FW-04',
+    parent: 'FW-00',
+    depth: 2,
+    area: 'field',
+    route: '/field/sites/[project]/schedule',
+    owner: 'C',
+    reqs: ['F2'],
+    status: 'active',
+    titleKey: 'field.screen.schedule',
+  },
+  {
+    id: 'FW-05',
+    parent: 'FW-00',
+    depth: 2,
+    area: 'field',
+    route: '/field/sites/[project]/designs',
+    owner: 'C',
+    reqs: ['F2'],
+    status: 'active',
+    titleKey: 'field.screen.designs',
+  },
+  {
+    id: 'FW-06',
+    parent: 'FW-00',
+    depth: 2,
+    area: 'field',
+    route: '/field/sites/[project]/materials',
+    owner: 'C',
+    reqs: ['F2'],
+    status: 'active',
+    titleKey: 'field.screen.materials',
+  },
   {
     id: 'FW-01',
     parent: null,
@@ -671,6 +716,10 @@ export const PORTAL_TABS = [
 ] as const;
 export type PortalTab = (typeof PORTAL_TABS)[number];
 
+/** 시공팀 현장 탭 — 담당자가 프로젝트마다 켠 것만 보인다 (F2, project_field_settings) */
+export const FIELD_TABS = ['schedule', 'designs', 'materials'] as const;
+export type FieldTab = (typeof FIELD_TABS)[number];
+
 /** 영구 제외 범위 — 이 이름/기능의 화면을 만들지 않는다 (11_PRD 제외 범위) */
 export const EXCLUDED_SCREENS = [
   '시스템 관리자/OP 영역',
@@ -680,7 +729,6 @@ export const EXCLUDED_SCREENS = [
   '미팅 탭',
   '고객 마이페이지',
   '시공팀 오늘 작업',
-  '시공팀 내 현장 목록',
   '공정일지·작업일지',
   '자재 구매·발주',
   '별도 대시보드(D1)',

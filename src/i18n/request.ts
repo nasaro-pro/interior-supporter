@@ -25,6 +25,7 @@ export const NAMESPACES = [
   'requests',
   'photos',
   'schedule',
+  'field',
 ] as const;
 
 export function toLocale(value: string | undefined): Locale {

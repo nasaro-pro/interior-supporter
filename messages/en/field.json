@@ -1,0 +1,67 @@
+{
+  "screen": {
+    "sites": "My sites",
+    "schedule": "Site schedule",
+    "designs": "Confirmed designs",
+    "materials": "Confirmed materials"
+  },
+  "nav": {
+    "sites": "My sites"
+  },
+  "sites": {
+    "description": "See your assigned sites and today's schedule.",
+    "empty": "No assigned sites",
+    "emptyHint": "Sites appear here once a project manager invites you."
+  },
+  "card": {
+    "period": "Assignment",
+    "noLimit": "No end date",
+    "today": "Today",
+    "noToday": "Nothing scheduled today",
+    "photos": "Site photos"
+  },
+  "tab": {
+    "schedule": "Schedule",
+    "designs": "Designs",
+    "materials": "Materials",
+    "photos": "Photos"
+  },
+  "schedule": {
+    "empty": "No schedule yet"
+  },
+  "designs": {
+    "empty": "No confirmed designs"
+  },
+  "materials": {
+    "empty": "No confirmed materials"
+  },
+  "design": {
+    "version": "Confirmed revision {no}",
+    "download": "Download original",
+    "noPreview": "No preview"
+  },
+  "material": {
+    "location": "Location"
+  },
+  "access": {
+    "title": "Crew visibility",
+    "hint": "The crew sees only what you turn on (view only). Everything is off by default.",
+    "saved": "Crew visibility saved",
+    "showSchedule": {
+      "label": "Schedule",
+      "hint": "Show the site schedule and send change notifications to the crew."
+    },
+    "showDesigns": {
+      "label": "Confirmed designs",
+      "hint": "Show previews and originals of confirmed designs."
+    },
+    "showMaterials": {
+      "label": "Confirmed materials",
+      "hint": "Show spec, quantity and location of confirmed materials. Prices stay hidden."
+    },
+    "photoAutoPublic": {
+      "label": "Publish crew photos immediately",
+      "hint": "When on, crew photos are visible to the customer right away. When off, you review them before publishing."
+    }
+  }
+}
