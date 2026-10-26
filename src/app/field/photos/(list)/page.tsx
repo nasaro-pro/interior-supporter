@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { MapPin } from 'lucide-react';
 import { getAccessContext, requireProjectAccess } from '@/features/core';
+import { getFieldSite } from '@/features/field/server/queries';
 import { PhotoFilters } from '@/features/photos/components/PhotoFilters';
 import { PhotoGrid } from '@/features/photos/components/PhotoGrid';
 import { PhotoUploadSheet } from '@/features/photos/components/PhotoUploadSheet';
@@ -69,10 +70,13 @@ export default async function FieldPhotosPage({ searchParams }: Props) {
   const site = pick.site;
   const access = await requireProjectAccess(site.projectId, ['field']);
   const filters = parsePhotoListParams(sp, access.as);
-  const [{ items, hasMore }, { items: uploaders }] = await Promise.all([
+  const [{ items, hasMore }, { items: uploaders }, detail] = await Promise.all([
     listPhotos(site.projectId, access, filters),
     listPhotoUploaders(site.projectId, access, { archived: filters.archived }),
+    getFieldSite(site.projectId),
   ]);
+  // F9: 담당자가 '시공팀 사진 바로 공개'를 켰으면 안내도 바꾼다
+  const autoPublic = detail?.photoAutoPublic === true;
   const base = routes.field.photos();
   const extra = { project: site.projectId };
 
@@ -80,7 +84,7 @@ export default async function FieldPhotosPage({ searchParams }: Props) {
     <main data-screen-id="FW-01" key={site.projectId} className="flex flex-col gap-4">
       <PageHeader
         title={t('photos.screen.field')}
-        description={t('photos.crew.privateNotice')}
+        description={t(autoPublic ? 'photos.crew.autoPublicNotice' : 'photos.crew.privateNotice')}
         actions={
           <PhotoUploadSheet
             projectId={site.projectId}
@@ -88,6 +92,7 @@ export default async function FieldPhotosPage({ searchParams }: Props) {
             allowPublic={false}
             trigger="upload"
             siteName={site.name}
+            crewAutoPublic={autoPublic}
           />
         }
       />

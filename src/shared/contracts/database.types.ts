@@ -1,6 +1,6 @@
 // ⚠️ 임시 DB 타입 — PGlite 로 베이스라인 마이그레이션을 적용해 생성 (_integration/tools/gen-types.mjs)
 // 실 Supabase 연결 후 `npm run db:types` 결과로 반드시 교체한다 (병합 3파트 계획 · 파트 2).
-// 생성: 2026-10-26T09:01:30.356Z · 마이그레이션: 20261006000100_a_foundation.sql, 20261006000200_b_designs_materials_estimates.sql, 20261006000300_c_requests_photos_schedule.sql, 20261006000900_a_grants_hardening.sql, 20261013000100_a_password_reset_scope.sql, 20261013000110_a_field_project_scope.sql, 20261013000120_a_file_visibility.sql, 20261013000130_a_assignment_notify.sql, 20261013000140_a_client_projects_archive.sql, 20261013000150_a_created_by_defaults.sql, 20261013000200_b_confirmations_reconfirm.sql, 20261013000210_b_created_by_defaults.sql, 20261013000300_c_request_status_guard.sql, 20261024000100_a_home_template.sql, 20261025000100_a_page_theme.sql, 20261026000200_c_field_access.sql
+// 생성: 2026-10-26T09:21:59.953Z · 마이그레이션: 20261006000100_a_foundation.sql, 20261006000200_b_designs_materials_estimates.sql, 20261006000300_c_requests_photos_schedule.sql, 20261006000900_a_grants_hardening.sql, 20261013000100_a_password_reset_scope.sql, 20261013000110_a_field_project_scope.sql, 20261013000120_a_file_visibility.sql, 20261013000130_a_assignment_notify.sql, 20261013000140_a_client_projects_archive.sql, 20261013000150_a_created_by_defaults.sql, 20261013000200_b_confirmations_reconfirm.sql, 20261013000210_b_created_by_defaults.sql, 20261013000300_c_request_status_guard.sql, 20261024000100_a_home_template.sql, 20261025000100_a_page_theme.sql, 20261026000200_c_field_access.sql
 
 export type Json =
   | string
@@ -1618,7 +1618,7 @@ export type Database = {
         Args: {
           p_project: string
         }
-        Returns: { id: string; company_id: string; name: string; site_address: string; page_tone: string; show_schedule: boolean; show_designs: boolean; show_materials: boolean }[]
+        Returns: { id: string; company_id: string; name: string; site_address: string; page_tone: string; show_schedule: boolean; show_designs: boolean; show_materials: boolean; photo_auto_public: boolean }[]
       }
       field_sites: {
         Args: never

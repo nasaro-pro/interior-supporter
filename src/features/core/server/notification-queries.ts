@@ -28,19 +28,21 @@ const CUSTOMER_TYPES = new Set([
 ]);
 
 export function areaOfNotification(type: string, fallback: Area): Area {
+  // CR-11(F11): 시공팀 영역에서 연 알림은 시공팀 링크로 (일정 변경도 시공팀 탭으로 간다)
+  if (fallback === 'field') return 'field';
   if (PM_TYPES.has(type)) return 'app';
   if (CUSTOMER_TYPES.has(type)) return 'portal';
   return fallback; // assignment_changed: 열람 영역 기준
 }
 
 /**
- * A-07: 영역별로 보여 줄 알림 종류. 시공팀이 받는 알림은 배정 변경뿐이다(DB 트리거 기준).
+ * A-07: 영역별로 보여 줄 알림 종류. 시공팀이 받는 알림은 배정 변경과, 일정 탭이 켜진 현장의 일정 변경(CR-11, F11)이다.
  * assignment_changed 는 역할 영역을 행만으로 알 수 없어 모든 영역에 보이고, 해석기가 영역에 맞는 링크를 만든다.
  */
 const AREA_TYPES: Record<Area, readonly string[]> = {
   app: [...PM_TYPES, 'assignment_changed'],
   portal: [...CUSTOMER_TYPES, 'assignment_changed'],
-  field: ['assignment_changed'],
+  field: ['assignment_changed', 'schedule_changed'],
 };
 
 export function typesForArea(area: Area): string[] {

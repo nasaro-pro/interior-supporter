@@ -23,6 +23,8 @@ export interface FieldSiteDetail {
   siteAddress: string | null;
   pageTone: PageTone;
   tabs: FieldTab[];
+  /** 시공팀 사진이 고객에게 바로 공개되는가 (F9) */
+  photoAutoPublic: boolean;
 }
 
 export interface FieldScheduleItem {

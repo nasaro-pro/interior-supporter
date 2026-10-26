@@ -65,7 +65,8 @@
     "privateNotice": "올린 사진은 업체가 공개하기 전까지 고객에게 보이지 않습니다.",
     "chooseSite": "현장 선택",
     "move": "이동",
-    "uploadNeedsSite": "현장을 선택해야 사진을 올릴 수 있습니다."
+    "uploadNeedsSite": "현장을 선택해야 사진을 올릴 수 있습니다.",
+    "autoPublicNotice": "이 현장은 올린 사진이 고객에게 바로 공개됩니다."
   },
   "toast": {
     "uploaded": "사진 {count}장을 올렸습니다.",
@@ -111,6 +112,10 @@
       "saving": "저장 중",
       "done": "완료",
       "failed": "실패"
-    }
+    },
+    "prepNotice": "GIF·BMP 는 JPEG 로 바꾸고, 긴 변이 4000px 를 넘는 사진은 줄여서 올립니다.",
+    "preparing": "사진 {count}장 준비 중…",
+    "autoRetry": "자동 재시도 {attempt}회",
+    "itemPhase": "{name} 공정"
   }
 }

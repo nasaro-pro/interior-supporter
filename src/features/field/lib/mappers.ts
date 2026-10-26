@@ -44,6 +44,7 @@ export interface SiteRow {
   show_schedule: boolean | null;
   show_designs: boolean | null;
   show_materials: boolean | null;
+  photo_auto_public: boolean | null;
 }
 
 export function toSiteDetail(r: SiteRow): FieldSiteDetail {
@@ -58,6 +59,7 @@ export function toSiteDetail(r: SiteRow): FieldSiteDetail {
       showDesigns: r.show_designs === true,
       showMaterials: r.show_materials === true,
     }),
+    photoAutoPublic: r.photo_auto_public === true,
   };
 }
 

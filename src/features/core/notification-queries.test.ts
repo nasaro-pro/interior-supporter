@@ -89,7 +89,9 @@ describe('A-07 영역별 알림 종류', () => {
     expect(isTypeInArea('item_published', 'app')).toBe(false);
     expect(isTypeInArea('item_published', 'portal')).toBe(true);
     expect(isTypeInArea('request_created', 'portal')).toBe(false);
-    expect(typesForArea('field')).toEqual(['assignment_changed']);
+    // CR-11(F11): 시공팀은 일정 탭이 켜진 현장의 일정 변경도 받는다
+    expect(typesForArea('field')).toEqual(['assignment_changed', 'schedule_changed']);
+    expect(isTypeInArea('item_published', 'field')).toBe(false);
     for (const a of ['app', 'portal', 'field'] as const)
       expect(isTypeInArea('assignment_changed', a)).toBe(true);
     expect(isTypeInArea('item_confirmed', 'bogus' as 'app')).toBe(false);
@@ -184,7 +186,12 @@ describe('A-07/A-14 listNotifications', () => {
           : undefined,
     );
     const res = await listNotifications('field');
-    expect(called(fake.of('notifications')[0]!, 'in', 'type', ['assignment_changed'])).toBe(true);
+    expect(
+      called(fake.of('notifications')[0]!, 'in', 'type', [
+        'assignment_changed',
+        'schedule_changed',
+      ]),
+    ).toBe(true);
     expect(fake.of('projects')).toHaveLength(0);
     expect(res.items[0]?.projectName).toBe('현장1');
   });

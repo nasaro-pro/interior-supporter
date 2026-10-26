@@ -37,8 +37,10 @@ describe('toSiteDetail', () => {
       show_schedule: false,
       show_designs: true,
       show_materials: null,
+      photo_auto_public: null,
     });
     expect(d.tabs).toEqual(['designs']);
+    expect(d.photoAutoPublic).toBe(false);
     expect(d.pageTone).toBe('default');
   });
 });

@@ -90,14 +90,17 @@ language sql stable security definer set search_path = '' as $$
   order by p.name
 $$;
 
--- F2 현장 1곳: 머리글·탭 표시용 (볼 수 없으면 0행)
+-- F2 현장 1곳: 머리글·탭 표시용 + 사진 바로 공개 여부(F9 안내 문구) (볼 수 없으면 0행)
 create function public.field_site(p_project uuid)
 returns table (id uuid, company_id uuid, name text, site_address text, page_tone text,
-               show_schedule boolean, show_designs boolean, show_materials boolean)
+               show_schedule boolean, show_designs boolean, show_materials boolean,
+               photo_auto_public boolean)
 language sql stable security definer set search_path = '' as $$
   select p.id, p.company_id, p.name, p.site_address, p.page_tone,
          private.field_sees(p.id, 'schedule'), private.field_sees(p.id, 'designs'),
-         private.field_sees(p.id, 'materials')
+         private.field_sees(p.id, 'materials'),
+         coalesce((select s.photo_auto_public from public.project_field_settings s
+                   where s.project_id = p.id), false)
   from public.projects p
   where p.id = p_project and p.archived_at is null and private.is_field_on(p.id)
 $$;
