@@ -2,11 +2,11 @@
 import 'server-only';
 import type { AccessContext } from '@/shared/contracts/integration';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
-import type { RelatedType } from '../schema';
+import type { RelatedType, ScheduleProgress } from '../schema';
 import type { ScheduleEvent } from '../types';
 
 const COLUMNS =
-  'id, project_id, title, description, start_date, start_time, end_date, end_time, is_public, related_type, related_id, archived_at, version, created_at';
+  'id, project_id, title, description, start_date, start_time, end_date, end_time, is_public, progress, related_type, related_id, archived_at, version, created_at';
 
 interface EventRow {
   id: string;
@@ -18,6 +18,7 @@ interface EventRow {
   end_date: string | null;
   end_time: string | null;
   is_public: boolean;
+  progress: string;
   related_type: string | null;
   related_id: string | null;
   archived_at: string | null;
@@ -39,6 +40,7 @@ function toEvent(r: EventRow): ScheduleEvent {
     endDate: r.end_date,
     endTime: hm(r.end_time),
     isPublic: r.is_public,
+    progress: r.progress as ScheduleProgress,
     relatedType: (r.related_type as RelatedType | null) ?? null,
     relatedId: r.related_id,
     archived: r.archived_at !== null,

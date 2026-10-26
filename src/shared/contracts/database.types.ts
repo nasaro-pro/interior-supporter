@@ -179,6 +179,7 @@ export type Database = {
           created_at: string
           updated_at: string
           version: number
+          status: string
         }
         Insert: {
           id?: string
@@ -189,6 +190,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
           version?: number
+          status?: string
         }
         Update: {
           id?: string
@@ -199,6 +201,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
           version?: number
+          status?: string
         }
         Relationships: [
           {
@@ -220,6 +223,7 @@ export type Database = {
           created_at: string
           updated_at: string
           version: number
+          can_create_projects: boolean
         }
         Insert: {
           id?: string
@@ -230,6 +234,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
           version?: number
+          can_create_projects?: boolean
         }
         Update: {
           id?: string
@@ -240,6 +245,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
           version?: number
+          can_create_projects?: boolean
         }
         Relationships: [
           {
@@ -251,14 +257,43 @@ export type Database = {
           },
         ]
       }
+      project_create_requests: {
+        Row: {
+          id: string
+          company_id: string
+          user_id: string
+          note: string
+          status: string
+          decided_by: string | null
+          decided_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          user_id: string
+          note?: string
+          status?: string
+          decided_by?: string | null
+          decided_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          user_id?: string
+          note?: string
+          status?: string
+          decided_by?: string | null
+          decided_at?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       company_settings: {
         Row: {
           company_id: string
           default_home_message: string
-          default_home_sections: Json
-          default_home_theme: string
-          default_page_images: Json
-          default_page_tone: string
           updated_at: string
           version: number
           id: string | null
@@ -266,10 +301,6 @@ export type Database = {
         Insert: {
           company_id: string
           default_home_message?: string
-          default_home_sections?: Json
-          default_home_theme?: string
-          default_page_images?: Json
-          default_page_tone?: string
           updated_at?: string
           version?: number
           id?: never
@@ -277,10 +308,6 @@ export type Database = {
         Update: {
           company_id?: string
           default_home_message?: string
-          default_home_sections?: Json
-          default_home_theme?: string
-          default_page_images?: Json
-          default_page_tone?: string
           updated_at?: string
           version?: number
           id?: never
@@ -513,6 +540,9 @@ export type Database = {
           updated_at: string
           archived_at: string | null
           version: number
+          space: Database["public"]["Enums"]["material_space"] | null
+          is_main: boolean
+          sort_order: number
         }
         Insert: {
           id?: string
@@ -528,6 +558,9 @@ export type Database = {
           updated_at?: string
           archived_at?: string | null
           version?: number
+          space?: Database["public"]["Enums"]["material_space"] | null
+          is_main?: boolean
+          sort_order?: number
         }
         Update: {
           id?: string
@@ -543,6 +576,9 @@ export type Database = {
           updated_at?: string
           archived_at?: string | null
           version?: number
+          space?: Database["public"]["Enums"]["material_space"] | null
+          is_main?: boolean
+          sort_order?: number
         }
         Relationships: [
           {
@@ -996,6 +1032,39 @@ export type Database = {
           },
         ]
       }
+      photo_comments: {
+        Row: {
+          id: string
+          company_id: string
+          project_id: string
+          photo_id: string
+          author_id: string
+          thread_owner: string
+          body: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          company_id?: string
+          project_id?: string
+          photo_id: string
+          author_id?: string
+          thread_owner: string
+          body: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          project_id?: string
+          photo_id?: string
+          author_id?: string
+          thread_owner?: string
+          body?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       photos: {
         Row: {
           id: string
@@ -1087,6 +1156,8 @@ export type Database = {
           created_at: string
           updated_at: string
           version: number
+          must_change_password: boolean
+          temp_password_expires_at: string | null
         }
         Insert: {
           id: string
@@ -1095,6 +1166,8 @@ export type Database = {
           created_at?: string
           updated_at?: string
           version?: number
+          must_change_password?: boolean
+          temp_password_expires_at?: string | null
         }
         Update: {
           id?: string
@@ -1103,6 +1176,8 @@ export type Database = {
           created_at?: string
           updated_at?: string
           version?: number
+          must_change_password?: boolean
+          temp_password_expires_at?: string | null
         }
         Relationships: []
       }
@@ -1182,9 +1257,6 @@ export type Database = {
           is_public: boolean
           home_message: string
           home_sections: Json
-          home_theme: string
-          page_images: Json
-          page_tone: string
           created_by: string
           created_at: string
           updated_at: string
@@ -1203,9 +1275,6 @@ export type Database = {
           is_public?: boolean
           home_message?: string
           home_sections?: Json
-          home_theme?: string
-          page_images?: Json
-          page_tone?: string
           created_by: string
           created_at?: string
           updated_at?: string
@@ -1224,9 +1293,6 @@ export type Database = {
           is_public?: boolean
           home_message?: string
           home_sections?: Json
-          home_theme?: string
-          page_images?: Json
-          page_tone?: string
           created_by?: string
           created_at?: string
           updated_at?: string
@@ -1360,6 +1426,8 @@ export type Database = {
           updated_at: string
           archived_at: string | null
           version: number
+          target_type: string | null
+          target_id: string | null
         }
         Insert: {
           id?: string
@@ -1373,6 +1441,8 @@ export type Database = {
           updated_at?: string
           archived_at?: string | null
           version?: number
+          target_type?: string | null
+          target_id?: string | null
         }
         Update: {
           id?: string
@@ -1386,6 +1456,8 @@ export type Database = {
           updated_at?: string
           archived_at?: string | null
           version?: number
+          target_type?: string | null
+          target_id?: string | null
         }
         Relationships: [
           {
@@ -1416,6 +1488,7 @@ export type Database = {
           end_date: string | null
           end_time: string | null
           is_public: boolean
+          progress: string
           related_type: string | null
           related_id: string | null
           created_by: string
@@ -1435,6 +1508,7 @@ export type Database = {
           end_date?: string | null
           end_time?: string | null
           is_public?: boolean
+          progress?: string
           related_type?: string | null
           related_id?: string | null
           created_by: string
@@ -1454,6 +1528,7 @@ export type Database = {
           end_date?: string | null
           end_time?: string | null
           is_public?: boolean
+          progress?: string
           related_type?: string | null
           related_id?: string | null
           created_by?: string
@@ -1529,6 +1604,58 @@ export type Database = {
           p_display_name: string
         }
         Returns: string
+      }
+      create_estimate: {
+        Args: {
+          p_id: string
+          p_version_id: string
+          p_project: string
+          p_title: string
+          p_version_label: string
+          p_change_note: string
+          p_file: string
+          p_is_public: boolean
+        }
+        Returns: number
+      }
+      assign_external_participant: {
+        Args: {
+          p_project: string
+          p_email: string
+          p_role: Database["public"]["Enums"]["participant_role"]
+          p_can_confirm: boolean
+          p_valid_from: string | null
+          p_valid_until: string | null
+        }
+        Returns: string
+      }
+      my_inactive_companies: {
+        Args: never
+        Returns: { id: string; name: string; status: string }[]
+      }
+      set_company_status: {
+        Args: { p_company: string; p_status: string }
+        Returns: undefined
+      }
+      request_project_create: {
+        Args: { p_company: string; p_note?: string }
+        Returns: string
+      }
+      set_project_create_permission: {
+        Args: { p_member: string; p_allowed: boolean }
+        Returns: undefined
+      }
+      decide_project_create_request: {
+        Args: { p_request: string; p_approve: boolean }
+        Returns: undefined
+      }
+      set_main_design: {
+        Args: { p_design: string }
+        Returns: undefined
+      }
+      reorder_designs: {
+        Args: { p_project: string; p_ids: string[] }
+        Returns: undefined
       }
       create_design: {
         Args: {

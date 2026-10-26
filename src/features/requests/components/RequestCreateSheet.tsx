@@ -15,13 +15,13 @@ import { Button } from '@/shared/ui/button';
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { FormField } from '@/shared/ui/form-parts';
 import { FormSheet } from '@/shared/ui/form-sheet';
-import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
 import { createRequest } from '../server/actions';
-import { REQUEST_LIMITS, requestCreateSchema } from '../schema';
+import { REQUEST_LIMITS, requestEntrySchema } from '../schema';
 
-const formSchema = requestCreateSchema.pick({ title: true, body: true });
-type FormValues = { title: string; body: string };
+// D-33 · CU-06: 제목 입력 없음 — 서버가 본문 앞부분으로 제목을 만든다
+const formSchema = requestEntrySchema.pick({ body: true });
+type FormValues = { body: string };
 
 export function RequestCreateSheet({ projectId }: { projectId: string }) {
   const t = useTranslations();
@@ -34,7 +34,7 @@ export function RequestCreateSheet({ projectId }: { projectId: string }) {
   const [pending, startTransition] = useTransition();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { title: '', body: '' },
+    defaultValues: { body: '' },
   });
   const { errors } = form.formState;
 
@@ -57,7 +57,7 @@ export function RequestCreateSheet({ projectId }: { projectId: string }) {
       if (!res.ok) {
         setServerError(res.error);
         for (const [field, keys] of Object.entries(res.error.fieldErrors ?? {})) {
-          if (field === 'title' || field === 'body') form.setError(field, { message: keys[0] });
+          if (field === 'body') form.setError(field, { message: keys[0] });
         }
         return; // 입력 보존 (공통 AC ③)
       }
@@ -99,15 +99,6 @@ export function RequestCreateSheet({ projectId }: { projectId: string }) {
       >
         <form id="request-create-form" onSubmit={submit} className="flex flex-col gap-4" noValidate>
           <ActionError error={serverError} />
-          <FormField
-            id="request-title"
-            label={t('requests.field.title')}
-            required
-            requiredLabel={t('common.field.required')}
-            error={errorText(errors.title?.message, REQUEST_LIMITS.title)}
-          >
-            <Input maxLength={REQUEST_LIMITS.title} {...form.register('title')} />
-          </FormField>
           <FormField
             id="request-body"
             label={t('requests.field.body')}

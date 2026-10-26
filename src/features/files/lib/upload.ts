@@ -9,6 +9,7 @@ import {
   type UploadKind,
 } from '@/features/files/lib/rules';
 import type { ErrorCode } from '@/shared/contracts/errors';
+import { FILE_RULES } from '@/shared/contracts/domain';
 import type { FinalizedFile } from '@/shared/contracts/integration';
 import { createBrowserSupabase } from '@/shared/lib/supabase/browser';
 
@@ -32,7 +33,8 @@ export type UploadOutcome =
 
 export async function precheckFile(kind: UploadKind, file: File): Promise<PrecheckIssue | null> {
   const ext = extOf(file.name);
-  if (ext === '.heic' || ext === '.heif') return 'heic';
+  // HEIC 를 받지 않는 종류(사진 등)만 안내 — 도안 원본은 HEIC 도 원본 그대로 보관한다 (D-20)
+  if ((ext === '.heic' || ext === '.heif') && !FILE_RULES[kind].exts.includes(ext)) return 'heic';
   const basic = checkNameAndSize(kind, file.name, file.size);
   if (basic) return basic;
   const head = new Uint8Array(await file.slice(0, SNIFF_BYTES).arrayBuffer());

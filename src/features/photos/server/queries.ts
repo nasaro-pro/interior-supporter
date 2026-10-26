@@ -128,3 +128,68 @@ export async function getPhoto(
   const names = await profileNames(supabase, [row.uploaded_by]);
   return toItem(row, names);
 }
+
+export interface PhotoCommentThread {
+  /** 대화의 고객 */
+  ownerId: string;
+  ownerName: string | null;
+  comments: {
+    id: string;
+    body: string;
+    authorId: string;
+    authorName: string | null;
+    /** 고객 글이면 true, 디자이너 답글이면 false */
+    byOwner: boolean;
+    createdAt: string;
+  }[];
+}
+
+/**
+ * D-34 · CU-07 사진 댓글 — 고객별 대화로 묶는다. 고객은 자기 대화만(RLS + 쿼리 이중 검증), 편집자는 전체.
+ * 시공팀은 빈 목록.
+ */
+export async function listPhotoComments(
+  photoId: string,
+  viewer: ProjectAccess,
+  userId: string,
+): Promise<PhotoCommentThread[]> {
+  if (viewer.as === 'field') return [];
+  const supabase = await createServerSupabase();
+  let query = supabase
+    .from('photo_comments')
+    .select('id, body, author_id, thread_owner, created_at')
+    .eq('photo_id', photoId)
+    .eq('project_id', viewer.projectId);
+  if (viewer.as !== 'editor') query = query.eq('thread_owner', userId);
+  const { data, error } = await query
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true })
+    .limit(200);
+  if (error) {
+    logger.warn('photos.comments.list_failed', { dbCode: error.code, objectId: photoId });
+    throw new Error(`photos.comments:${error.code ?? 'unknown'}`);
+  }
+  const rows = data ?? [];
+  const names = await profileNames(supabase, [
+    ...rows.map((r) => r.author_id),
+    ...rows.map((r) => r.thread_owner),
+  ]);
+  const threads = new Map<string, PhotoCommentThread>();
+  for (const r of rows) {
+    const t = threads.get(r.thread_owner) ?? {
+      ownerId: r.thread_owner,
+      ownerName: names.get(r.thread_owner) ?? null,
+      comments: [],
+    };
+    t.comments.push({
+      id: r.id,
+      body: r.body,
+      authorId: r.author_id,
+      authorName: names.get(r.author_id) ?? null,
+      byOwner: r.author_id === r.thread_owner,
+      createdAt: r.created_at,
+    });
+    threads.set(r.thread_owner, t);
+  }
+  return [...threads.values()];
+}

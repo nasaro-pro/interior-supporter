@@ -11,6 +11,9 @@ export const RELATED_TYPES = [
   'photos',
 ] as const;
 export type RelatedType = (typeof RELATED_TYPES)[number];
+/** D-30 일정 진행 상태 (DB CHECK 와 동일) */
+export const SCHEDULE_PROGRESS = ['planned', 'in_progress', 'done'] as const;
+export type ScheduleProgress = (typeof SCHEDULE_PROGRESS)[number];
 
 const hm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'field.invalid');
 
@@ -22,6 +25,8 @@ const fields = {
   endDate: ymdSchema.nullable(),
   endTime: hm.nullable(),
   isPublic: z.boolean(),
+  /** 보내지 않으면 바꾸지 않음 (새 일정은 DB 기본값 '예정') */
+  progress: z.enum(SCHEDULE_PROGRESS, 'field.invalid').optional(),
   relatedType: z.enum(RELATED_TYPES).nullable(),
   relatedId: z.guid().nullable(),
 };

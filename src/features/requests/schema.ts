@@ -7,12 +7,24 @@ export const REQUEST_LIMITS = { title: 120, body: 4000 } as const;
 
 const body = z.string().trim().min(1, 'field.required').max(REQUEST_LIMITS.body, 'field.tooLong');
 
-export const requestCreateSchema = z.object({
-  id: z.guid(),
-  projectId: z.guid(),
-  title: z.string().trim().min(1, 'field.required').max(REQUEST_LIMITS.title, 'field.tooLong'),
-  body,
-});
+/** D-32: 메모를 다는 항목 (도안 · 자재) */
+export const REQUEST_TARGET_TYPES = ['designs', 'materials'] as const;
+export type RequestTargetType = (typeof REQUEST_TARGET_TYPES)[number];
+
+export const requestCreateSchema = z
+  .object({
+    id: z.guid(),
+    projectId: z.guid(),
+    /** D-33: 비우면 서버가 본문 앞부분으로 만든다 */
+    title: z.string().trim().max(REQUEST_LIMITS.title, 'field.tooLong').default(''),
+    body,
+    targetType: z.enum(REQUEST_TARGET_TYPES).nullable().default(null),
+    targetId: z.guid().nullable().default(null),
+  })
+  .refine((v) => (v.targetType === null) === (v.targetId === null), {
+    path: ['targetId'],
+    message: 'field.invalid',
+  });
 export type RequestCreateInput = z.infer<typeof requestCreateSchema>;
 
 /** 정정·답변 공통 (POL-018: 정정 = 원 작성자, 답변 = 편집자 — 권한은 액션·RLS 가 판정) */

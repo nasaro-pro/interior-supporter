@@ -14,6 +14,8 @@ export const routes = {
   signup: () => '/signup',
   invite: (token: string) => `/invite/${enc(token)}`,
   resetPassword: () => '/reset-password',
+  /** D-15: 임시 비밀번호로 처음 로그인한 계정의 비밀번호 변경 (AUTH-06) */
+  changePassword: () => '/change-password',
   selectArea: () => '/select-area',
   authConfirm: () => '/auth/confirm',
 

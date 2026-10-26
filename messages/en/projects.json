@@ -53,7 +53,8 @@
     "empty": "No projects yet. Create a new project to get started.",
     "statusLabel": "Status",
     "createHint": "New projects are private by default. The customer home message starts from the company template.",
-    "noPeriod": "No dates"
+    "noPeriod": "No dates",
+    "unanswered": "My unanswered requests"
   },
   "switcher": {
     "label": "Switch project",
@@ -69,12 +70,7 @@
     "previewNotice": "The preview shows only what customers can see.",
     "empty": "Nothing to share yet.",
     "sectionsLabel": "Customer home section order and visibility",
-    "privateProjectNotice": "This project is still private, so customers cannot open it yet.",
-    "themeLabel": "Color theme",
-    "pageToneLabel": "Page mood",
-    "pageImagesLabel": "Images by page",
-    "pageImagesHint": "Change page images in Settings > Templates. Here you only choose whether to show them.",
-    "showImage": "Show"
+    "privateProjectNotice": "This project is still private, so customers cannot open it yet."
   },
   "settings": {
     "basic": "Basic information",
@@ -151,21 +147,26 @@
     "closeWarning": "You cannot see this link again after closing. Copy it now.",
     "create": "Create invite link"
   },
-  "homeTheme": {
-    "brand": "Teal (default)",
-    "info": "Blue",
-    "positive": "Green",
-    "caution": "Yellow",
-    "attention": "Orange",
-    "neutral": "Gray"
+  "account": {
+    "createCustomer": "Create customer account",
+    "createField": "Create field crew account",
+    "hint": "Creating an account emails the ID (email) and a temporary password. If the email already has an account, it is only added to this project.",
+    "project": "Project",
+    "emailId": "Email (sign-in ID)",
+    "submit": "Create and send",
+    "mailSent": "Account created and email sent.",
+    "created": "Account created. The email couldn't be sent, so share the temporary password yourself.",
+    "assignedExisting": "This person already has an account, so they were added to this project.",
+    "tempTitle": "Temporary password",
+    "mailNotSent": "The email couldn't be sent. Copy the details below and share them directly.",
+    "closeWarning": "Once you close this, you can't see the temporary password again. Resend it if needed.",
+    "copy": "Copy ID and password",
+    "resend": "Resend temporary password",
+    "alreadyActive": "This account already set its own password. Use a reset link if they forgot it."
   },
-  "pageTone": {
-    "default": "Default",
-    "ivory": "Ivory",
-    "sand": "Sand",
-    "greige": "Greige",
-    "sage": "Sage",
-    "mist": "Mist",
-    "clay": "Clay"
+  "createPermission": {
+    "request": "Request permission to create projects",
+    "requested": "Asked the company admin for permission to create projects.",
+    "pending": "Permission requested — waiting for the company admin."
   }
 }

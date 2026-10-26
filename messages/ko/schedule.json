@@ -37,7 +37,8 @@
     "project": "프로젝트",
     "when": "일시",
     "relatedType": "항목 종류",
-    "visibility": "고객 공개"
+    "visibility": "고객 공개",
+    "progress": "진행 상태"
   },
   "relatedType": {
     "designs": "도안",
@@ -102,5 +103,10 @@
     "empty": "표시할 기간이 없습니다. 프로젝트 공사 기간을 입력하거나 일정을 등록하세요.",
     "label": "일정 타임라인",
     "projectPeriod": "공사 기간"
+  },
+  "progress": {
+    "planned": "예정",
+    "in_progress": "진행중",
+    "done": "완료"
   }
 }

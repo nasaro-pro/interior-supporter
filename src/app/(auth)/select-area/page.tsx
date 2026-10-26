@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Building2, Camera, Home } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { getAccessContext } from '@/features/core';
+import { loadInactiveCompanies } from '@/features/core/server/access';
 import { chooseArea, logout } from '@/features/core/server/session-actions';
 import { LAST_COMPANY_COOKIE } from '@/features/core/constants';
 import { routes } from '@/shared/contracts/routes';
@@ -16,6 +17,8 @@ export default async function SelectAreaPage({
 }) {
   const sp = await searchParams;
   const ctx = await getAccessContext();
+  // D-11: 승인 대기·정지 업체 안내 (영역 수에는 들어가지 않는다)
+  const inactive = await loadInactiveCompanies();
   const t = await getTranslations();
   const choices =
     ctx.memberships.length +
@@ -53,8 +56,27 @@ export default async function SelectAreaPage({
           {t('auth.reset.done')}
         </p>
       ) : null}
+      {inactive.length ? (
+        <ul className="flex flex-col gap-2" data-ui-key="area-inactive-companies">
+          {inactive.map((c) => (
+            <li
+              key={c.id}
+              data-key={c.id}
+              role="status"
+              className="bg-tone-caution-bg text-tone-caution-fg rounded-md px-3 py-2 text-sm"
+            >
+              <span className="font-medium">{c.name}</span> ·{' '}
+              {c.status === 'pending'
+                ? t('auth.selectArea.companyPending')
+                : t('auth.selectArea.companySuspended')}
+            </li>
+          ))}
+        </ul>
+      ) : null}
       {choices === 0 ? (
-        <p className="text-muted-foreground">{t('auth.selectArea.none')}</p>
+        inactive.length ? null : (
+          <p className="text-muted-foreground">{t('auth.selectArea.none')}</p>
+        )
       ) : (
         <>
           <p className="text-muted-foreground">{t('auth.selectArea.intro')}</p>

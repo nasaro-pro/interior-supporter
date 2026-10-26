@@ -20,7 +20,9 @@
     "request_status_changed": "A request status changed.",
     "photo_uploaded": "New site photos were uploaded.",
     "photo_published": "Site photos are now visible to you.",
-    "schedule_changed": "A schedule event was added or changed."
+    "schedule_changed": "A schedule event was added or changed.",
+    "photo_commented": "A customer commented on a site photo.",
+    "photo_comment_replied": "Your designer replied to your photo comment."
   },
   "target": {
     "unavailable": "This item is no longer available to you."

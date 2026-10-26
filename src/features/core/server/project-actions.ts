@@ -13,6 +13,7 @@ import {
   projectUpdateSchema,
 } from '../schema';
 import { findMembershipBySlug, findProjectAccess, loadAccessContext } from './access';
+import { getCreatePermission } from './create-permission-queries';
 
 function revalidateProject(slug: string, projectId: string) {
   revalidatePath(routes.app.projects(slug));
@@ -38,6 +39,10 @@ export async function createProject(
   const parsed = parseInput(projectCreateSchema, raw);
   if (!parsed.ok) return parsed.result;
   const v = parsed.data;
+
+  // D-36: 담당자는 업체관리자가 준 생성 권한이 있어야 한다 (RLS projects_insert 가 한 번 더 막는다)
+  const permission = await getCreatePermission(member.companyId, member.role, ctx.userId);
+  if (!permission.allowed) return fail('FORBIDDEN');
 
   const supabase = await createServerSupabase();
   const { error } = await supabase.from('projects').insert({
@@ -109,7 +114,7 @@ export async function updateProject(
   return ok({ version: data.version });
 }
 
-// ── REQ-014 고객 홈 편집 (안내문 + 4영역 순서·표시 + 테마·배경, 저장 즉시 반영) ─────────────
+// ── REQ-014 고객 홈 편집 (안내문 + 4영역 순서·표시, 저장 즉시 반영) ─────────────
 export async function updateHome(raw: unknown): Promise<ActionResult<{ version: number }>> {
   const parsed = parseInput(homeUpdateSchema, raw);
   if (!parsed.ok) return parsed.result;
@@ -120,13 +125,7 @@ export async function updateHome(raw: unknown): Promise<ActionResult<{ version: 
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('projects')
-    .update({
-      home_message: v.homeMessage,
-      home_sections: v.homeSections,
-      home_theme: v.homeTheme,
-      page_images: v.pageImages,
-      page_tone: v.pageTone,
-    })
+    .update({ home_message: v.homeMessage, home_sections: v.homeSections })
     .eq('id', v.projectId)
     .eq('version', v.baseVersion)
     .select('version')

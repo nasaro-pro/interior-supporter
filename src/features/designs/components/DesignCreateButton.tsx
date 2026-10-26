@@ -1,5 +1,6 @@
 'use client';
-// PM-04 도안 업로드 Sheet (REQ-101): 원본 업로드(.skp/.pdf/.dwg 50MB, 이중 검사) → 정보 입력 → create_design
+// PM-04 도안 업로드 Sheet (REQ-101·D-20·D-21): 원본 업로드(업계 형식 16종 50MB, 이중 검사) → 정보 입력 → create_design
+// D-21: 원본이 이미지(PNG·JPG·WebP)면 같은 이미지를 첫 비교 이미지로도 등록한다 — 이미지 1장만으로 도안을 시작
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -8,8 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { routes } from '@/shared/contracts/routes';
 import type { AppError } from '@/shared/contracts/errors';
-import { UploadField, UploadQueue, type UploadedFile } from '@/features/files';
-import { createDesign } from '@/features/designs/server/actions';
+import { UploadField, UploadQueue, uploadFile, type UploadedFile } from '@/features/files';
+import { FILE_RULES } from '@/shared/contracts/domain';
+import { addDesignPreview, createDesign } from '@/features/designs/server/actions';
 import { designCreateSchema, type DesignCreateInput } from '@/features/designs/schema';
 import { Plus } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
@@ -19,6 +21,15 @@ import { useActionErrorText } from '@/shared/ui/action-error';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
 import { NativeCheckbox } from '@/shared/ui/native-fields';
+import { DesignSpaceSelect, spaceValue } from '@/features/designs/components/DesignSpaceControls';
+
+/** D-21: 비교 이미지 규격(PNG·JPG·WebP, 20MB)에 맞는 이미지 원본인가 */
+function isPreviewableImage(f: File): boolean {
+  const dot = f.name.lastIndexOf('.');
+  const ext = dot >= 0 ? f.name.slice(dot).toLowerCase() : '';
+  const rule = FILE_RULES.design_preview;
+  return rule.exts.includes(ext) && f.size > 0 && f.size <= rule.maxBytes;
+}
 
 export function DesignCreateButton({
   projectId,
@@ -98,7 +109,15 @@ function DesignCreateForm({
   const [serverError, setServerError] = useState<AppError | null>(null);
   const form = useForm<DesignCreateInput>({
     resolver: zodResolver(designCreateSchema),
-    defaultValues: { projectId, title: '', description: '', note: '', isPublic: false, fileId: '' },
+    defaultValues: {
+      projectId,
+      title: '',
+      description: '',
+      note: '',
+      isPublic: false,
+      fileId: '',
+      space: null,
+    },
   });
   const { register, handleSubmit, setValue, formState } = form;
 
@@ -121,6 +140,23 @@ function DesignCreateForm({
         return;
       }
       toast.success(t('toast.created'));
+      // D-21: 이미지 원본은 첫 비교 이미지로도 등록 (실패해도 도안은 이미 만들어졌다 — 상세에서 다시 추가)
+      const src = file?.source;
+      if (src && isPreviewableImage(src)) {
+        const up = await uploadFile(src, { kind: 'design_preview', projectId, companyId });
+        const added = up.ok
+          ? await addDesignPreview({
+              projectId,
+              designId: res.data.id,
+              id: crypto.randomUUID(),
+              fileId: up.file.fileId,
+              label: values.title.slice(0, 80),
+              designVersionId: null,
+              pdfPage: null,
+            })
+          : null;
+        if (!added?.ok) toast.warning(t('toast.previewAutoFailed'));
+      }
       onDone();
       router.push(routes.app.design(companySlug, projectId, res.data.id));
     }),
@@ -150,6 +186,7 @@ function DesignCreateForm({
         label={t('field.original')}
         error={fieldErr('fileId')}
         fileName={file?.name}
+        hint={t('field.originalHint')}
         required
       >
         <UploadQueue
@@ -161,6 +198,9 @@ function DesignCreateForm({
       </UploadField>
       <FormField label={t('field.title')} error={fieldErr('title')} required>
         <Input {...register('title')} maxLength={120} />
+      </FormField>
+      <FormField label={t('field.space')} hint={t('field.spaceHint')}>
+        <DesignSpaceSelect {...register('space', { setValueAs: spaceValue })} />
       </FormField>
       <FormField label={t('field.description')} error={fieldErr('description')}>
         <Textarea {...register('description')} rows={3} maxLength={2000} />

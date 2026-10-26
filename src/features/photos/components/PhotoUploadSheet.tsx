@@ -25,6 +25,7 @@ import { Notice } from '@/shared/ui/notice';
 import { SwitchField } from '@/shared/ui/switch-field';
 import { Textarea } from '@/shared/ui/textarea';
 import { createPhoto } from '../server/actions';
+import { LocalThumb } from './LocalThumb';
 import { PHOTO_LIMITS } from '../schema';
 import { readExifDate } from '../lib/exif-date';
 import { runUploadItem, type PipelineDeps } from '../lib/upload-pipeline';
@@ -241,7 +242,10 @@ export function PhotoUploadSheet({
               id="photo-upload-input"
               type="file"
               multiple
-              accept={FILE_RULES.photo_original.exts.join(',')}
+              // D-25: MIME 을 함께 적으면 아이폰 사파리가 HEIC 사진을 JPEG 로 바꿔서 넘겨 준다
+              accept={[...FILE_RULES.photo_original.mimes, ...FILE_RULES.photo_original.exts].join(
+                ',',
+              )}
               className="peer sr-only"
               onChange={(e) => void addFiles(e.target.files)}
               disabled={busy}
@@ -325,6 +329,7 @@ export function PhotoUploadSheet({
                 <QueueRow
                   key={item.key}
                   item={item}
+                  file={files.current.get(item.key)}
                   onRetry={() => retry(item.key)}
                   onRemove={() => {
                     files.current.delete(item.key);
@@ -352,10 +357,12 @@ export function PhotoUploadSheet({
 
 function QueueRow({
   item,
+  file,
   onRetry,
   onRemove,
 }: {
   item: UploadItem;
+  file?: File;
   onRetry: () => void;
   onRemove: () => void;
 }) {
@@ -372,6 +379,7 @@ function QueueRow({
   return (
     <li data-key={item.key} data-stage={item.stage} className="flex flex-col gap-1.5 px-3 py-2.5">
       <div className="flex items-center gap-2">
+        <LocalThumb file={file} alt={t('photos.upload.previewAlt', { name: item.name })} />
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{item.name}</span>
         <span className="text-muted-foreground text-xs" data-numeric>
           {t('files.size.mb', { value: (item.size / 1024 / 1024).toFixed(1) })}

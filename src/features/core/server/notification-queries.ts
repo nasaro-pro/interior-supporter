@@ -17,6 +17,7 @@ const PM_TYPES = new Set([
   'request_created',
   'request_corrected',
   'photo_uploaded',
+  'photo_commented',
 ]);
 const CUSTOMER_TYPES = new Set([
   'item_published',
@@ -25,6 +26,7 @@ const CUSTOMER_TYPES = new Set([
   'request_status_changed',
   'photo_published',
   'schedule_changed',
+  'photo_comment_replied',
 ]);
 
 export function areaOfNotification(type: string, fallback: Area): Area {

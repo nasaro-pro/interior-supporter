@@ -1,5 +1,5 @@
 // 화면용 타입 (camelCase). snake_case 변환은 server/queries.ts 에서만
-import type { ConfirmState } from '@/shared/contracts/domain';
+import type { ConfirmState, MaterialSpace } from '@/shared/contracts/domain';
 
 export interface DesignListItem {
   id: string;
@@ -10,6 +10,12 @@ export interface DesignListItem {
   updatedAt: string;
   archivedAt: string | null;
   previewFileId: string | null;
+  /** D-26 공간 (null = 전체) */
+  space: MaterialSpace | null;
+  /** D-27 대표 도안 */
+  isMain: boolean;
+  /** D-28 디자이너가 정한 순서 */
+  sortOrder: number;
 }
 
 export interface DesignFileInfo {
@@ -57,6 +63,8 @@ export interface DesignDetail {
   version: number;
   updatedAt: string;
   archivedAt: string | null;
+  space: MaterialSpace | null;
+  isMain: boolean;
   versions: DesignVersionItem[];
   previews: DesignPreviewItem[];
   confirmations: ConfirmationRecord[];

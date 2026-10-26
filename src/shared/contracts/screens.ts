@@ -87,6 +87,17 @@ export const SCREENS = [
     titleKey: 'auth.screen.reset',
   },
   {
+    id: 'AUTH-06',
+    parent: null,
+    depth: 0,
+    area: 'auth',
+    route: '/change-password',
+    owner: 'A',
+    reqs: ['REQ-006'],
+    status: 'active',
+    titleKey: 'auth.screen.changePassword',
+  },
+  {
     id: 'AUTH-05',
     parent: null,
     depth: 0,

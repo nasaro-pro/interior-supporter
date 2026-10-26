@@ -111,6 +111,23 @@
       "saving": "Saving",
       "done": "Done",
       "failed": "Failed"
-    }
+    },
+    "previewAlt": "Preview of {name}"
+  },
+  "comments": {
+    "title": "Comments",
+    "label": "Comment",
+    "placeholder": "Leave a comment about this photo",
+    "send": "Send comment",
+    "sent": "Comment sent. Your designer will be notified.",
+    "reply": "Reply",
+    "replyLabel": "Reply",
+    "replyPlaceholder": "Type your reply",
+    "replied": "Reply sent.",
+    "emptyEditor": "No customer comments yet.",
+    "emptyCustomer": "Ask about this photo here. Only your designer can see it.",
+    "privateHint": "Customers cannot comment on private photos.",
+    "threadOf": "Comments from {name}",
+    "designer": "Designer"
   }
 }
