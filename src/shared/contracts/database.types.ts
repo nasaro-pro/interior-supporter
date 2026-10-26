@@ -1,6 +1,6 @@
-// DB 타입 — 실 dev Supabase 카탈로그에서 생성 (_integration/tools/gen-types.mjs --live). supabase gen types 와 같은 형식
-// 마이그레이션 추가 후 다시 생성: cd _integration/tools && node gen-types.mjs ../20_merged/supabase/migrations ../20_merged/src/shared/contracts/database.types.ts --live
-// 생성: 2026-10-13T00:27:05.531Z · 마이그레이션: 20261006000100_a_foundation.sql, 20261006000200_b_designs_materials_estimates.sql, 20261006000300_c_requests_photos_schedule.sql, 20261006000900_a_grants_hardening.sql, 20261013000100_a_password_reset_scope.sql, 20261013000110_a_field_project_scope.sql, 20261013000120_a_file_visibility.sql, 20261013000130_a_assignment_notify.sql, 20261013000140_a_client_projects_archive.sql, 20261013000150_a_created_by_defaults.sql, 20261013000200_b_confirmations_reconfirm.sql, 20261013000210_b_created_by_defaults.sql, 20261013000300_c_request_status_guard.sql
+// ⚠️ 임시 DB 타입 — PGlite 로 베이스라인 마이그레이션을 적용해 생성 (_integration/tools/gen-types.mjs)
+// 실 Supabase 연결 후 `npm run db:types` 결과로 반드시 교체한다 (병합 3파트 계획 · 파트 2).
+// 생성: 2026-10-26T09:01:30.356Z · 마이그레이션: 20261006000100_a_foundation.sql, 20261006000200_b_designs_materials_estimates.sql, 20261006000300_c_requests_photos_schedule.sql, 20261006000900_a_grants_hardening.sql, 20261013000100_a_password_reset_scope.sql, 20261013000110_a_field_project_scope.sql, 20261013000120_a_file_visibility.sql, 20261013000130_a_assignment_notify.sql, 20261013000140_a_client_projects_archive.sql, 20261013000150_a_created_by_defaults.sql, 20261013000200_b_confirmations_reconfirm.sql, 20261013000210_b_created_by_defaults.sql, 20261013000300_c_request_status_guard.sql, 20261024000100_a_home_template.sql, 20261025000100_a_page_theme.sql, 20261026000200_c_field_access.sql
 
 export type Json =
   | string
@@ -255,35 +255,35 @@ export type Database = {
         Row: {
           company_id: string
           default_home_message: string
+          updated_at: string
+          version: number
+          id: string | null
           default_home_sections: Json
           default_home_theme: string
           default_page_images: Json
           default_page_tone: string
-          updated_at: string
-          version: number
-          id: string | null
         }
         Insert: {
           company_id: string
           default_home_message?: string
+          updated_at?: string
+          version?: number
+          id?: never
           default_home_sections?: Json
           default_home_theme?: string
           default_page_images?: Json
           default_page_tone?: string
-          updated_at?: string
-          version?: number
-          id?: never
         }
         Update: {
           company_id?: string
           default_home_message?: string
+          updated_at?: string
+          version?: number
+          id?: never
           default_home_sections?: Json
           default_home_theme?: string
           default_page_images?: Json
           default_page_tone?: string
-          updated_at?: string
-          version?: number
-          id?: never
         }
         Relationships: [
           {
@@ -1106,6 +1106,57 @@ export type Database = {
         }
         Relationships: []
       }
+      project_field_settings: {
+        Row: {
+          project_id: string
+          id: string
+          company_id: string
+          show_schedule: boolean
+          show_designs: boolean
+          show_materials: boolean
+          photo_auto_public: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          project_id: string
+          id?: string
+          company_id: string
+          show_schedule?: boolean
+          show_designs?: boolean
+          show_materials?: boolean
+          photo_auto_public?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          project_id?: string
+          id?: string
+          company_id?: string
+          show_schedule?: boolean
+          show_designs?: boolean
+          show_materials?: boolean
+          photo_auto_public?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_field_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_field_settings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_participants: {
         Row: {
           id: string
@@ -1182,14 +1233,14 @@ export type Database = {
           is_public: boolean
           home_message: string
           home_sections: Json
-          home_theme: string
-          page_images: Json
-          page_tone: string
           created_by: string
           created_at: string
           updated_at: string
           archived_at: string | null
           version: number
+          home_theme: string
+          page_images: Json
+          page_tone: string
         }
         Insert: {
           id?: string
@@ -1203,14 +1254,14 @@ export type Database = {
           is_public?: boolean
           home_message?: string
           home_sections?: Json
-          home_theme?: string
-          page_images?: Json
-          page_tone?: string
           created_by: string
           created_at?: string
           updated_at?: string
           archived_at?: string | null
           version?: number
+          home_theme?: string
+          page_images?: Json
+          page_tone?: string
         }
         Update: {
           id?: string
@@ -1224,14 +1275,14 @@ export type Database = {
           is_public?: boolean
           home_message?: string
           home_sections?: Json
-          home_theme?: string
-          page_images?: Json
-          page_tone?: string
           created_by?: string
           created_at?: string
           updated_at?: string
           archived_at?: string | null
           version?: number
+          home_theme?: string
+          page_images?: Json
+          page_tone?: string
         }
         Relationships: [
           {
@@ -1541,9 +1592,37 @@ export type Database = {
         }
         Returns: string
       }
+      field_designs: {
+        Args: {
+          p_project: string
+        }
+        Returns: { id: string; title: string; description: string; confirmed_version: number; original_file_id: string; preview_file_ids: string[]; preview_labels: string[] }[]
+      }
+      field_materials: {
+        Args: {
+          p_project: string
+        }
+        Returns: { id: string; name: string; category: string; space: Database["public"]["Enums"]["material_space"]; spec: string; quantity: number; unit: string; location_note: string; image_file_id: string }[]
+      }
       field_projects: {
         Args: never
         Returns: { id: string; company_id: string; name: string; site_address: string }[]
+      }
+      field_schedule: {
+        Args: {
+          p_project: string
+        }
+        Returns: { id: string; title: string; description: string; start_date: string; start_time: string; end_date: string; end_time: string }[]
+      }
+      field_site: {
+        Args: {
+          p_project: string
+        }
+        Returns: { id: string; company_id: string; name: string; site_address: string; page_tone: string; show_schedule: boolean; show_designs: boolean; show_materials: boolean }[]
+      }
+      field_sites: {
+        Args: never
+        Returns: { id: string; company_id: string; company_name: string; name: string; site_address: string; valid_from: string; valid_until: string; today_events: string[] }[]
       }
       project_brief: {
         Args: {
