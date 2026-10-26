@@ -9,7 +9,7 @@
  * - 각 page.tsx 의 최상위 <main> 에 data-screen-id={SCREEN_ID} 를 붙인다 (TC-907 이 검사).
  */
 
-export type Area = 'public' | 'auth' | 'app' | 'portal' | 'field' | 'system';
+export type Area = 'public' | 'auth' | 'app' | 'portal' | 'field' | 'admin' | 'system';
 export type Owner = 'A' | 'B' | 'C';
 export type ScreenStatus = 'active' | 'state' | 'retired';
 
@@ -621,6 +621,131 @@ export const SCREENS = [
     titleKey: 'notifications.screen.list',
   },
 
+  // ── 사이트 관리 /admin (통합본 3장, CR-3) ───────────────────────
+  {
+    id: 'ADM-00',
+    parent: null,
+    depth: 0,
+    area: 'auth',
+    route: '/admin/login',
+    owner: 'A',
+    reqs: ['A1'],
+    status: 'active',
+    titleKey: 'admin.screen.login',
+  },
+  {
+    id: 'ADM-01',
+    parent: null,
+    depth: 1,
+    area: 'admin',
+    route: '/admin',
+    owner: 'A',
+    reqs: ['A3'],
+    status: 'active',
+    titleKey: 'admin.screen.dashboard',
+  },
+  {
+    id: 'ADM-02',
+    parent: 'ADM-01',
+    depth: 1,
+    area: 'admin',
+    route: '/admin/companies',
+    owner: 'A',
+    reqs: ['A4'],
+    status: 'active',
+    titleKey: 'admin.screen.companies',
+  },
+  {
+    id: 'ADM-03',
+    parent: 'ADM-02',
+    depth: 2,
+    area: 'admin',
+    route: '/admin/companies/[companyId]',
+    owner: 'A',
+    reqs: ['A4', 'A6'],
+    status: 'active',
+    titleKey: 'admin.screen.company',
+  },
+  {
+    id: 'ADM-04',
+    parent: 'ADM-01',
+    depth: 1,
+    area: 'admin',
+    route: '/admin/users',
+    owner: 'A',
+    reqs: ['A5'],
+    status: 'active',
+    titleKey: 'admin.screen.users',
+  },
+  {
+    id: 'ADM-05',
+    parent: 'ADM-01',
+    depth: 1,
+    area: 'admin',
+    route: '/admin/settings',
+    owner: 'A',
+    reqs: ['A6'],
+    status: 'active',
+    titleKey: 'admin.screen.settings',
+  },
+  {
+    id: 'ADM-06',
+    parent: 'ADM-01',
+    depth: 1,
+    area: 'admin',
+    route: '/admin/cleanup',
+    owner: 'A',
+    reqs: ['A7'],
+    status: 'active',
+    titleKey: 'admin.screen.cleanup',
+  },
+  {
+    id: 'ADM-07',
+    parent: 'ADM-01',
+    depth: 1,
+    area: 'admin',
+    route: '/admin/audit',
+    owner: 'A',
+    reqs: ['A8'],
+    status: 'active',
+    titleKey: 'admin.screen.audit',
+  },
+
+  // ── 약관·탈퇴 (A9·A10) ──────────────────────────────────────────
+  {
+    id: 'PUB-02',
+    parent: null,
+    depth: 0,
+    area: 'public',
+    route: '/terms',
+    owner: 'A',
+    reqs: ['A9'],
+    status: 'active',
+    titleKey: 'admin.screen.terms',
+  },
+  {
+    id: 'PUB-03',
+    parent: null,
+    depth: 0,
+    area: 'public',
+    route: '/privacy',
+    owner: 'A',
+    reqs: ['A9'],
+    status: 'active',
+    titleKey: 'admin.screen.privacy',
+  },
+  {
+    id: 'ACC-01',
+    parent: null,
+    depth: 0,
+    area: 'auth',
+    route: '/account/withdraw',
+    owner: 'A',
+    reqs: ['A10'],
+    status: 'active',
+    titleKey: 'admin.screen.withdraw',
+  },
+
   // ── 시스템 ─────────────────────────────────────────────────────
   {
     id: 'SYS-403',
@@ -673,7 +798,7 @@ export type PortalTab = (typeof PORTAL_TABS)[number];
 
 /** 영구 제외 범위 — 이 이름/기능의 화면을 만들지 않는다 (11_PRD 제외 범위) */
 export const EXCLUDED_SCREENS = [
-  '시스템 관리자/OP 영역',
+  // '시스템 관리자/OP 영역' — 2차 수정 CR-3 으로 사이트 관리(/admin)를 만든다 (통합본 3장)
   '업체 총관리자 콘솔',
   '요금제·결제',
   '고객 확정 코드 페이지',
