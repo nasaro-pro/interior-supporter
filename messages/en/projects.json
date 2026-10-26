@@ -16,7 +16,8 @@
     "photos": "Photos",
     "schedule": "Schedule",
     "estimates": "Estimates",
-    "settings": "Settings"
+    "settings": "Settings",
+    "memos": "Notes"
   },
   "status": {
     "planned": "Planned",

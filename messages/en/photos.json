@@ -45,8 +45,8 @@
     "label": "Photo filters",
     "allPhases": "All phases",
     "allUploaders": "Everyone",
-    "from": "Taken from",
-    "to": "Taken until",
+    "from": "Start date",
+    "to": "End date",
     "apply": "Apply"
   },
   "summary": {

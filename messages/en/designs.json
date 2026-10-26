@@ -130,5 +130,15 @@
     "hiddenNotice": "The main design is private, so customers cannot see it. Make it public to show it large on the customer design page. Until then customers see the latest public design with an image instead.",
     "noPreviewNotice": "The main design has no comparison image, so there is nothing to show large on the customer design page. Add a render (JPG, PNG, WebP) under comparison images below. Until then customers see the latest public design with an image instead.",
     "setHint": "Before setting this as the main design, add a comparison image first. Customers see it large on their design page."
+  },
+  "customer": {
+    "heroLabel": "Main design",
+    "browseSpaces": "Browse by space ({count})",
+    "heroHint": "Tap the main design to browse designs by space.",
+    "backToHero": "← Back to main design",
+    "spaceNav": "Spaces",
+    "allSpaces": "All",
+    "spaceEmpty": "No public designs in this space yet.",
+    "wholeHome": "Whole home"
   }
 }

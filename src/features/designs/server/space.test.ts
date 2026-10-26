@@ -14,7 +14,7 @@ vi.mock('@/shared/lib/logger', () => ({
 import { requireProjectAccess } from '@/features/core';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
 import { createDesign, moveDesign, moveDesignSpace, setMainDesign, updateDesign } from './actions';
-import { moveSpace, moveWithinSpace } from '../lib/order';
+import { moveSpace, moveWithinSpace, parseSpaceParam, pickHero } from '../lib/order';
 import { groupBySpace } from '../components/DesignList';
 import type { DesignListItem } from '../types';
 
@@ -238,5 +238,44 @@ describe('D-26·D-28 groupBySpace', () => {
     ]);
     expect(groups.map((g) => g.space)).toEqual([null, 'kitchen', 'living']);
     expect(groups[1]?.items.map((x) => x.id)).toEqual(['b', 'd']);
+  });
+});
+
+describe('CU-03 · CU-04 고객 도안 화면 규칙', () => {
+  const item = (i: string, o: Partial<DesignListItem> = {}): DesignListItem => ({
+    id: i,
+    title: i,
+    currentVersion: 1,
+    isPublic: true,
+    confirmState: 'none',
+    updatedAt: '2026-10-24T00:00:00Z',
+    archivedAt: null,
+    previewFileId: `f-${i}`,
+    space: null,
+    isMain: false,
+    sortOrder: 0,
+    ...o,
+  });
+
+  it('대표 도안(이미지 있음)이 먼저', () => {
+    expect(pickHero([item('a'), item('b', { isMain: true })])?.id).toBe('b');
+  });
+  it('대표가 없거나 이미지가 없으면 이미지가 있는 최근 도안, 이미지가 하나도 없으면 null', () => {
+    expect(
+      pickHero([
+        item('a', { updatedAt: '2026-10-20T00:00:00Z' }),
+        item('b', { updatedAt: '2026-10-23T00:00:00Z' }),
+        item('m', { isMain: true, previewFileId: null }),
+      ])?.id,
+    ).toBe('b');
+    expect(pickHero([item('a', { previewFileId: null })])).toBeNull();
+  });
+  it('?space= 해석: 없음 → 대표, all → 전체, whole → 집 전체, 공간 이름 → 그 공간, 모르는 값 → 대표', () => {
+    const S = ['living', 'kitchen'];
+    expect(parseSpaceParam(undefined, S)).toEqual({ mode: 'hero' });
+    expect(parseSpaceParam('all', S)).toEqual({ mode: 'all' });
+    expect(parseSpaceParam('whole', S)).toEqual({ mode: 'space', space: null });
+    expect(parseSpaceParam('kitchen', S)).toEqual({ mode: 'space', space: 'kitchen' });
+    expect(parseSpaceParam('garage', S)).toEqual({ mode: 'hero' });
   });
 });

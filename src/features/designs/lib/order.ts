@@ -71,3 +71,32 @@ export function moveSpace<T extends Orderable>(
   if (j < 0 || j >= groups.length) return 'edge';
   return flattenIds(swap(groups, i, j));
 }
+
+/** CU-03 고객 도안 첫 화면에 크게 보일 도안 */
+export interface HeroCandidate extends Orderable {
+  previewFileId: string | null;
+  updatedAt: string;
+}
+/**
+ * 대표 도안(비교 이미지 있음) → 없으면 이미지가 있는 최근 공개 도안 → 그것도 없으면 null.
+ * 고객 목록은 RLS 가 공개분만 주므로, 비공개 대표 도안은 처음부터 후보가 아니다.
+ */
+export function pickHero<T extends HeroCandidate>(items: T[]): T | null {
+  const main = items.find((d) => d.isMain && d.previewFileId);
+  if (main) return main;
+  const withImage = items.filter((d) => d.previewFileId);
+  if (withImage.length === 0) return null;
+  return withImage.reduce((a, b) => (b.updatedAt > a.updatedAt ? b : a));
+}
+
+/** ?space= 값 → 공간 (all = 전체 보기, 그 밖 모르는 값은 null = 대표 화면) */
+export function parseSpaceParam(
+  raw: string | undefined,
+  spaces: readonly string[],
+): { mode: 'hero' } | { mode: 'all' } | { mode: 'space'; space: Space } {
+  if (raw === undefined || raw === '') return { mode: 'hero' };
+  if (raw === 'all') return { mode: 'all' };
+  if (raw === 'whole') return { mode: 'space', space: null };
+  if (spaces.includes(raw)) return { mode: 'space', space: raw as Space };
+  return { mode: 'hero' };
+}

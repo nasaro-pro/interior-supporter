@@ -45,8 +45,8 @@
     "label": "사진 필터",
     "allPhases": "전체 공정",
     "allUploaders": "모든 사람",
-    "from": "촬영일 시작",
-    "to": "촬영일 끝",
+    "from": "시작일",
+    "to": "종료일",
     "apply": "적용"
   },
   "summary": {

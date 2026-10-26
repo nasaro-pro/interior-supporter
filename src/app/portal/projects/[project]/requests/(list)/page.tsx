@@ -24,7 +24,7 @@ type Props = { params: Promise<{ project: string }>; searchParams: Promise<Searc
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('requests');
-  return { title: t('screen.list') };
+  return { title: t('customer.title') };
 }
 
 export default async function PortalRequestListPage({ params, searchParams }: Props) {
@@ -40,8 +40,8 @@ export default async function PortalRequestListPage({ params, searchParams }: Pr
   return (
     <main data-screen-id="CL-06" className="flex flex-col gap-4">
       <SectionHeader
-        title={t('requests.screen.list')}
-        description={t('requests.detail.ownOnly')}
+        title={t('requests.customer.title')}
+        description={t('requests.customer.ownOnly')}
         meta={items.length > 0 ? t('common.list.count', { count: items.length }) : undefined}
         actions={<RequestCreateSheet projectId={project} />}
       />
@@ -55,14 +55,14 @@ export default async function PortalRequestListPage({ params, searchParams }: Pr
           />
         ) : (
           <EmptyState
-            title={t('requests.list.emptyCustomer')}
+            title={t('requests.customer.empty')}
             action={
               <ButtonLink
                 href={withQuery(base, { mode: 'new' })}
                 data-ui-key="request-empty-create"
               >
                 <Plus aria-hidden />
-                {t('requests.action.create')}
+                {t('requests.customer.create')}
               </ButtonLink>
             }
           />

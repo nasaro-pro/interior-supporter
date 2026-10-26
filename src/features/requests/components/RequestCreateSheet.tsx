@@ -61,7 +61,7 @@ export function RequestCreateSheet({ projectId }: { projectId: string }) {
         }
         return; // 입력 보존 (공통 AC ③)
       }
-      toast.success(t('requests.toast.created'));
+      toast.success(t('requests.customer.created'));
       form.reset();
       setClientId(crypto.randomUUID());
       router.push(routes.portal.request(projectId, res.data.id));
@@ -72,15 +72,15 @@ export function RequestCreateSheet({ projectId }: { projectId: string }) {
     <>
       <Button onClick={() => setMode('new')} data-ui-key="request-create-open">
         <Plus aria-hidden />
-        {t('requests.action.create')}
+        {t('requests.customer.create')}
       </Button>
       <FormSheet
         open={open}
         onOpenChange={(next) => (next ? setMode('new') : close())}
         busy={pending}
         uiKey="request-create-sheet"
-        title={t('requests.action.create')}
-        description={t('requests.form.immutableHint')}
+        title={t('requests.customer.create')}
+        description={t('requests.customer.immutableHint')}
         footer={
           <>
             <Button variant="outline" onClick={close} disabled={pending}>
@@ -92,7 +92,7 @@ export function RequestCreateSheet({ projectId }: { projectId: string }) {
               pending={pending}
               data-ui-key="request-form-submit"
             >
-              {t('requests.action.submit')}
+              {t('requests.customer.submit')}
             </Button>
           </>
         }
@@ -101,7 +101,7 @@ export function RequestCreateSheet({ projectId }: { projectId: string }) {
           <ActionError error={serverError} />
           <FormField
             id="request-body"
-            label={t('requests.field.body')}
+            label={t('requests.customer.body')}
             required
             requiredLabel={t('common.field.required')}
             error={errorText(errors.body?.message, REQUEST_LIMITS.body)}
@@ -116,9 +116,9 @@ export function RequestCreateSheet({ projectId }: { projectId: string }) {
         onOpenChange={setConfirming}
         uiKey="request-submit"
         destructive={false}
-        title={t('requests.submit.title')}
-        body={t('requests.submit.body')}
-        confirmLabel={t('requests.action.submit')}
+        title={t('requests.customer.submitTitle')}
+        body={t('requests.customer.submitBody')}
+        confirmLabel={t('requests.customer.submit')}
         onConfirm={confirm}
         pending={pending}
       />
