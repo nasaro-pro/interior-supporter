@@ -97,6 +97,8 @@ export function PhotoUploadSheet({
     setItems(itemsRef.current);
   }, []);
   const files = useRef(new Map<string, File>());
+  // 미리보기(D-24)용 사본 — 렌더 중에는 ref 를 읽지 않는다 (react-hooks/refs)
+  const [previews, setPreviews] = useState<ReadonlyMap<string, File>>(() => new Map());
   const running = useRef(new Set<string>());
   const [pumping, setPumping] = useState(false);
   const pumpingRef = useRef(false);
@@ -179,7 +181,17 @@ export function PhotoUploadSheet({
       });
     }
     setRejected(messages);
-    if (accepted.length) dispatch({ type: 'add', items: accepted });
+    if (accepted.length) {
+      setPreviews((prev) => {
+        const next = new Map(prev);
+        for (const a of accepted) {
+          const f = files.current.get(a.key);
+          if (f) next.set(a.key, f);
+        }
+        return next;
+      });
+      dispatch({ type: 'add', items: accepted });
+    }
   };
 
   const common = useCallback(
@@ -233,6 +245,7 @@ export function PhotoUploadSheet({
       toast.success(t('photos.toast.uploaded', { count: s.done }));
       dispatch({ type: 'clearDone' });
       files.current.clear();
+      setPreviews(new Map());
       setParam(null); // 입력 상태 종료 → 같은 현장 목록 (TR-08)
       router.refresh();
     }
@@ -298,7 +311,7 @@ export function PhotoUploadSheet({
               type="file"
               multiple
               // D-25: MIME 을 함께 적으면 아이폰 사파리가 HEIC 사진을 JPEG 로 바꿔서 넘겨 준다 (GIF·BMP 는 PICK_EXTS 로 받아 F3 변환)
-              accept={[...FILE_RULES.photo_original.mimes, ...PICK_EXTS].join(",")}
+              accept={[...FILE_RULES.photo_original.mimes, ...PICK_EXTS].join(',')}
               className="peer sr-only"
               onChange={(e) => void addFiles(e.target.files)}
               disabled={busy}
@@ -396,10 +409,15 @@ export function PhotoUploadSheet({
                       patch: { phase: p === phase ? null : p },
                     })
                   }
-                  file={files.current.get(item.key)}
+                  file={previews.get(item.key)}
                   onRetry={() => retry(item.key)}
                   onRemove={() => {
                     files.current.delete(item.key);
+                    setPreviews((prev) => {
+                      const next = new Map(prev);
+                      next.delete(item.key);
+                      return next;
+                    });
                     dispatch({ type: 'remove', key: item.key });
                   }}
                 />
