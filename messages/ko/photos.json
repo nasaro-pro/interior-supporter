@@ -45,8 +45,8 @@
     "label": "사진 필터",
     "allPhases": "전체 공정",
     "allUploaders": "모든 사람",
-    "from": "촬영일 시작",
-    "to": "촬영일 끝",
+    "from": "시작일",
+    "to": "종료일",
     "apply": "적용"
   },
   "summary": {
@@ -65,7 +65,8 @@
     "privateNotice": "올린 사진은 업체가 공개하기 전까지 고객에게 보이지 않습니다.",
     "chooseSite": "현장 선택",
     "move": "이동",
-    "uploadNeedsSite": "현장을 선택해야 사진을 올릴 수 있습니다."
+    "uploadNeedsSite": "현장을 선택해야 사진을 올릴 수 있습니다.",
+    "autoPublicNotice": "이 현장은 올린 사진이 고객에게 바로 공개됩니다."
   },
   "toast": {
     "uploaded": "사진 {count}장을 올렸습니다.",
@@ -111,6 +112,27 @@
       "saving": "저장 중",
       "done": "완료",
       "failed": "실패"
-    }
+    },
+    "prepNotice": "GIF·BMP 는 JPEG 로 바꾸고, 긴 변이 4000px 를 넘는 사진은 줄여서 올립니다.",
+    "preparing": "사진 {count}장 준비 중…",
+    "autoRetry": "자동 재시도 {attempt}회",
+    "itemPhase": "{name} 공정",
+    "previewAlt": "{name} 미리보기"
+  },
+  "comments": {
+    "title": "댓글",
+    "label": "댓글",
+    "placeholder": "이 사진에 대한 댓글을 남겨 주세요",
+    "send": "댓글 보내기",
+    "sent": "댓글을 남겼습니다. 디자이너에게 알림이 갑니다.",
+    "reply": "답글",
+    "replyLabel": "답글",
+    "replyPlaceholder": "답글을 입력하세요",
+    "replied": "답글을 남겼습니다.",
+    "emptyEditor": "아직 고객 댓글이 없습니다.",
+    "emptyCustomer": "궁금한 점을 댓글로 남겨 주세요. 디자이너만 볼 수 있습니다.",
+    "privateHint": "비공개 사진에는 고객이 댓글을 달 수 없습니다.",
+    "threadOf": "{name} 님 댓글",
+    "designer": "디자이너"
   }
 }

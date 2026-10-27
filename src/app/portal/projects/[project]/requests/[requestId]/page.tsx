@@ -38,7 +38,8 @@ export default async function PortalRequestDetailPage({ params }: Props) {
         as="h3"
         meta={t('common.list.count', { count: detail.entries.length })}
       >
-        <RequestThread entries={detail.entries} />
+        {/* CU-06: 대화형 — 고객 본인 글이 오른쪽 */}
+        <RequestThread entries={detail.entries} perspective="customer" />
         {!hasReply ? (
           <p className="text-muted-foreground text-sm">{t('requests.detail.noReplies')}</p>
         ) : null}

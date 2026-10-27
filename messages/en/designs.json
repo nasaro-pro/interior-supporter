@@ -21,7 +21,10 @@
     "linkedVersion": "Linked version",
     "wholeDesign": "Whole design",
     "reason": "Reason",
-    "pageNumber": "Page number"
+    "pageNumber": "Page number",
+    "originalHint": "DWG, DXF, SKP, 3DS, MAX, OBJ, FBX, 3DM, RVT, JPG, PNG, WebP, TIFF, HEIC, PDF, AI, PSD — up to 50 MB. An image (JPG, PNG, WebP) is also added as the first preview image.",
+    "space": "Space",
+    "spaceHint": "Customers tap the main design to browse designs by space. Leave whole-home designs as \"Whole home\"."
   },
   "action": {
     "create": "Upload design",
@@ -33,7 +36,12 @@
     "confirm": "Confirm this design",
     "requestReconfirm": "Request reconfirmation",
     "versionHistory": "Version history",
-    "reconfirm": "Changed — confirm again"
+    "reconfirm": "Changed — confirm again",
+    "setMain": "Set as main design",
+    "moveUp": "Move {title} up",
+    "moveDown": "Move {title} down",
+    "spaceUp": "Move {space} up",
+    "spaceDown": "Move {space} down"
   },
   "compare": {
     "sideA": "A",
@@ -65,12 +73,14 @@
     "versionAddedReconfirm": "New version uploaded, so this design now needs reconfirmation. Customers with the confirm right were notified.",
     "confirmed": "Design confirmed.",
     "reconfirmRequested": "Reconfirmation requested.",
-    "previewAdded": "Comparison image added."
+    "previewAdded": "Comparison image added.",
+    "previewAutoFailed": "The design was created, but its preview image couldn't be added automatically. Add it on the detail page.",
+    "mainSet": "Set as the main design."
   },
   "preview": {
     "empty": "No preview images. You can still download the original.",
     "loadFailed": "Couldn’t load the image. Choose another image or try again.",
-    "cadHint": "SKP and DWG files can’t be previewed in the browser. Link a preview image instead.",
+    "cadHint": "This format can't be previewed in the browser. Link a preview image instead.",
     "modeImage": "Upload image",
     "none": "No comparison image"
   },
@@ -109,5 +119,26 @@
     "reasonCoreChanged": "core details changed",
     "reasonNewVersion": "new version uploaded",
     "reasonPm": "reconfirmation requested — {reason}"
+  },
+  "empty": "No designs yet. Upload an original (CAD, 3D, image, or PDF) or a single image to get started.",
+  "space": {
+    "all": "Whole home"
+  },
+  "main": {
+    "badge": "Main",
+    "hiddenShort": "Private · hidden from customers",
+    "hiddenNotice": "The main design is private, so customers cannot see it. Make it public to show it large on the customer design page. Until then customers see the latest public design with an image instead.",
+    "noPreviewNotice": "The main design has no comparison image, so there is nothing to show large on the customer design page. Add a render (JPG, PNG, WebP) under comparison images below. Until then customers see the latest public design with an image instead.",
+    "setHint": "Before setting this as the main design, add a comparison image first. Customers see it large on their design page."
+  },
+  "customer": {
+    "heroLabel": "Main design",
+    "browseSpaces": "Browse by space ({count})",
+    "heroHint": "Tap the main design to browse designs by space.",
+    "backToHero": "← Back to main design",
+    "spaceNav": "Spaces",
+    "allSpaces": "All",
+    "spaceEmpty": "No public designs in this space yet.",
+    "wholeHome": "Whole home"
   }
 }

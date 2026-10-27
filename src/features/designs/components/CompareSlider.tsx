@@ -221,7 +221,8 @@ export function CompareSlider({
 
       <div
         ref={frame}
-        className="bg-muted relative aspect-[16/10] w-full min-w-0 touch-none overflow-hidden rounded-md border select-none"
+        // D-06: 큰 모니터에서 세로가 화면을 넘지 않도록 높이 상한(화면의 70%) — 이미지는 object-contain 으로 비율 유지
+        className="bg-muted relative aspect-[16/10] max-h-[70svh] w-full min-w-0 touch-none overflow-hidden rounded-md border select-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -251,7 +252,8 @@ export function CompareSlider({
             onLoad={() => onImgLoad(imgA.id)}
             onError={() => onImgError(imgA.id)}
             style={{ clipPath: clipForPosition(pos) }}
-            className="absolute inset-0 h-full w-full object-contain"
+            // X1: object-contain 여백은 투명이라 아래 B 가 비친다 → 틀과 같은 불투명 배경으로 A 쪽을 덮는다
+            className="bg-muted absolute inset-0 h-full w-full object-contain"
             data-testid="compare-a"
           />
         ) : null}

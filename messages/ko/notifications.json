@@ -20,7 +20,9 @@
     "request_status_changed": "요청 처리 상태가 바뀌었습니다.",
     "photo_uploaded": "새 현장 사진이 올라왔습니다.",
     "photo_published": "현장 사진이 공개되었습니다.",
-    "schedule_changed": "일정이 등록되거나 바뀌었습니다."
+    "schedule_changed": "일정이 등록되거나 바뀌었습니다.",
+    "photo_commented": "고객이 현장 사진에 댓글을 남겼습니다.",
+    "photo_comment_replied": "현장 사진 댓글에 답글이 달렸습니다."
   },
   "target": {
     "unavailable": "더 이상 볼 수 없는 항목입니다."

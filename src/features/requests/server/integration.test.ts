@@ -230,8 +230,11 @@ describe('notification target resolvers (A-T07)', () => {
     });
     expect(await resolvePhotosTarget('ph1', projectId, 'portal', 'studio')).toBeNull();
   });
-  it('일정: app → PM-18, field → null', async () => {
-    useFake({ schedule_events: [{ data: { id: 'e1', title: '철거', is_public: false } }] });
+  it('일정: app → PM-18, 일정 탭이 꺼진 시공팀 → null (F11)', async () => {
+    useFake({
+      schedule_events: [{ data: { id: 'e1', title: '철거', is_public: false } }],
+      'rpc:field_schedule': [{ data: [] }],
+    });
     expect(await resolveScheduleEventsTarget('e1', projectId, 'app', 'studio')).toEqual({
       title: '철거',
       href: `/app/studio/projects/${projectId}/schedule/e1`,

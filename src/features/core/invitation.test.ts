@@ -52,7 +52,10 @@ describe('A-08 getInvitationPreview (server-only 조회)', () => {
       [
         'acceptInvitationAsCurrentUser',
         'acceptInvitationWithNewAccount',
+        'completeFirstPassword',
+        'createExternalAccount',
         'createPasswordResetLink',
+        'resendTempPassword',
         'signupCompany',
       ].sort(),
     );

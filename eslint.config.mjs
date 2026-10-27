@@ -75,6 +75,8 @@ export default defineConfig([
       'src/shared/lib/supabase/admin.ts',
       'src/features/core/server/auth-actions.ts',
       'src/features/files/server/**/*.ts',
+      // 2차 수정 CR-3: 계정 정지·익명화·재설정 링크·정리 파일 삭제 (사이트 관리)
+      'src/features/admin/server/auth-admin.ts',
     ],
     rules: { 'no-restricted-imports': ['error', { paths: BANNED, patterns: PATTERNS }] },
   },

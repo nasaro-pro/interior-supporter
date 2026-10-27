@@ -45,8 +45,8 @@
     "label": "Photo filters",
     "allPhases": "All phases",
     "allUploaders": "Everyone",
-    "from": "Taken from",
-    "to": "Taken until",
+    "from": "Start date",
+    "to": "End date",
     "apply": "Apply"
   },
   "summary": {
@@ -65,7 +65,8 @@
     "privateNotice": "Photos you upload stay hidden from customers until the studio shares them.",
     "chooseSite": "Choose site",
     "move": "Go",
-    "uploadNeedsSite": "Choose a site before uploading photos."
+    "uploadNeedsSite": "Choose a site before uploading photos.",
+    "autoPublicNotice": "On this site, photos you upload are shared with the customer right away."
   },
   "toast": {
     "uploaded": "Uploaded {count} photos.",
@@ -111,6 +112,27 @@
       "saving": "Saving",
       "done": "Done",
       "failed": "Failed"
-    }
+    },
+    "prepNotice": "GIF and BMP are converted to JPEG, and photos longer than 4000px are resized before upload.",
+    "preparing": "Preparing {count} photo(s)…",
+    "autoRetry": "Auto-retry {attempt}",
+    "itemPhase": "Phase for {name}",
+    "previewAlt": "Preview of {name}"
+  },
+  "comments": {
+    "title": "Comments",
+    "label": "Comment",
+    "placeholder": "Leave a comment about this photo",
+    "send": "Send comment",
+    "sent": "Comment sent. Your designer will be notified.",
+    "reply": "Reply",
+    "replyLabel": "Reply",
+    "replyPlaceholder": "Type your reply",
+    "replied": "Reply sent.",
+    "emptyEditor": "No customer comments yet.",
+    "emptyCustomer": "Ask about this photo here. Only your designer can see it.",
+    "privateHint": "Customers cannot comment on private photos.",
+    "threadOf": "Comments from {name}",
+    "designer": "Designer"
   }
 }

@@ -1,8 +1,6 @@
 'use server';
 // 견적 Server Actions (REQ-131·133) — 번호는 DB 트리거가 행 잠금으로 부여, 올린 PDF 는 바꿀 수 없다 (POL-015)
-// B-04 알려진 한계: 견적 묶음 insert 와 첫 버전 insert 는 별도 요청이라 원자적이지 않다.
-//   버전 저장이 실패하면 버전 없는 견적이 남을 수 있고, 같은 폼 재시도(같은 id)가 이어서 버전을 저장한다.
-//   근본 해결은 create_estimate RPC(새 B 마이그레이션) — CR-B-01 로 통합 책임자 승인 필요.
+// D-05: 견적 묶음과 첫 버전은 create_estimate RPC 한 번으로 저장한다(한 트랜잭션 — 버전 실패 시 견적도 남지 않음).
 import { revalidatePath } from 'next/cache';
 import { requireProjectAccess } from '@/features/core';
 import { fail, ok, type ActionResult } from '@/shared/contracts/errors';
@@ -10,6 +8,7 @@ import type { ProjectAccess } from '@/shared/contracts/integration';
 import { routes } from '@/shared/contracts/routes';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
 import { dbFail, explainNoRow, invalid } from '@/features/designs/server/result';
+import { canManageEstimates } from '@/features/estimates/server/permission';
 import {
   estimateArchiveSchema,
   estimateCreateSchema,
@@ -79,7 +78,7 @@ async function insertVersion(
   return ok({ versionNo: data.version_no });
 }
 
-/** REQ-131: 견적 등록 = 견적 묶음 + 첫 버전 */
+/** REQ-131: 견적 등록 = 견적 묶음 + 첫 버전 (D-05: 원자적 RPC) */
 export async function createEstimate(
   raw: unknown,
 ): Promise<ActionResult<{ id: string; versionNo: number }>> {
@@ -88,43 +87,37 @@ export async function createEstimate(
   const { projectId, id, versionId, title, versionLabel, changeNote, fileId, isPublic } =
     parsed.data;
   const access = await requireProjectAccess(projectId, ['editor']);
+  // D-37: 견적서는 업체관리자만 바꾼다 (담당자는 보기만)
+  if (!(await canManageEstimates(access.companyId))) return fail('FORBIDDEN');
   const supabase = await createServerSupabase();
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return fail('UNAUTHENTICATED');
-  const { error } = await supabase.from('estimates').insert({
-    id,
-    company_id: access.companyId, // 트리거(scope)가 프로젝트에서 덮어씀 — PATCH_LOG P1-B-03
-    project_id: projectId,
-    title,
-    created_by: user.user.id,
+  const { data, error } = await supabase.rpc('create_estimate', {
+    p_id: id,
+    p_version_id: versionId,
+    p_project: projectId,
+    p_title: title,
+    p_version_label: versionLabel,
+    p_change_note: changeNote,
+    p_file: fileId,
+    p_is_public: isPublic,
   });
   if (error) {
     if (error.code !== '23505') return dbFail('estimate.create.failed', error, { projectId });
-    // 23505 = 같은 폼의 재시도 (견적은 이미 있음) → 버전 저장을 이어서 한다.
-    // B-04: 이미 있는 견적이 이 프로젝트의 보관되지 않은 견적일 때만 (아니면 다른 견적에 버전이 붙는다)
+    // 23505 = 같은 폼의 재시도(이미 둘 다 저장됨). 그 버전이 이 견적·프로젝트의 것일 때만 성공 (POL-038)
     const { data: existing, error: lookupError } = await supabase
-      .from('estimates')
-      .select('id, project_id, archived_at')
-      .eq('id', id)
+      .from('estimate_versions')
+      .select('version_no, estimate_id, project_id')
+      .eq('id', versionId)
       .maybeSingle();
     if (lookupError) return dbFail('estimate.create.recheck_failed', lookupError, { projectId });
-    if (!existing || existing.project_id !== projectId || existing.archived_at)
+    if (!existing || existing.estimate_id !== id || existing.project_id !== projectId)
       return fail('CONFLICT');
+    revalidateEstimate(access, id);
+    return ok({ id, versionNo: existing.version_no });
   }
-  const version = await insertVersion(supabase, {
-    versionId,
-    estimateId: id,
-    projectId,
-    companyId: access.companyId,
-    uploadedBy: user.user.id,
-    versionLabel,
-    changeNote,
-    fileId,
-    isPublic,
-  });
-  if (!version.ok) return version;
   revalidateEstimate(access, id);
-  return ok({ id, versionNo: version.data.versionNo });
+  return ok({ id, versionNo: data });
 }
 
 /** REQ-131: 새 버전 (과거 PDF 덮어쓰기 불가 — 항상 새 행) */
@@ -135,6 +128,8 @@ export async function addEstimateVersion(
   if (!parsed.success) return invalid(parsed.error);
   const { projectId, estimateId, ...rest } = parsed.data;
   const access = await requireProjectAccess(projectId, ['editor']);
+  // D-37: 견적서는 업체관리자만 바꾼다 (담당자는 보기만)
+  if (!(await canManageEstimates(access.companyId))) return fail('FORBIDDEN');
   const supabase = await createServerSupabase();
   const { data: estimate } = await supabase
     .from('estimates')
@@ -166,6 +161,8 @@ export async function setEstimateVersionPublic(
   if (!parsed.success) return invalid(parsed.error);
   const { projectId, estimateId, id, baseVersion, isPublic } = parsed.data;
   const access = await requireProjectAccess(projectId, ['editor']);
+  // D-37: 견적서는 업체관리자만 바꾼다 (담당자는 보기만)
+  if (!(await canManageEstimates(access.companyId))) return fail('FORBIDDEN');
   const supabase = await createServerSupabase();
   // B-06: 보관된 견적의 버전은 공개 전환하지 않는다 (읽기 전용)
   const { data: parent, error: parentError } = await supabase
@@ -211,6 +208,8 @@ export async function setEstimateArchived(
   if (!parsed.success) return invalid(parsed.error);
   const { projectId, id, baseVersion, archived } = parsed.data;
   const access = await requireProjectAccess(projectId, ['editor']);
+  // D-37: 견적서는 업체관리자만 바꾼다 (담당자는 보기만)
+  if (!(await canManageEstimates(access.companyId))) return fail('FORBIDDEN');
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('estimates')

@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { runUploadItem, type CommonInput, type PipelineDeps } from './upload-pipeline';
+import {
+  runUploadItem,
+  runUploadItemWithRetry,
+  type CommonInput,
+  type PipelineDeps,
+} from './upload-pipeline';
 import {
   createUploadItem,
   uploadQueueReducer,
@@ -58,7 +63,13 @@ describe('runUploadItem (REQ-211 · C-T03)', () => {
       expect.objectContaining({ id: 'photo-1', fileId: 'f1', capturedOn: '2026-10-01' }),
     );
     // C-07: 버킷은 intent 가 준 값으로 업로드한다
-    expect(h.full.upload).toHaveBeenCalledWith('project-files', 'p/f1.jpg', 'tok', file);
+    expect(h.full.upload).toHaveBeenCalledWith(
+      'project-files',
+      'p/f1.jpg',
+      'tok',
+      file,
+      expect.any(Function),
+    );
   });
 
   it('촬영일은 공통 입력 > EXIF(브라우저) > 서버 EXIF 순 (POL-022)', async () => {
@@ -140,5 +151,58 @@ describe('runUploadItem (REQ-211 · C-T03)', () => {
     });
     await h.run();
     expect(h.get()).toMatchObject({ stage: 'failed', error: { kind: 'network' } });
+  });
+});
+
+describe('사진별 공정 · 진행률 · 자동 재시도 (F5·F6·F7)', () => {
+  it('사진별 공정이 있으면 공통 공정보다 우선', async () => {
+    const h = harness({}, { phase: 'electrical' });
+    await h.run();
+    expect(h.full.createPhoto).toHaveBeenCalledWith(
+      expect.objectContaining({ phase: 'electrical' }),
+    );
+  });
+
+  it('업로드 진행률을 항목에 기록한다', async () => {
+    const h = harness({
+      upload: vi.fn(async (_b, _p, _t, _f, onProgress) => {
+        onProgress(0.5);
+        return { ok: true as const };
+      }),
+    });
+    await h.run();
+    expect(h.get().progress).toBe(0.5);
+  });
+
+  it('네트워크 실패는 자동으로 다시 시도해 성공한다 (intent 재사용)', async () => {
+    let n = 0;
+    const h = harness({
+      upload: vi.fn(async () => {
+        if (n++ === 0) throw new Error('net');
+        return { ok: true as const };
+      }),
+    });
+    await runUploadItemWithRetry('k', file, common, h.full, h.dispatch, () => h.get(), {
+      delays: [0],
+      sleep: async () => {},
+    });
+    expect(h.get().stage).toBe('done');
+    expect(h.get().autoRetry).toBe(1);
+    expect(h.full.createUploadIntent).toHaveBeenCalledTimes(1);
+  });
+
+  it('거절은 자동 재시도하지 않는다', async () => {
+    const h = harness({
+      finalizeUpload: vi.fn(async () => ({
+        ok: true as const,
+        data: { fileId: 'f1', status: 'rejected' as const, rejectReason: 'corrupt' as const },
+      })),
+    });
+    await runUploadItemWithRetry('k', file, common, h.full, h.dispatch, () => h.get(), {
+      delays: [0],
+      sleep: async () => {},
+    });
+    expect(h.get().stage).toBe('failed');
+    expect(h.full.finalizeUpload).toHaveBeenCalledTimes(1);
   });
 });

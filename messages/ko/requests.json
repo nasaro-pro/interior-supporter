@@ -80,5 +80,33 @@
     "statusTransitionHint": "지금 상태에서 바꿀 수 있는 상태만 보여 줍니다.",
     "archivedNoCorrection": "보관된 요청에는 정정을 추가할 수 없습니다.",
     "manage": "처리"
+  },
+  "target": {
+    "designs": "도안: {label}",
+    "materials": "자재: {label}",
+    "unknown": "볼 수 없는 항목"
+  },
+  "memo": {
+    "title": "메모",
+    "open": "메모 {count}",
+    "emptyEditor": "이 항목에 남긴 고객 메모가 없습니다.",
+    "emptyCustomer": "궁금한 점이나 바라는 점을 이 항목에 바로 남겨 주세요.",
+    "openThread": "대화 전체 보기",
+    "placeholder": "이 항목에 대한 메모를 남겨 주세요",
+    "replyPlaceholder": "답변을 입력하세요",
+    "send": "메모 보내기",
+    "sent": "메모를 보냈습니다. 디자이너에게 알림이 갑니다."
+  },
+  "customer": {
+    "title": "메모 대화",
+    "ownOnly": "메모는 작성한 본인과 담당 디자이너만 볼 수 있습니다.",
+    "empty": "남긴 메모가 없습니다. 도안 · 자재 화면 옆에서 바로 남기거나 여기서 새로 남기세요.",
+    "create": "메모 남기기",
+    "body": "메모 내용",
+    "immutableHint": "보낸 메모는 고칠 수 없습니다. 바꿀 내용은 대화에 덧붙이세요.",
+    "submitTitle": "메모를 보낼까요?",
+    "submitBody": "보낸 뒤에는 내용을 고칠 수 없습니다.",
+    "submit": "메모 보내기",
+    "created": "메모를 보냈습니다."
   }
 }

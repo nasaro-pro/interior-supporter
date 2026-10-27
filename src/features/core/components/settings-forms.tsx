@@ -1,10 +1,10 @@
 'use client';
-// src/features/core/components/settings-forms.tsx (A · TASK-015·016) — 업체 정보·로고·템플릿·구성원 초대·재설정 링크
+// src/features/core/components/settings-forms.tsx (A · TASK-015·016) — 업체 정보·로고·템플릿(고객 홈 전체, CR-A-10)·구성원 초대·재설정 링크
 import { useActionState, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { KeyRound, Upload, UserPlus } from 'lucide-react';
+import { Eye, ImageOff, KeyRound, Upload, UserPlus, X } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
@@ -14,12 +14,21 @@ import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { useActionErrorText } from '@/shared/ui/action-error';
 import { createBrowserSupabase } from '@/shared/lib/supabase/browser';
 import { FILE_RULES } from '@/shared/contracts/domain';
-import type { ActionResult } from '@/shared/contracts/errors';
+import type { ActionResult, AppError } from '@/shared/contracts/errors';
+import type { HomeSections } from '@/shared/contracts/domain';
+import { PORTAL_TABS, type PortalTab } from '@/shared/contracts/screens';
+import { routes } from '@/shared/contracts/routes';
+import { ConflictState } from '@/shared/ui/states';
 import { createUploadIntent, finalizeUpload } from '@/features/files';
 import { setCompanyLogo, updateCompany, updateTemplate } from '../server/company-actions';
 import { changeMemberRole, createMemberInvite } from '../server/participant-actions';
 import { createPasswordResetLink } from '../server/auth-actions';
+import type { HomeTheme } from '../home-theme';
+import type { PageImages, PageTone } from '../page-theme';
 import { FormSheet } from './form-sheet';
+import { HomeSectionsField, HomeThemeField, PageToneField } from './home-template-fields';
+import { PageCanvas } from './page-canvas';
+import { CustomerHomeBody, Panel } from './summary-blocks';
 import { OneTimeLinkDialog } from './one-time-link';
 
 type V = ActionResult<{ version: number }> | null;
@@ -82,23 +91,15 @@ export function CompanyInfoForm({
   );
 }
 
-/** 로고(1MB) — 업로드는 B 의 FilesApi(개발 중 STUB) 시그니처로만 (헌법 4.1 ④) */
-export function LogoUploader({
-  companyId,
-  version,
-  logoUrl,
-}: {
-  companyId: string;
-  version: number;
-  logoUrl: string | null;
-}) {
+/**
+ * 업체 이미지(company_logo kind, 1MB) 업로드 — 서명 URL → finalize. 성공 시 fileId.
+ * 로고와 고객 홈 배경(CR-A-10)이 같이 쓴다. 업로드는 B 의 FilesApi 시그니처로만 (헌법 4.1 ④)
+ */
+function useCompanyImageUpload(companyId: string) {
   const t = useTranslations();
-  const router = useRouter();
-  const input = useRef<HTMLInputElement>(null);
   const [pending, start] = useTransition();
   const rule = FILE_RULES.company_logo;
-
-  const upload = (file: File) =>
+  const upload = (file: File, onReady: (fileId: string) => Promise<void> | void) =>
     start(async () => {
       const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
       if (!rule.exts.includes(ext)) return void toast.error(t('errors.FILE_TYPE_REJECTED'));
@@ -118,11 +119,30 @@ export function LogoUploader({
       if (up.error) return void toast.error(t('files.queue.interrupted'));
       const fin = await finalizeUpload(intent.data.fileId);
       if (!fin.ok || fin.data.status !== 'ready') return void toast.error(t('errors.FILE_CORRUPT'));
-      const res = await setCompanyLogo({
-        companyId,
-        baseVersion: version,
-        fileId: intent.data.fileId,
-      });
+      await onReady(intent.data.fileId);
+    });
+  return { upload, pending, rule };
+}
+
+/** 로고(1MB) — 업로드는 B 의 FilesApi(개발 중 STUB) 시그니처로만 (헌법 4.1 ④) */
+export function LogoUploader({
+  companyId,
+  version,
+  logoUrl,
+}: {
+  companyId: string;
+  version: number;
+  logoUrl: string | null;
+}) {
+  const t = useTranslations();
+  const router = useRouter();
+  const input = useRef<HTMLInputElement>(null);
+
+  const { upload: uploadImage, pending, rule } = useCompanyImageUpload(companyId);
+
+  const upload = (file: File) =>
+    uploadImage(file, async (fileId) => {
+      const res = await setCompanyLogo({ companyId, baseVersion: version, fileId });
       if (!res.ok) return void toast.error(t(`errors.${res.error.code}`));
       toast.success(t('settings.toast.logoUpdated'));
       router.refresh();
@@ -169,45 +189,282 @@ export function LogoUploader({
   );
 }
 
+/**
+ * REQ-052 기본 템플릿 — 신규 프로젝트 고객 화면 기본값 (CR-A-10)
+ * 페이지 분위기(바탕색) + 페이지(탭)별 이미지 + 홈 안내문·색상 테마·4영역, 페이지별 미리보기
+ */
 export function TemplateForm({
   companyId,
-  value,
   version,
+  value,
 }: {
   companyId: string;
-  value: string;
   version: number;
+  value: {
+    homeMessage: string;
+    homeSections: HomeSections;
+    homeTheme: HomeTheme;
+    pageImages: PageImages;
+    pageTone: PageTone;
+  };
 }) {
   const t = useTranslations();
-  const [state, action] = useSaved(updateTemplate);
-  const fe = state && !state.ok ? state.error.fieldErrors : undefined;
-  const current = state?.ok ? state.data.version : version;
+  const router = useRouter();
+  const input = useRef<HTMLInputElement>(null);
+  const [message, setMessage] = useState(value.homeMessage);
+  const [sections, setSections] = useState(value.homeSections);
+  const [theme, setTheme] = useState(value.homeTheme);
+  const [images, setImages] = useState<PageImages>(value.pageImages);
+  const [tone, setTone] = useState(value.pageTone);
+  const [target, setTarget] = useState<PortalTab>('home');
+  const [previewPage, setPreviewPage] = useState<PortalTab>('home');
+  const [error, setError] = useState<AppError | null>(null);
+  const [saving, start] = useTransition();
+  const { upload, pending: uploading, rule } = useCompanyImageUpload(companyId);
+  const fe = error?.fieldErrors;
+  const pageName = (tab: PortalTab) => t(`projects.tab.${tab}`);
+
+  const setImage = (tab: PortalTab, fileId: string | null) =>
+    setImages((prev) => {
+      const next = { ...prev };
+      if (fileId) next[tab] = fileId;
+      else delete next[tab];
+      return next;
+    });
+
+  const save = () =>
+    start(async () => {
+      setError(null);
+      const res = await updateTemplate({
+        companyId,
+        baseVersion: version,
+        defaultHomeMessage: message,
+        defaultHomeSections: sections,
+        defaultHomeTheme: theme,
+        defaultPageImages: images,
+        defaultPageTone: tone,
+      });
+      if (res.ok) {
+        toast.success(t('settings.templates.saved'));
+        router.refresh();
+      } else setError(res.error);
+    });
+
+  if (error?.code === 'VERSION_CONFLICT') {
+    return (
+      <ConflictState
+        action={
+          <Button
+            onClick={() => {
+              // 입력은 그대로 두고 최신 version 만 다시 받는다 (HomeEditor A-06 과 같은 방식)
+              setError(null);
+              router.refresh();
+            }}
+            data-ui-key="template-reload"
+          >
+            {t('common.action.loadLatest')}
+          </Button>
+        }
+      />
+    );
+  }
+
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
-      <input type="hidden" name="companyId" value={companyId} />
-      <input type="hidden" name="baseVersion" value={current} />
-      <FormRow
-        label={t('settings.field.defaultHomeMessage')}
-        htmlFor="tpl-msg"
-        errors={fe?.defaultHomeMessage}
-        hint={t('settings.templates.hint')}
-      >
-        <Textarea
-          id="tpl-msg"
-          name="defaultHomeMessage"
-          defaultValue={value}
-          maxLength={2000}
-          rows={8}
-          aria-describedby="tpl-msg-error"
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className="flex min-w-0 flex-col gap-6">
+        <p className="text-muted-foreground text-sm">{t('settings.templates.intro')}</p>
+        <PageToneField
+          name="tpl-tone"
+          value={tone}
+          onChange={setTone}
+          label={t('settings.field.pageTone')}
+          hint={t('settings.templates.pageToneHint')}
         />
-      </FormRow>
-      {state && !state.ok && !fe ? <FormError error={state.error} /> : null}
-      <div>
-        <SubmitButton data-ui-key="template-submit">{t('common.action.save')}</SubmitButton>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium" id="tpl-images-label">
+            {t('settings.field.pageImages')}
+          </span>
+          <input
+            ref={input}
+            type="file"
+            accept={rule.exts.join(',')}
+            className="sr-only"
+            id="tpl-page-file"
+            aria-labelledby="tpl-images-label"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              const tab = target;
+              if (f)
+                upload(f, (fileId) => {
+                  setImage(tab, fileId);
+                  setPreviewPage(tab);
+                  toast.success(t('settings.templates.imageUploaded', { page: pageName(tab) }));
+                });
+              e.target.value = '';
+            }}
+          />
+          <ul className="flex flex-col gap-2" aria-labelledby="tpl-images-label">
+            {PORTAL_TABS.map((tab) => {
+              const fileId = images[tab];
+              return (
+                <li
+                  key={tab}
+                  data-key={tab}
+                  className="flex items-center gap-3 rounded-md border px-3 py-2"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setPreviewPage(tab)}
+                    className="bg-muted grid aspect-video w-20 shrink-0 place-items-center overflow-hidden rounded border"
+                    aria-label={t('settings.templates.previewPage') + ': ' + pageName(tab)}
+                    data-ui-key="template-page-preview"
+                  >
+                    {fileId ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- /api/files 302 서명 URL (next/image 최적화 대상 아님)
+                      <img src={routes.file(fileId)} alt="" className="size-full object-cover" />
+                    ) : (
+                      <ImageOff aria-hidden className="text-muted-foreground size-4" />
+                    )}
+                  </button>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">{pageName(tab)}</span>
+                    {fileId ? null : (
+                      <span className="text-muted-foreground text-meta">
+                        {t('settings.templates.noImage')}
+                      </span>
+                    )}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    disabled={uploading}
+                    aria-busy={uploading && target === tab}
+                    aria-label={t('settings.templates.uploadFor', { page: pageName(tab) })}
+                    onClick={() => {
+                      setTarget(tab);
+                      input.current?.click();
+                    }}
+                    data-ui-key="template-page-upload"
+                  >
+                    <Upload aria-hidden />
+                  </Button>
+                  {fileId ? (
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={t('settings.templates.removeFor', { page: pageName(tab) })}
+                      onClick={() => setImage(tab, null)}
+                      data-ui-key="template-page-remove"
+                    >
+                      <X aria-hidden />
+                    </Button>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+          <p className="text-muted-foreground text-meta">
+            {t('settings.templates.pageImagesHint', { exts: rule.exts.join(', ') })}
+          </p>
+        </div>
+        <FormRow
+          label={t('settings.field.defaultHomeMessage')}
+          htmlFor="tpl-msg"
+          errors={fe?.defaultHomeMessage}
+          hint={t('settings.templates.hint')}
+        >
+          <Textarea
+            id="tpl-msg"
+            name="defaultHomeMessage"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            maxLength={2000}
+            rows={5}
+            aria-describedby="tpl-msg-error"
+          />
+        </FormRow>
+        <HomeThemeField
+          name="tpl-theme"
+          value={theme}
+          onChange={setTheme}
+          label={t('settings.field.homeTheme')}
+        />
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium">{t('settings.field.homeSections')}</span>
+          <HomeSectionsField
+            sections={sections}
+            onChange={setSections}
+            label={t('settings.field.homeSections')}
+          />
+        </div>
+        {error && !fe ? <FormError error={error} /> : null}
+        <div>
+          <Button
+            onClick={save}
+            disabled={saving || uploading}
+            aria-busy={saving}
+            data-ui-key="template-submit"
+          >
+            {t('common.action.save')}
+          </Button>
+        </div>
       </div>
-    </form>
+      <section className="flex min-w-0 flex-col gap-2" aria-labelledby="tpl-preview-title">
+        <h3 id="tpl-preview-title" className="font-semibold">
+          {t('settings.templates.previewTitle')}
+        </h3>
+        <div className="rounded-lg border border-dashed p-3">
+          <p className="text-muted-foreground text-meta mb-3 flex items-center gap-1.5">
+            <Eye aria-hidden className="size-4" />
+            {t('settings.templates.previewNotice')}
+          </p>
+          <div
+            className="mb-3 flex flex-wrap gap-1.5"
+            role="group"
+            aria-label={t('settings.templates.previewPage')}
+          >
+            {PORTAL_TABS.map((tab) => (
+              <Button
+                key={tab}
+                size="sm"
+                variant={tab === previewPage ? 'default' : 'outline'}
+                aria-pressed={tab === previewPage}
+                onClick={() => setPreviewPage(tab)}
+                data-ui-key="template-preview-tab"
+              >
+                {pageName(tab)}
+              </Button>
+            ))}
+          </div>
+          <PageCanvas tone={tone} imageFileId={images[previewPage]} variant="contained">
+            {previewPage === 'home' ? (
+              <CustomerHomeBody
+                project={{
+                  homeMessage: message,
+                  homeSections: sections,
+                  homeTheme: theme,
+                  currentPhase: '',
+                  startDate: null,
+                  endDate: null,
+                }}
+                blocks={PREVIEW_BLOCKS}
+              />
+            ) : (
+              <Panel title={pageName(previewPage)}>
+                <p className="text-muted-foreground py-6 text-center">
+                  {t('settings.templates.previewPlaceholder', { page: pageName(previewPage) })}
+                </p>
+              </Panel>
+            )}
+          </PageCanvas>
+        </div>
+      </section>
+    </div>
   );
 }
+
+const EMPTY_BLOCK = { items: [], failed: false };
+const PREVIEW_BLOCKS = { recent: EMPTY_BLOCK, schedule: EMPTY_BLOCK, documents: EMPTY_BLOCK };
 
 /** REQ-051 구성원 초대 (PM: owner/manager, 관리자: owner) — 링크 1회 표시 */
 export function MemberInviteSheet({

@@ -81,14 +81,16 @@ select throws_ok($$ select public.request_reconfirm('designs', current_setting('
   'P0001', 'reason_required', 'DB-02 사유 501자는 reason_required');
 
 -- ===== DB-04 estimates.created_by 트리거 =====
+-- (D-37 · CR-9: 견적 쓰기는 업체관리자만 — 소유자 owner1 로 확인)
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-000000000001","role":"authenticated"}', true);
 select lives_ok($$ insert into public.estimates (id, project_id, company_id, title) values
   ('e1000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', '1차 견적') $$,
   'DB-04 created_by 를 보내지 않아도 견적이 만들어진다');
-select is((select created_by from public.estimates where id = 'e1000000-0000-0000-0000-000000000001'), 'a0000000-0000-0000-0000-000000000002'::uuid, 'DB-04 created_by = 호출자');
+select is((select created_by from public.estimates where id = 'e1000000-0000-0000-0000-000000000001'), 'a0000000-0000-0000-0000-000000000001'::uuid, 'DB-04 created_by = 호출자');
 select lives_ok($$ insert into public.estimates (id, project_id, company_id, title, created_by) values
-  ('e1000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', '2차 견적', 'a0000000-0000-0000-0000-000000000001') $$,
+  ('e1000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', '2차 견적', 'a0000000-0000-0000-0000-000000000002') $$,
   'DB-04 다른 사람 id 를 보내도');
-select is((select created_by from public.estimates where id = 'e1000000-0000-0000-0000-000000000002'), 'a0000000-0000-0000-0000-000000000002'::uuid, 'DB-04 created_by 는 호출자로 덮어써진다 (위조 불가)');
+select is((select created_by from public.estimates where id = 'e1000000-0000-0000-0000-000000000002'), 'a0000000-0000-0000-0000-000000000001'::uuid, 'DB-04 created_by 는 호출자로 덮어써진다 (위조 불가)');
 reset role;
 select has_trigger('public', 'design_previews', 'a_created_by', 'DB-04 design_previews 에도 created_by 트리거');
 

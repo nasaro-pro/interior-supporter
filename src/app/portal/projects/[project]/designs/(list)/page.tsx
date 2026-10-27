@@ -1,4 +1,5 @@
 // CL-04 도안 목록 (고객, D3) — 공개분만 (RLS) · REQ-100
+// CU-03 · CU-04: 대표 도안 크게 → 누르면 공간 칩 + 공간별 도안 (?space=)
 import { getTranslations } from 'next-intl/server';
 import { PAGE_SIZE } from '@/shared/contracts/domain';
 import { routes } from '@/shared/contracts/routes';
@@ -6,8 +7,8 @@ import { LoadMore } from '@/shared/ui/page-parts';
 import { SectionHeader } from '@/shared/ui/section';
 import { requireCustomerOf } from '@/features/designs/server/access';
 import { listDesigns } from '@/features/designs/server/queries';
-import { DesignList } from '@/features/designs/components/DesignList';
-import { parseLimit, withQuery } from '@/features/designs/lib/query';
+import { CustomerDesignBrowser } from '@/features/designs/components/CustomerDesignBrowser';
+import { one, parseLimit, withQuery } from '@/features/designs/lib/query';
 
 export default async function PortalDesignsPage({
   params,
@@ -18,17 +19,22 @@ export default async function PortalDesignsPage({
 }) {
   const { project } = await params;
   const access = await requireCustomerOf(project);
-  const limit = parseLimit((await searchParams).limit);
+  const sp = await searchParams;
+  const limit = parseLimit(sp.limit);
+  const space = one(sp.space);
   const { items, hasMore } = await listDesigns(project, access, { limit });
   const t = await getTranslations('designs');
   return (
     <main data-screen-id="CL-04" className="flex min-w-0 flex-col gap-6">
       <SectionHeader title={t('screen.list')} />
-      <DesignList items={items} viewer={access} />
+      <CustomerDesignBrowser items={items} viewer={access} spaceParam={space} />
       <LoadMore
         href={
           hasMore
-            ? withQuery(routes.portal.project(project, 'designs'), { limit: limit + PAGE_SIZE })
+            ? withQuery(routes.portal.project(project, 'designs'), {
+                limit: limit + PAGE_SIZE,
+                space,
+              })
             : null
         }
         uiKey="design-list-more"

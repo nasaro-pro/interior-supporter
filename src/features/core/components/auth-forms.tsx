@@ -11,6 +11,7 @@ import { login, resetPassword } from '../server/session-actions';
 import {
   acceptInvitationAsCurrentUser,
   acceptInvitationWithNewAccount,
+  completeFirstPassword,
   signupCompany,
 } from '../server/auth-actions';
 
@@ -24,6 +25,11 @@ export function LoginForm({ next }: { next?: string }) {
   const [state, action] = useActionState(login, null);
   const fe = fieldErrors(state);
   const code = state && !state.ok ? state.error.code : null;
+  // D-01: 제출 후에도 입력값 유지(React 폼 액션은 제출 뒤 비제어 입력을 비움)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  // 인증 실패는 어느 칸이 틀렸는지 알리지 않고 두 칸을 함께 표시(계정 존재 노출 방지, REQ-002)
+  const authFailed = code === 'UNAUTHENTICATED' ? true : undefined;
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
       <input type="hidden" name="next" value={next ?? ''} />
@@ -34,6 +40,9 @@ export function LoginForm({ next }: { next?: string }) {
           type="email"
           autoComplete="email"
           aria-describedby="login-email-error"
+          aria-invalid={fe?.email ? true : authFailed}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
       </FormRow>
@@ -44,6 +53,9 @@ export function LoginForm({ next }: { next?: string }) {
           type="password"
           autoComplete="current-password"
           aria-describedby="login-password-error"
+          aria-invalid={fe?.password ? true : authFailed}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
       </FormRow>
@@ -77,7 +89,6 @@ export function SignupForm() {
   const tc = useTranslations('common');
   const [state, action] = useActionState(signupCompany, null);
   const fe = fieldErrors(state);
-  const [slug, setSlug] = useState('');
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
       <FormRow
@@ -91,30 +102,6 @@ export function SignupForm() {
           name="companyName"
           maxLength={100}
           aria-describedby="su-company-error"
-          required
-        />
-      </FormRow>
-      <FormRow
-        label={t('field.slug')}
-        htmlFor="su-slug"
-        errors={fe?.slug}
-        required
-        hint={
-          <>
-            {t('signup.slugHelp')}{' '}
-            <span className="tabular-nums">{t('signup.slugPreview', { slug: slug || '…' })}</span>
-          </>
-        }
-      >
-        <Input
-          id="su-slug"
-          name="slug"
-          maxLength={40}
-          autoCapitalize="none"
-          spellCheck={false}
-          value={slug}
-          onChange={(e) => setSlug(e.target.value.toLowerCase())}
-          aria-describedby="su-slug-error"
           required
         />
       </FormRow>
@@ -342,6 +329,68 @@ export function ResetPasswordForm() {
       {state && !state.ok && !fe ? <FormError error={state.error} /> : null}
       <SubmitButton size="lg" data-ui-key="reset-form-submit">
         {t('reset.submit')}
+      </SubmitButton>
+    </form>
+  );
+}
+
+// ── AUTH-06 첫 로그인 비밀번호 변경 (D-15) ─────────────────────────────
+export function FirstPasswordForm() {
+  const t = useTranslations('auth');
+  const [state, action] = useActionState(completeFirstPassword, null);
+  const fe = fieldErrors(state);
+  return (
+    <form action={action} className="flex flex-col gap-4" noValidate>
+      <FormRow
+        label={t('field.tempPassword')}
+        htmlFor="fp-current"
+        errors={fe?.currentPassword}
+        hint={t('firstPassword.tempHint')}
+        required
+      >
+        <Input
+          id="fp-current"
+          name="currentPassword"
+          type="password"
+          autoComplete="current-password"
+          aria-describedby="fp-current-error"
+          required
+        />
+      </FormRow>
+      <FormRow
+        label={t('field.newPassword')}
+        htmlFor="fp-password"
+        errors={fe?.password}
+        hint={t('signup.passwordHelp')}
+        required
+      >
+        <Input
+          id="fp-password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          aria-describedby="fp-password-error"
+          required
+        />
+      </FormRow>
+      <FormRow
+        label={t('field.passwordConfirm')}
+        htmlFor="fp-password2"
+        errors={fe?.passwordConfirm}
+        required
+      >
+        <Input
+          id="fp-password2"
+          name="passwordConfirm"
+          type="password"
+          autoComplete="new-password"
+          aria-describedby="fp-password2-error"
+          required
+        />
+      </FormRow>
+      {state && !state.ok && !fe ? <FormError error={state.error} /> : null}
+      <SubmitButton size="lg" data-ui-key="first-password-submit">
+        {t('firstPassword.submit')}
       </SubmitButton>
     </form>
   );

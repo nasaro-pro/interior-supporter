@@ -27,6 +27,7 @@ const readyRow = {
   path: 'c/p/design_original/x.pdf',
   original_name: '평면도.pdf',
   status: 'ready',
+  mime: 'application/pdf',
 };
 
 function setup(opts: {
@@ -101,6 +102,21 @@ describe('respondWithFile (B-01, TC-903)', () => {
       undefined,
     );
     expect(SIGNED_URL_TTL_SECONDS).toBe(60);
+  });
+
+  it('D-20 CAD·3D 등 미리보기 불가 형식은 download 요청이 없어도 항상 내려받기 서명', async () => {
+    const { admin } = setup({
+      file: {
+        ...readyRow,
+        path: 'c/p/design_original/x.dwg',
+        original_name: '평면도.dwg',
+        mime: 'image/vnd.dwg',
+      },
+    });
+    await respondWithFile(fileId, false);
+    expect(admin.storageApi.createSignedUrl).toHaveBeenCalledWith('c/p/design_original/x.dwg', 60, {
+      download: '평면도.dwg',
+    });
   });
 
   it('download=1 이면 원래 파일 이름으로 내려받기 서명', async () => {

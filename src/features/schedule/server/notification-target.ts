@@ -1,5 +1,5 @@
 // ⑥ 알림 대상 해석기 — schedule_events (NOTIFICATION_TARGET_OWNERS.schedule_events = 'C')
-// schedule_changed → CL-18. 시공팀은 일정을 볼 수 없다. 못 보면 null (POL-027)
+// schedule_changed → PM-18 / CL-18 / FW-04. 시공팀은 담당자가 일정 탭을 켠 현장만 (F11). 못 보면 null (POL-027)
 import 'server-only';
 import type { NotificationTargetResolver } from '@/shared/contracts/integration';
 import { routes } from '@/shared/contracts/routes';
@@ -11,8 +11,19 @@ export const notificationTargetResolver: NotificationTargetResolver = async (
   area,
   companySlug,
 ) => {
-  if (area === 'field') return null;
   const supabase = await createServerSupabase();
+  if (area === 'field') {
+    // 시공팀은 schedule_events 를 직접 못 읽는다 → 탭 판정까지 하는 field_schedule RPC
+    const { data } = await supabase.rpc('field_schedule', { p_project: projectId });
+    const event = data?.find((e) => e.id === objectId);
+    return event
+      ? {
+          title: event.title,
+          href: routes.field.site(projectId, 'schedule'),
+          screenId: 'FW-04',
+        }
+      : null;
+  }
   const { data } = await supabase
     .from('schedule_events')
     .select('id, title, is_public')

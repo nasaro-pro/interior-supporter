@@ -5,6 +5,8 @@ import type {
   ParticipantRole,
   ProjectStatus,
 } from '@/shared/contracts/domain';
+import type { HomeTheme } from './home-theme';
+import type { PageImages, PageTone } from './page-theme';
 
 export interface ProjectListItem {
   id: string;
@@ -22,6 +24,9 @@ export interface ProjectDetail extends ProjectListItem {
   companyId: string;
   homeMessage: string;
   homeSections: HomeSections;
+  homeTheme: HomeTheme;
+  pageImages: PageImages;
+  pageTone: PageTone;
   createdAt: string;
   updatedAt: string;
   version: number;
@@ -58,6 +63,8 @@ export interface MemberItem {
   role: MemberRole;
   createdAt: string;
   version: number;
+  /** D-36: 담당자(pm)의 프로젝트 생성 권한 (owner·manager 는 항상) */
+  canCreateProjects: boolean;
 }
 
 export interface ClientItem {

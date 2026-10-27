@@ -22,6 +22,7 @@ import { createScheduleEvent, updateScheduleEvent } from '../server/actions';
 import type { RelatedOption } from '../server/related';
 import {
   RELATED_TYPES,
+  SCHEDULE_PROGRESS,
   SCHEDULE_LIMITS,
   scheduleFormSchema,
   type RelatedType,
@@ -37,6 +38,7 @@ const FIELDS = [
   'endDate',
   'endTime',
   'isPublic',
+  'progress',
   'relatedType',
   'relatedId',
 ] as const;
@@ -78,6 +80,7 @@ export function ScheduleFormSheet({
       endDate: event?.endDate ?? null,
       endTime: event?.endTime ?? null,
       isPublic: event?.isPublic ?? false,
+      progress: event?.progress ?? 'planned',
       relatedType: event?.relatedType ?? null,
       relatedId: event?.relatedId ?? null,
     },
@@ -220,6 +223,20 @@ export function ScheduleFormSheet({
               maxLength={SCHEDULE_LIMITS.description}
               {...form.register('description')}
             />
+          </FormField>
+          {/* D-30 진행 상태 */}
+          <FormField
+            id="schedule-progress"
+            label={t('schedule.field.progress')}
+            error={err('progress')}
+          >
+            <NativeSelect data-ui-key="schedule-progress-select" {...form.register('progress')}>
+              {SCHEDULE_PROGRESS.map((p) => (
+                <option key={p} value={p}>
+                  {t(`schedule.progress.${p}`)}
+                </option>
+              ))}
+            </NativeSelect>
           </FormField>
           <Controller
             control={form.control}

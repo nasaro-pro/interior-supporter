@@ -32,7 +32,7 @@
     "choose": "Choose files",
     "spec": "Allowed: {exts} · Max {size}",
     "prompt": "Drag files here, or click to choose.",
-    "heic": "HEIC photos aren’t supported. On iPhone, go to Settings > Camera > Formats and choose “Most Compatible”, or convert the photo to JPG.",
+    "heic": "HEIC photos can't be uploaded directly. Picking photos on an iPhone converts them to JPG automatically; convert HEIC files on a computer to JPG first.",
     "tooMany": "You can upload up to {max} files at once.",
     "renamedExt": "Files with only a changed extension can’t be uploaded. Upload the file in its original format.",
     "metadataNotice": "To protect privacy, photo metadata such as location isn’t stored."

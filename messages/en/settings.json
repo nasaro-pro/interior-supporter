@@ -17,7 +17,12 @@
     "logo": "Logo",
     "defaultHomeMessage": "Default customer home message",
     "role": "Role",
-    "joinedAt": "Joined"
+    "joinedAt": "Joined",
+    "createPermission": "Create projects",
+    "homeSections": "Customer home section order and visibility",
+    "homeTheme": "Color theme",
+    "pageImages": "Images by page",
+    "pageTone": "Page mood (background color)"
   },
   "members": {
     "invite": "Invite member",
@@ -26,7 +31,9 @@
     "ownerLocked": "The owner’s role can’t be changed or removed.",
     "resetLinkCreated": "Reset link created. Copy it now and give it directly to the person. It can be used once within 1 hour.",
     "resetOwnerHint": "The owner’s password can only be reset through the operations procedure.",
-    "empty": "No members invited yet. Invite PMs to work together."
+    "empty": "No members invited yet. Invite PMs to work together.",
+    "createAlways": "Always",
+    "createPermissionFor": "Project creation for {name}"
   },
   "storage": {
     "used": "{used} of {total} used",
@@ -44,7 +51,11 @@
   "toast": {
     "logoUpdated": "Logo updated.",
     "memberRemoved": "Member removed.",
-    "roleChanged": "Role updated."
+    "roleChanged": "Role updated.",
+    "createPermissionOn": "Project creation turned on.",
+    "createPermissionOff": "Project creation turned off.",
+    "createRequestApproved": "Request approved. They can now create projects.",
+    "createRequestRejected": "Request rejected."
   },
   "confirm": {
     "removeMember": {
@@ -58,6 +69,33 @@
     }
   },
   "templates": {
-    "hint": "Used as the default customer home message for new projects. Existing projects aren’t changed."
+    "hint": "Used as the default customer home message for new projects. Existing projects are not changed.",
+    "intro": "When you create a project, this template (page mood, images by page, message, color theme and home sections) is applied to its customer pages. Existing projects are not changed, and each project can be adjusted from its overview.",
+    "previewTitle": "New project customer home preview",
+    "previewNotice": "The real customer home also shows each project's recent updates, schedule and documents.",
+    "saved": "Default template saved. It applies to projects you create from now on.",
+    "pageToneHint": "The background color of every customer page. In dark mode it switches to a darker color with the same mood.",
+    "pageImagesHint": "Each customer page can have its own background image. Content sits on a translucent sheet above the image, so it stays readable on busy photos. {exts}, up to 1MB. A large landscape image (about 16:9) works best.",
+    "noImage": "No image",
+    "uploadFor": "Upload image for {page}",
+    "removeFor": "Remove image for {page}",
+    "imageUploaded": "Image for {page} uploaded. Save to apply it to the template.",
+    "previewPage": "Page to preview",
+    "previewPlaceholder": "{page} content appears here."
+  },
+  "externals": {
+    "title": "Customer and field crew accounts",
+    "empty": "No customer or field crew accounts yet.",
+    "revokeAll": "Revoke access to this company",
+    "revokeTitle": "Revoke all of {name}'s access to this company?",
+    "revokeBody": "All customer and field crew assignments in this company's projects are revoked right away. The account stays, so projects with other companies keep working.",
+    "revoked": "Access to this company revoked."
+  },
+  "createRequests": {
+    "title": "Requests to create projects",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveFor": "Approve request from {name}",
+    "rejectFor": "Reject request from {name}"
   }
 }

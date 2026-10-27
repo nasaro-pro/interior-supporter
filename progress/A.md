@@ -41,7 +41,7 @@
 | REQ-041 알림 생성 | (DB) | 베이스라인 트리거 + DB-06 | — | pgTAP | 회수·기간 변경 당사자 알림 |
 | REQ-050 업체 정보·로고 | PM-61 | 구현 완료(단위·DB) | A-T05 | — | 로고 업로드는 B files 실구현 |
 | REQ-051 구성원 관리 | PM-62 | 구현 완료(단위·DB) | A-T05 | — | E2E A-T05 는 `settings-forbidden` 키로 판정 |
-| REQ-052 기본 템플릿 | PM-63 | 구현 완료(단위·DB) | TC-052 | — | |
+| REQ-052 기본 템플릿 | PM-63 | 구현 완료(단위·DB·로컬 화면) | TC-052, A-T52 | home-template.test.ts, template-form.test.tsx, a_home_template.test.sql | CR-A-10: 페이지 분위기(바탕색 프리셋 7종) + 고객 포털 탭별 이미지 + 안내문·색상 테마·4영역, 페이지별 미리보기. 신규 프로젝트만 적용 |
 | REQ-053 저장공간 | PM-64 | 구현 완료(단위·DB) | TC-053 | — | 80% 경고 |
 
 ## 2. 추가·변경한 파일 (내 경로)
@@ -75,6 +75,7 @@
 | CR-A-03 → CR-INT-11 | A | `next dev` 가 AGENTS.md 수정 | `agentRules: false` | 승인 권고 | 스타터 v2.1 `next.config.ts` |
 | CR-A-04 → CR-INT-12 | A | shadcn `cn` import 경로 | import 를 `@/shared/lib/utils` 로 (A 방식 표준) | **승인** | README 안내 |
 | CR-A-07 (신규) | A | PM 구성원의 프로젝트 생성 허용 여부 | 현행 유지: 업체 구성원(PM 포함) 생성 가능 — RLS projects insert 정책과 일치 | 정책 확인 요청 | `project-actions.ts` 주석 |
+| **CR-A-10** (신규) | A | 기본 템플릿이 안내문뿐이라 고객 홈 모양(배경·테마·영역)을 업체 단위로 정할 수 없음 | `company_settings` +4컬럼(default_home_sections·home_theme·page_images·page_tone), `projects` +3컬럼(home_theme·page_images·page_tone), `project_defaults()` 확장, 배경 검사 트리거 2개. 배경은 계약 변경 없이 `company_logo` kind 재사용(1MB) | 대기 (A 경로 안에서 구현 완료) | `20261024000100_a_home_template.sql`·`20261025000100_a_page_theme.sql`, PM-63·PM-03·CL-02 레이아웃(포털 전 탭). 설계: `progress/CR_고객홈_템플릿_설계안.md` |
 | CR-A-09 (신규) | A | A-08 로 `getInvitationPreview` 를 server-only 모듈로 옮기며 service_role 사용 파일이 1개 늘어남 | TC-909 허용 목록(`eslint.config.mjs`, 고정)에 `src/features/core/server/invitation-queries.ts` 추가 | 대기 | 현재는 해당 import 1줄에 근거 주석 + eslint-disable |
 | (A-02 후속) | A | 프록시 홉 수 | `TRUSTED_PROXY_HOPS`(선택, 기본 1) 문서화 | 승인 권고 | 배포 런북 |
 
@@ -86,6 +87,8 @@
 - D-1: SYS-403 별도 경로 없음 → 권한 없음은 화면 안 `ForbiddenState`, 존재 숨김은 `notFound()`(SYS-404)
 - D-2: REQ-010 '내 미답변 요청' 요약 수치 — 계약에 카운트 제공자 없음. 결정 전 미표시
 - A-03 응답 시간 평준화: 실패 경로는 요청 시작부터 최소 700ms(+0~150ms 지터)까지 대기. 네트워크 지터 수준 차이는 남고, 요청 제한이 2차 방어선
+- 결정 필요(CR-A-10): ③ 분위기 프리셋 색(hex 14개)을 `page-theme.ts` 한 곳에 둠 — 해석 a) 현행 유지 / b) 고정 파일 `globals.css` 에 `--page-*` 토큰으로 옮기기(통합 CR). ① 배경을 `company_logo` kind 로 재사용 → 저장공간(PM-64) 종류별 합계에 '로고'로 합산됨. 해석 a) 현행 유지 / b) 계약 `FileKind` 에 `home_background` 추가(B 파일 어댑터·`FILE_RULES` 동시 변경, 용량 상향 가능). ② 기존 프로젝트 일괄 적용 — a) 미제공(POL-026 현행, 채택) / b) 버튼 추가(정책 개정 필요)
+- CR-A-10 로컬 화면 확인 시 CSP `upgrade-insecure-requests` 때문에 http 로컬 Supabase 의 서명 이미지 URL 이 https 로 바뀌어 차단됨(기존 로고도 동일). 운영(https)에는 영향 없음 — 로컬 확인은 브라우저 CSP 우회로 진행
 - 시드 비밀번호(A-13): `seed.sql` 에 값 없음. `app.seed_password` 를 주입해야 실행되며 미설정이면 예외로 중단(운영 실수 적용 가드). 통합 도구는 `.env.local` `SEED_PASSWORD`, E2E 는 `E2E_SEED_PASSWORD`
 
 ## 6. 평가 기록 (14.5 양식)
@@ -97,6 +100,7 @@
 | A-T05 | 2026-10-14 | A | TASK-007·015 | pm1·X | 업체 설정 동작 불가 | 단위 통과 | participant-actions.test.ts, e2e(미실행) | 부분 | E2E 는 `settings-forbidden` 판정 |
 | A-T07 | 2026-10-13 | 통합 | TASK-010 | pm1·field1 | 영역별 알림 | PM-50·FW-50 200 | P2_scenarios, notification-queries.test.ts | 통과 | |
 | A-T08 | 2026-10-13 | 통합 | TASK-006·009 | cust1·cust3 | 비공개 미노출, 미초대 404 | 404 | P2_scenarios | 통과 | 360px 시각 점검은 visual 도구 |
+| A-T52 | 2026-10-24 | A | REQ-052·014·016 | owner-x·pm1·cust1·X | 템플릿(배경·파랑·순서·문서 숨김) 저장 → 새 프로젝트 고객 홈에 반영, 기존 프로젝트 불변, PM 은 금지 | 기대대로 | 로컬 Supabase + next start + Playwright 스크린샷, pgTAP 183/183 | 통과(로컬) | 통합 dev DB 미적용 |
 | A-T09 | 2026-10-07 | A | TASK-003 | — | 제외 화면 없음 | 통과 | registry.test.ts | 통과 | |
 | TC-018 | 2026-10-13 | 통합 | 기간 만료 시공팀 | field2 | /field·파일 404 | 404 | P2_scenarios | 통과 | |
 | TC-904 | 2026-10-07 | A | safeNext | — | 외부·`//` 경로 거절 | 통과 | helpers.test.ts | 통과 | |

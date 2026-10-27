@@ -21,8 +21,12 @@ export async function listDesigns(
   const limit = opts.limit ?? PAGE_SIZE;
   let q = supabase
     .from('designs')
-    .select('id, title, current_version, is_public, confirm_state, updated_at, archived_at')
+    .select(
+      'id, title, current_version, is_public, confirm_state, updated_at, archived_at, space, is_main, sort_order',
+    )
     .eq('project_id', projectId)
+    // D-28: 디자이너가 정한 순서, 같으면 최근 수정순 (공간 묶음 · 대표 먼저는 lib/order.ts)
+    .order('sort_order', { ascending: true })
     .order('updated_at', { ascending: false })
     .order('id', { ascending: false })
     .limit(limit + 1);
@@ -63,6 +67,9 @@ export async function listDesigns(
       updatedAt: r.updated_at,
       archivedAt: r.archived_at,
       previewFileId: previewByDesign.get(r.id) ?? null,
+      space: r.space,
+      isMain: r.is_main,
+      sortOrder: r.sort_order,
     })),
     hasMore: (data ?? []).length > limit,
   };
@@ -129,7 +136,7 @@ export async function getDesignDetail(projectId: string, designId: string): Prom
   const { data: d, error } = await supabase
     .from('designs')
     .select(
-      'id, title, description, is_public, confirm_state, current_version, version, updated_at, archived_at',
+      'id, title, description, is_public, confirm_state, current_version, version, updated_at, archived_at, space, is_main',
     )
     .eq('id', designId)
     .eq('project_id', projectId)
@@ -192,6 +199,8 @@ export async function getDesignDetail(projectId: string, designId: string): Prom
     version: d.version,
     updatedAt: d.updated_at,
     archivedAt: d.archived_at,
+    space: d.space,
+    isMain: d.is_main,
     versions: (versions ?? []).map((v) => {
       const f = files.get(v.file_id);
       return {

@@ -54,6 +54,7 @@
   "detail": {
     "versionMatch": "The selected version’s PDF is shown and downloaded.",
     "privateVersion": "This version is hidden from customers.",
-    "noVersion": "No versions yet. Upload a new version."
+    "noVersion": "No versions yet. Upload a new version.",
+    "viewOnly": "The company admin uploads and publishes estimates. Designers can view them."
   }
 }

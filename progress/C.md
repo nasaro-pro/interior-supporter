@@ -1,6 +1,6 @@
 # PROGRESS — C 이재서
 
-- 스타터 버전: 2.0 / 최종 갱신: 2026-10-14 (파트 3: 디자인 통일 · C-11·C-12 · E2E 통합 시드 재지정)
+- 스타터 버전: 2.0 / 최종 갱신: 2026-10-24 (UI 시안 ↔ 저장소 화면 레지스트리 정렬, CR-C-04 제안)
 - 상태 요약: TASK-200~210 구현 완료, 통합본(`_integration/20_merged`)에서 검증 중. 통합 검증: pgTAP 161/161(`90_reports/PART2_REPORT.md`) · 역할별 시나리오 52/52(`90_reports/P2_scenarios.md`). 단위 테스트 전체 504 통과(C 26 파일). E2E(`tests/e2e/c`)는 통합 시드 기준으로 재지정 — 최종 실행은 통합 책임자의 재빌드 후.
 - 화면 형식: A 표준 "차분한 스튜디오"(`80_patches/P3_UI_STANDARD.md`). 8766 클론 형식(CR-C-02)은 반려되어 C kit 과 클론 시각 요소를 모두 제거했다 (`80_patches/P3_C_changes.md`).
 
@@ -48,6 +48,7 @@
 | CR-C-01 | shadcn `cn` 경로·C 전용 UI kit | CR-INT-12 로 통합, A 표준으로 해결 | P3 에서 C kit 삭제, A 표준(`@/shared/ui/*`)으로 교체 |
 | CR-C-02 | 8766 클론 디자인 토큰 | **반려** (02 문서 7.7·헌법 10.5 충돌) | 클론 시각 요소 전부 제거 (P3_C_changes.md 1·2장) |
 | CR-C-03 | `next dev` 가 AGENTS.md 수정 → `agentRules:false` | CR-INT-11 로 이관 (승인 권고) | 해당 없음 (C 코드 변경 없음) |
+| CR-C-04 | PM-08 휴대폰 기본 보기: 주간 목록(CalendarWeekList) 위에 '다가오는 일정' 묶음 추가 (UX-08, Figma 시안 '04 일정 · 모바일') | 제안 (2026-10-24) | 미반영 — 승인 후 `src/features/schedule/**` 안에서만 구현 |
 
 ## 5. 결정 필요·충돌·규격과 다르게 한 것
 
@@ -127,3 +128,8 @@ export const C_TARGETS: Record<'requests' | 'photos' | 'schedule_events', Notifi
 ```
 
 **B 와의 계약**: 업로드는 `@/features/files` 의 `createUploadIntent({ kind: 'photo_original', … })` → `uploadToSignedUrl` → `finalizeUpload` 만 호출, 다운로드는 `routes.file(fileId)`. 일정 관련 항목은 B 테이블을 사용자 권한으로 id·제목·project_id 만 조회하고 항목이 속한 프로젝트의 `routes` 로 링크(B 코드 import 없음, 같은 업체 안에서 다른 프로젝트 항목 허용).
+8. **충돌 보고 (2026-10-24, UI 시안 정렬 중 발견)** — 고치지 않고 보고만 함. Figma 와이어프레임은 `screens.ts` 기준으로 다시 그림(화면 ID·경로·D0~D4·담당 표시).
+   - 충돌: 01-1.4 / 문서 시스템 관리자(운영자) 화면 제외 범위 / 코드 screens.ts 에 영역 없음, 브랜치 feature/site-admin 있음 / 제안 A 가 CR 로 범위 변경 후 화면 ID·경로 지정
+   - 충돌: 02-7.1 / 문서 '차분한 스튜디오' 토큰 고정 / 코드 globals.css 고정 / 제안 UI 방향은 C(청록 유지), 레퍼런스는 레이아웃 참고만
+   - 충돌: PM-02 / 문서 휴대폰 탭 가로 스크롤 / 코드 ProjectTabsNav 가로 스크롤 / 제안 2줄 격자(UX-09)는 A 결정 사항으로 CR
+   - 충돌: AGENTS.md 0장 / 문서 원격 저장소 없이 ZIP 제출 / 코드 GitHub Develop + feature/{site-admin,designer,customer,field} 브랜치 / 제안 통합 책임자가 제출 방식 확정 후 문서 갱신

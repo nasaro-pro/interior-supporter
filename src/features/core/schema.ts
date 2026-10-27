@@ -9,6 +9,9 @@ import {
   RESERVED_SLUGS,
   SLUG_PATTERN,
 } from '@/shared/contracts/domain';
+import { PORTAL_TABS } from '@/shared/contracts/screens';
+import { HOME_THEMES } from './home-theme';
+import { PAGE_TONES } from './page-theme';
 
 const YMD = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -97,7 +100,6 @@ export const loginSchema = z.object({
 export const signupSchema = z
   .object({
     companyName: text(100, 1),
-    slug: slugSchema,
     displayName: text(80, 1),
     email: emailSchema,
     password: passwordSchema,
@@ -175,11 +177,18 @@ export const homeSectionsSchema = z
   .length(4)
   .refine((v) => new Set(v.map((s) => s.key)).size === 4, { message: 'field.invalid' });
 
+/** 고객 포털 탭 → files.id (CR-A-10) */
+export const pageImagesSchema = z.partialRecord(z.enum(PORTAL_TABS), uuid);
+
 export const homeUpdateSchema = z.object({
   projectId: uuid,
   baseVersion: version,
   homeMessage: z.string().max(2000, { message: 'field.tooLong|2000' }),
   homeSections: homeSectionsSchema,
+  homeTheme: z.enum(HOME_THEMES, { message: 'field.select' }),
+  /** 페이지 이미지는 템플릿에서 복사된 것만 — 프로젝트 화면에서는 유지 또는 제거만 (DB 트리거가 파일 검사) */
+  pageImages: pageImagesSchema,
+  pageTone: z.enum(PAGE_TONES, { message: 'field.select' }),
 });
 
 export const projectArchiveSchema = z.object({
@@ -272,6 +281,10 @@ export const templateUpdateSchema = z.object({
   companyId: uuid,
   baseVersion: version,
   defaultHomeMessage: z.string().max(2000, { message: 'field.tooLong|2000' }),
+  defaultHomeSections: homeSectionsSchema,
+  defaultHomeTheme: z.enum(HOME_THEMES, { message: 'field.select' }),
+  defaultPageImages: pageImagesSchema,
+  defaultPageTone: z.enum(PAGE_TONES, { message: 'field.select' }),
 });
 
 export const memberInviteSchema = z.object({
@@ -294,3 +307,45 @@ export const memberRemoveSchema = z.object({
 });
 
 export const resetLinkSchema = z.object({ companyId: uuid, targetUserId: uuid });
+
+// ── 디자이너 페이지 2단계 (D-12·D-16·D-17) ─────────────────────────────
+/** D-12: 디자이너가 고객·시공팀 계정을 만들고 프로젝트에 배정 */
+export const externalAccountSchema = z
+  .object({
+    projectId: uuid,
+    role: z.enum(['customer', 'field'], { message: 'field.select' }),
+    displayName: text(80, 1),
+    email: emailSchema,
+    canConfirm: checkbox,
+    validFrom: optionalDate,
+    validUntil: optionalDate,
+  })
+  .refine(periodRefine, { message: 'field.dateOrder', path: ['validUntil'] })
+  .refine((v) => !v.canConfirm || v.role === 'customer', {
+    message: 'field.invalid',
+    path: ['canConfirm'],
+  });
+
+/** D-16: 임시 비밀번호 재발송 (아직 첫 로그인 변경 전인 계정만) */
+export const resendTempPasswordSchema = z.object({ projectId: uuid, userId: uuid });
+
+/** D-17: 이 업체에서의 고객·시공팀 접근 일괄 회수 */
+export const companyAccessRevokeSchema = z.object({ companyId: uuid, userId: uuid });
+
+/** D-36: 담당자의 프로젝트 생성 권한 요청 */
+export const createPermissionRequestSchema = z.object({
+  companyId: uuid,
+  note: z.string().trim().max(500, 'field.tooLong').default(''),
+});
+/** D-36 · CA-07: 업체관리자가 요청 승인·거절 */
+export const createPermissionDecideSchema = z.object({
+  companyId: uuid,
+  requestId: uuid,
+  approve: z.boolean(),
+});
+/** D-36 · CA-07: 업체관리자가 담당자 권한 켜기·끄기 */
+export const createPermissionSetSchema = z.object({
+  companyId: uuid,
+  memberId: uuid,
+  allowed: z.boolean(),
+});
