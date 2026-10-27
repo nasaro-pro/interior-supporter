@@ -25,6 +25,8 @@ export const NAMESPACES = [
   'requests',
   'photos',
   'schedule',
+  'admin', // 2차 수정 CR-3 사이트 관리·약관·탈퇴
+  'field',
 ] as const;
 
 export function toLocale(value: string | undefined): Locale {

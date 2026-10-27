@@ -18,7 +18,13 @@ const pretendard = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('common');
-  return { title: { default: t('appName'), template: `%s · ${t('appName')}` } };
+  return {
+    title: { default: t('appName'), template: `%s · ${t('appName')}` },
+    // D-18: 홈 화면에 추가했을 때 앱처럼 열린다 (manifest.ts)
+    applicationName: t('appName'),
+    appleWebApp: { capable: true, title: t('appName'), statusBarStyle: 'default' },
+    icons: { apple: '/icons/apple-touch-icon.png' },
+  };
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {

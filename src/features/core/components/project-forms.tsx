@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useSearchParamState } from '@/shared/hooks/use-search-param-state';
 import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
 import { Input } from '@/shared/ui/input';
@@ -30,16 +31,13 @@ function StatusSelect({ id, defaultValue }: { id: string; defaultValue: ProjectS
 }
 
 /** REQ-011: 이름·현장·기간·상태 → 생성 후 PM-03. id 는 Sheet 를 열 때 만든다 (POL-038) */
-export function ProjectCreateSheet({
-  companySlug,
-  defaultOpen,
-}: {
-  companySlug: string;
-  defaultOpen?: boolean;
-}) {
+export function ProjectCreateSheet({ companySlug }: { companySlug: string }) {
   const t = useTranslations('projects');
   const [state, action] = useActionState(createProject, null);
   const [id] = useState(() => crypto.randomUUID());
+  // D-02: 열림 상태를 ?mode=new 와 동기화 — 빈 화면 '생성' 링크·버튼·새로고침 모두 같은 상태
+  const [mode, setMode] = useSearchParamState('mode');
+  const open = mode === 'new';
   const fe = state && !state.ok ? state.error.fieldErrors : undefined;
   return (
     <FormSheet
@@ -47,7 +45,8 @@ export function ProjectCreateSheet({
       triggerIcon={<Plus aria-hidden />}
       title={t('list.create')}
       uiKey="project-create"
-      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={(next) => setMode(next ? 'new' : null)}
     >
       <form action={action} className="flex flex-col gap-4" noValidate>
         <input type="hidden" name="companySlug" value={companySlug} />

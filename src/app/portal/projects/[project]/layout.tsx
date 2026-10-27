@@ -39,7 +39,8 @@ export default async function PortalProjectLayout({
       <ProjectTabsNav
         tabs={PORTAL_TABS.map((tab) => ({
           key: tab,
-          label: t(`projects.tab.${tab}`),
+          // CU-06: 고객에게 요청 탭은 '메모 대화'
+          label: tab === 'requests' ? t('projects.tab.memos') : t(`projects.tab.${tab}`),
           href: routes.portal.project(projectId, tab),
         }))}
       />

@@ -25,7 +25,8 @@ export async function AppShell({
   brand: string;
   navItems: NavItem[];
   tabItems: NavItem[];
-  notificationsHref: string;
+  /** 없으면 알림 종을 그리지 않는다 (사이트 관리 영역은 앱 알림이 없다) */
+  notificationsHref?: string;
   unread: number;
   settingsHref?: string;
   displayName: string;
@@ -62,22 +63,24 @@ export async function AppShell({
             <TopNav items={navItems} label={t('common.nav.mainNav')} />
           </div>
           <div className="flex items-center gap-1">
-            <Link
-              href={notificationsHref}
-              data-ui-key="shell-notifications-link"
-              aria-label={t('notifications.label.bell', { count: unread })}
-              className={cn(
-                buttonVariants({ variant: 'ghost', size: 'sm' }),
-                'relative hidden md:inline-flex',
-              )}
-            >
-              <Bell aria-hidden className="size-5" />
-              {unread > 0 ? (
-                <span className="bg-destructive text-destructive-foreground absolute -top-0.5 -right-0.5 min-w-4 rounded-full px-1 text-center text-[10px] leading-4 tabular-nums">
-                  {unread > 99 ? '99+' : unread}
-                </span>
-              ) : null}
-            </Link>
+            {notificationsHref ? (
+              <Link
+                href={notificationsHref}
+                data-ui-key="shell-notifications-link"
+                aria-label={t('notifications.label.bell', { count: unread })}
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'relative hidden md:inline-flex',
+                )}
+              >
+                <Bell aria-hidden className="size-5" />
+                {unread > 0 ? (
+                  <span className="bg-destructive text-destructive-foreground absolute -top-0.5 -right-0.5 min-w-4 rounded-full px-1 text-center text-[10px] leading-4 tabular-nums">
+                    {unread > 99 ? '99+' : unread}
+                  </span>
+                ) : null}
+              </Link>
+            ) : null}
             {settingsHref ? (
               <Link
                 href={settingsHref}

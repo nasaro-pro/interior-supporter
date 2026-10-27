@@ -3,7 +3,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSupabaseFake, NotFoundSignal } from '@/features/files/testing/supabase-fake';
 
-vi.mock('@/features/core', () => ({ requireProjectAccess: vi.fn() }));
+vi.mock('@/features/core', () => ({ requireProjectAccess: vi.fn(), getAccessContext: vi.fn() }));
 vi.mock('@/shared/lib/supabase/server', () => ({ createServerSupabase: vi.fn() }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 vi.mock('@/shared/lib/logger', () => ({
@@ -12,7 +12,7 @@ vi.mock('@/shared/lib/logger', () => ({
 }));
 
 import { revalidatePath } from 'next/cache';
-import { requireProjectAccess } from '@/features/core';
+import { getAccessContext, requireProjectAccess } from '@/features/core';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
 import {
   addEstimateVersion,
@@ -51,68 +51,70 @@ function useFake(script: Parameters<typeof createSupabaseFake>[0]) {
   return fake;
 }
 
+const ctxWith = (role: 'owner' | 'manager' | 'pm') => ({
+  userId: 'u1',
+  displayName: 'U1',
+  locale: 'ko' as const,
+  memberships: [{ companyId: 'c1', slug: 'studio', name: '스튜디오', role }],
+  participations: [],
+  areas: ['app' as const],
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(requireProjectAccess).mockResolvedValue(access);
+  // D-37: 견적서 쓰기는 업체관리자 — 기본은 소유자로 확인
+  vi.mocked(getAccessContext).mockResolvedValue(ctxWith('owner'));
 });
 
-describe('createEstimate (B-04)', () => {
-  it('정상: 견적 + 1번 버전 (트리거가 덮어쓰는 값도 타입상 보낸다)', async () => {
-    const fake = useFake({
-      estimates: [{ error: null }],
-      estimate_versions: [{ data: { version_no: 1 } }],
-    });
+describe('createEstimate (D-05 원자적 RPC)', () => {
+  it('정상: create_estimate RPC 한 번으로 견적 + 1번 버전', async () => {
+    const fake = useFake({ 'rpc:create_estimate': [{ data: 1 }] });
     expect(await createEstimate(create)).toEqual({ ok: true, data: { id, versionNo: 1 } });
-    expect(fake.argOf('estimate_versions', 'insert')?.[0]).toMatchObject({
-      company_id: 'c1',
-      uploaded_by: 'u1',
-      version_no: 0,
-      estimate_id: id,
-    });
-  });
-
-  it('같은 폼 재시도(23505, 같은 프로젝트·미보관)는 버전 저장을 이어 한다', async () => {
-    useFake({
-      estimates: [dup, { data: { id, project_id: projectId, archived_at: null } }],
-      estimate_versions: [{ data: { version_no: 1 } }],
-    });
-    expect(await createEstimate(create)).toEqual({ ok: true, data: { id, versionNo: 1 } });
-  });
-
-  it('23505 인데 다른 프로젝트의 견적이면 CONFLICT (버전을 붙이지 않음)', async () => {
-    const fake = useFake({
-      estimates: [dup, { data: { id, project_id: otherProject, archived_at: null } }],
-    });
-    expect(await createEstimate(create)).toMatchObject({ error: { code: 'CONFLICT' } });
+    expect(fake.callsOf('estimates')).toHaveLength(0);
     expect(fake.callsOf('estimate_versions')).toHaveLength(0);
-  });
-
-  it('23505 인데 보이지 않거나(다른 업체) 보관된 견적이면 CONFLICT', async () => {
-    useFake({ estimates: [dup, { data: null }] });
-    expect(await createEstimate(create)).toMatchObject({ error: { code: 'CONFLICT' } });
-    useFake({
-      estimates: [
-        dup,
-        { data: { id, project_id: projectId, archived_at: '2026-10-01T00:00:00Z' } },
-      ],
+    expect(fake.argOf('rpc:create_estimate', 'rpc')?.[0]).toMatchObject({
+      p_id: id,
+      p_version_id: versionId,
+      p_project: projectId,
+      p_title: '1차 견적',
+      p_file: fileId,
+      p_is_public: false,
     });
-    expect(await createEstimate(create)).toMatchObject({ error: { code: 'CONFLICT' } });
   });
 
-  it('버전 23505: 같은 견적의 버전이면 성공, 다른 견적의 버전이면 CONFLICT', async () => {
+  it('같은 폼 재시도(23505)는 이 견적·프로젝트의 버전이면 성공', async () => {
     useFake({
-      estimates: [{ error: null }],
-      estimate_versions: [dup, { data: { version_no: 1, estimate_id: id, project_id: projectId } }],
+      'rpc:create_estimate': [dup],
+      estimate_versions: [{ data: { version_no: 1, estimate_id: id, project_id: projectId } }],
     });
     expect(await createEstimate(create)).toEqual({ ok: true, data: { id, versionNo: 1 } });
+  });
+
+  it('23505 인데 다른 견적·프로젝트이거나 보이지 않으면 CONFLICT', async () => {
     useFake({
-      estimates: [{ error: null }],
+      'rpc:create_estimate': [dup],
       estimate_versions: [
-        dup,
         { data: { version_no: 4, estimate_id: 'another', project_id: projectId } },
       ],
     });
     expect(await createEstimate(create)).toMatchObject({ error: { code: 'CONFLICT' } });
+    useFake({
+      'rpc:create_estimate': [dup],
+      estimate_versions: [{ data: { version_no: 1, estimate_id: id, project_id: otherProject } }],
+    });
+    expect(await createEstimate(create)).toMatchObject({ error: { code: 'CONFLICT' } });
+    useFake({ 'rpc:create_estimate': [dup], estimate_versions: [{ data: null }] });
+    expect(await createEstimate(create)).toMatchObject({ error: { code: 'CONFLICT' } });
+  });
+
+  it('DB 오류(파일 오류 등)는 실패로 끝나고 재조회하지 않는다', async () => {
+    const fake = useFake({
+      'rpc:create_estimate': [{ error: { code: 'P0001', message: 'file_not_ready' } }],
+    });
+    const res = await createEstimate(create);
+    expect(res.ok).toBe(false);
+    expect(fake.callsOf('estimate_versions')).toHaveLength(0);
   });
 
   it('비로그인은 UNAUTHENTICATED, 편집자가 아니면 404', async () => {
@@ -211,5 +213,44 @@ describe('setEstimateVersionPublic (B-06·B-08)', () => {
       estimate_versions: [{ data: { version: 2 } }],
     });
     expect(await setEstimateVersionPublic(input)).toEqual({ ok: true, data: { version: 2 } });
+  });
+});
+
+describe('D-37 견적서는 업체관리자만', () => {
+  it('담당자(pm)는 편집자여도 등록 · 새 버전 · 공개 · 보관 모두 FORBIDDEN (DB 호출 없음)', async () => {
+    vi.mocked(getAccessContext).mockResolvedValue(ctxWith('pm'));
+    const fake = useFake({});
+    for (const res of [
+      await createEstimate(create),
+      await addEstimateVersion({
+        projectId,
+        estimateId: id,
+        versionId,
+        versionLabel: 'v2',
+        changeNote: '수정',
+        fileId,
+        isPublic: false,
+      }),
+      await setEstimateVersionPublic({
+        projectId,
+        estimateId: id,
+        id: versionId,
+        baseVersion: 1,
+        isPublic: true,
+      }),
+      await setEstimateArchived({ projectId, id, baseVersion: 1, archived: true }),
+    ]) {
+      expect(res).toMatchObject({ ok: false, error: { code: 'FORBIDDEN' } });
+    }
+    expect(fake.callsOf('rpc:create_estimate')).toHaveLength(0);
+    expect(fake.callsOf('estimates')).toHaveLength(0);
+    expect(fake.callsOf('estimate_versions')).toHaveLength(0);
+  });
+
+  it('관리자(manager)는 등록할 수 있다', async () => {
+    vi.mocked(getAccessContext).mockResolvedValue(ctxWith('manager'));
+    const fake = useFake({ 'rpc:create_estimate': [{ data: 1 }] });
+    expect(await createEstimate(create)).toMatchObject({ ok: true });
+    expect(fake.callsOf('rpc:create_estimate')).toHaveLength(1);
   });
 });

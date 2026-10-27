@@ -1,10 +1,13 @@
 // 도안·확정 입력 스키마 — 길이는 DB CHECK 와 동일 (20261006000200_b_…sql)
 // 메시지 규약: errors.field.<key>[:값] (표준 useFieldErrorText — @/shared/ui/form-parts)
 import { z } from 'zod';
+import { MATERIAL_SPACES } from '@/shared/contracts/domain';
 
 const title = z.string().trim().min(1, 'required').max(120, 'tooLong:120');
 const description = z.string().trim().max(2000, 'tooLong:2000');
 const note = z.string().trim().max(500, 'tooLong:500');
+/** D-26 공간 — 자재와 같은 목록, null = 전체 */
+const space = z.enum(MATERIAL_SPACES, 'invalid').nullable();
 
 export const designCreateSchema = z.object({
   projectId: z.uuid(),
@@ -13,6 +16,7 @@ export const designCreateSchema = z.object({
   note,
   isPublic: z.boolean(),
   fileId: z.uuid('fileRequired'),
+  space: space.optional(),
 });
 export type DesignCreateInput = z.infer<typeof designCreateSchema>;
 
@@ -30,6 +34,7 @@ export const designUpdateSchema = z.object({
   baseVersion: z.number().int().positive(),
   title,
   description,
+  space: space.optional(),
 });
 export type DesignUpdateInput = z.infer<typeof designUpdateSchema>;
 
@@ -84,3 +89,20 @@ export const reconfirmRequestSchema = z.object({
   reason: z.string().trim().min(1, 'required').max(500, 'tooLong:500'),
 });
 export type ReconfirmRequestInput = z.infer<typeof reconfirmRequestSchema>;
+
+/** D-27 대표 도안 지정 */
+export const designMainSchema = z.object({ projectId: z.uuid(), id: z.uuid() });
+
+/** D-28 순서 한 칸 이동 */
+export const designMoveSchema = z.object({
+  projectId: z.uuid(),
+  id: z.uuid(),
+  direction: z.enum(['up', 'down']),
+});
+
+/** D-28 공간 순서 한 칸 이동 (space null = 전체) */
+export const designSpaceMoveSchema = z.object({
+  projectId: z.uuid(),
+  space,
+  direction: z.enum(['up', 'down']),
+});

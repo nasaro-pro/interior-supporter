@@ -85,7 +85,7 @@ export async function listMembers(companyId: string): Promise<MemberItem[] | nul
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('company_members')
-    .select('id, user_id, role, created_at, version')
+    .select('id, user_id, role, created_at, version, can_create_projects')
     .eq('company_id', companyId)
     .is('removed_at', null)
     .order('created_at', { ascending: true });
@@ -98,5 +98,77 @@ export async function listMembers(companyId: string): Promise<MemberItem[] | nul
     role: m.role,
     createdAt: m.created_at,
     version: m.version,
+    canCreateProjects: m.role !== 'pm' || m.can_create_projects,
   }));
+}
+
+/** D-13·D-17: 업체의 고객·시공팀 계정 — 사람별로 묶어 참여 프로젝트를 보여 준다 (RLS: 편집 가능한 프로젝트만 보임) */
+export interface ExternalAccountItem {
+  userId: string;
+  displayName: string;
+  roles: ParticipantRole[];
+  projects: {
+    projectId: string;
+    projectName: string;
+    role: ParticipantRole;
+    state: ParticipantItem['state'];
+  }[];
+  /** 이 업체에서 아직 유효(회수 안 됨)한 배정이 있는가 */
+  hasActive: boolean;
+}
+
+export async function listExternalAccounts(
+  companyId: string,
+): Promise<ExternalAccountItem[] | null> {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('project_participants')
+    .select('user_id, project_id, role, valid_from, valid_until, revoked_at, created_at')
+    .eq('company_id', companyId)
+    .in('role', ['customer', 'field'])
+    .order('created_at', { ascending: true });
+  if (error) return null;
+  const projectIds = [...new Set(data.map((p) => p.project_id))];
+  const { data: projects } = projectIds.length
+    ? await supabase.from('projects').select('id, name').in('id', projectIds)
+    : { data: [] as { id: string; name: string }[] };
+  const projectName = new Map((projects ?? []).map((p) => [p.id, p.name]));
+  const names = await displayNames(data.map((p) => p.user_id));
+  const today = todayKst();
+  const byUser = new Map<string, ExternalAccountItem>();
+  for (const p of data) {
+    const item = byUser.get(p.user_id) ?? {
+      userId: p.user_id,
+      displayName: names.get(p.user_id) ?? '—',
+      roles: [],
+      projects: [],
+      hasActive: false,
+    };
+    const state = participantState(p, today);
+    if (!item.roles.includes(p.role)) item.roles.push(p.role);
+    item.projects.push({
+      projectId: p.project_id,
+      projectName: projectName.get(p.project_id) ?? '—',
+      role: p.role,
+      state,
+    });
+    if (state !== 'revoked') item.hasActive = true;
+    byUser.set(p.user_id, item);
+  }
+  return [...byUser.values()];
+}
+
+/** D-13: 업체 설정에서 계정을 만들 때 고를 프로젝트 (보관 제외, 편집 가능한 것만 — RLS) */
+export async function listAssignableProjects(
+  companyId: string,
+): Promise<{ id: string; name: string }[]> {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('projects')
+    .select('id, name')
+    .eq('company_id', companyId)
+    .is('archived_at', null)
+    .order('created_at', { ascending: false })
+    .limit(200);
+  return data ?? [];
 }

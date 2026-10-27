@@ -52,3 +52,15 @@ export const photoArchiveSchema = z.object({
   baseVersion: z.int().positive(),
   archived: z.boolean(),
 });
+
+/** D-34 · CU-07 사진 댓글 — 고객: 자기 대화에 댓글 / 편집자: threadOwner(고객) 대화에 답글 */
+export const PHOTO_COMMENT_LIMIT = 1000;
+export const photoCommentSchema = z.object({
+  id: z.guid(),
+  projectId: z.guid(),
+  photoId: z.guid(),
+  body: z.string().trim().min(1, 'field.required').max(PHOTO_COMMENT_LIMIT, 'field.tooLong'),
+  /** 편집자 답글일 때만 — 답할 고객 */
+  threadOwner: z.guid().nullable().default(null),
+});
+export type PhotoCommentInput = z.infer<typeof photoCommentSchema>;

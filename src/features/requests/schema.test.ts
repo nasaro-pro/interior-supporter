@@ -15,12 +15,27 @@ describe('requestCreateSchema (REQ-201)', () => {
     expect(r.success).toBe(true);
     expect(r.success && r.data.title).toBe('욕실 타일');
   });
-  it('제목 0자·공백만·121자는 거절한다', () => {
-    for (const title of ['', '   ', 'a'.repeat(121)]) {
-      expect(requestCreateSchema.safeParse({ id, projectId, title, body: 'x' }).success).toBe(
-        false,
-      );
+  it('D-33: 제목은 비워도 된다 (서버가 본문으로 만든다), 121자는 거절', () => {
+    for (const title of ['', '   ', undefined]) {
+      expect(requestCreateSchema.safeParse({ id, projectId, title, body: 'x' }).success).toBe(true);
     }
+    expect(
+      requestCreateSchema.safeParse({ id, projectId, title: 'a'.repeat(121), body: 'x' }).success,
+    ).toBe(false);
+  });
+  it('D-32: 연결 항목은 종류와 id 를 함께, 도안 · 자재만', () => {
+    const targetId = '6f1c2a4e-8b7d-4c1a-9e2f-0a1b2c3d4e5f';
+    expect(
+      requestCreateSchema.safeParse({ id, projectId, body: 'x', targetType: 'designs', targetId })
+        .success,
+    ).toBe(true);
+    expect(
+      requestCreateSchema.safeParse({ id, projectId, body: 'x', targetType: 'designs' }).success,
+    ).toBe(false);
+    expect(
+      requestCreateSchema.safeParse({ id, projectId, body: 'x', targetType: 'photos', targetId })
+        .success,
+    ).toBe(false);
   });
   it('원문 4001자는 field.tooLong 으로 거절한다', () => {
     const r = requestCreateSchema.safeParse({ id, projectId, title: 't', body: 'a'.repeat(4001) });

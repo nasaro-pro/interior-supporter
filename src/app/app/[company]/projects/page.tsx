@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { requireCompanyStaff } from '@/features/core';
-import { ProjectCreateSheet } from '@/features/core/components/project-forms';
+import { ProjectCreateEntry } from '@/features/core/components/create-permission';
+import { getCreatePermission } from '@/features/core/server/create-permission-queries';
+import { getAccessContext } from '@/features/core';
+import { countUnansweredRequests } from '@/features/requests/server/summary';
 import { ProjectStatusBadge, VisibilityBadge } from '@/features/core/components/project-badges';
 import { listProjects, projectStatusCounts } from '@/features/core/server/project-queries';
 import { PROJECT_STATUSES, type ProjectStatus } from '@/shared/contracts/domain';
@@ -35,9 +38,14 @@ export default async function ProjectsPage({
     ? (sp.status as ProjectStatus)
     : undefined;
   const archived = sp.archived === '1';
-  const [list, counts] = await Promise.all([
+  const ctx = await getAccessContext();
+  const [list, counts, permission, unanswered] = await Promise.all([
     listProjects(staff.companyId, { q: sp.q, status, archived, cursor: sp.cursor }),
     projectStatusCounts(staff.companyId),
+    // D-36: 담당자는 업체관리자가 준 생성 권한이 있을 때만 '생성', 없으면 '권한 요청'
+    getCreatePermission(staff.companyId, staff.role, ctx.userId),
+    // D-31: 내 미답변 요청 (같은 권한 범위 — RLS)
+    countUnansweredRequests(staff.companyId),
   ]);
   const filtered = Boolean(sp.q || status || archived);
   const listHref = routes.app.projects(slug);
@@ -54,12 +62,19 @@ export default async function ProjectsPage({
     <main data-screen-id="PM-01" className="flex flex-col gap-6">
       <PageHeader
         title={t('projects.screen.list')}
-        actions={<ProjectCreateSheet companySlug={slug} defaultOpen={sp.mode === 'new'} />}
+        actions={
+          <ProjectCreateEntry
+            companySlug={slug}
+            companyId={staff.companyId}
+            allowed={permission.allowed}
+            pending={permission.pending}
+          />
+        }
       />
 
       {counts ? (
         <section aria-label={t('projects.list.summaryTitle')}>
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-5">
             {PROJECT_STATUSES.map((s) => (
               <li key={s}>
                 <Link
@@ -75,6 +90,17 @@ export default async function ProjectsPage({
                 </Link>
               </li>
             ))}
+            <li>
+              <div
+                className="bg-card flex flex-col gap-1 rounded-lg border p-3 shadow-sm"
+                data-ui-key="project-summary-unanswered"
+              >
+                <span className="text-muted-foreground text-meta">
+                  {t('projects.list.unanswered')}
+                </span>
+                <span className="text-2xl font-semibold tabular-nums">{unanswered ?? '—'}</span>
+              </div>
+            </li>
           </ul>
         </section>
       ) : null}
@@ -149,12 +175,21 @@ export default async function ProjectsPage({
           <EmptyState
             title={t('projects.list.empty')}
             action={
-              <ButtonLink
-                href={withQuery(listHref, { mode: 'new' })}
-                data-ui-key="project-empty-create"
-              >
-                {t('projects.list.create')}
-              </ButtonLink>
+              permission.allowed ? (
+                <ButtonLink
+                  href={withQuery(listHref, { mode: 'new' })}
+                  data-ui-key="project-empty-create"
+                >
+                  {t('projects.list.create')}
+                </ButtonLink>
+              ) : (
+                <ProjectCreateEntry
+                  companySlug={slug}
+                  companyId={staff.companyId}
+                  allowed={false}
+                  pending={permission.pending}
+                />
+              )
             }
           />
         )

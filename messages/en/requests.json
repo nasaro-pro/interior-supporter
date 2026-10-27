@@ -80,5 +80,33 @@
     "statusTransitionHint": "Only statuses you can switch to from the current one are shown.",
     "archivedNoCorrection": "You can’t add corrections to an archived request.",
     "manage": "Handling"
+  },
+  "target": {
+    "designs": "Design: {label}",
+    "materials": "Material: {label}",
+    "unknown": "Unavailable item"
+  },
+  "memo": {
+    "title": "Notes",
+    "open": "Notes {count}",
+    "emptyEditor": "No customer notes on this item yet.",
+    "emptyCustomer": "Leave a question or request right here on this item.",
+    "openThread": "Open full conversation",
+    "placeholder": "Leave a note about this item",
+    "replyPlaceholder": "Type your reply",
+    "send": "Send note",
+    "sent": "Note sent. Your designer will be notified."
+  },
+  "customer": {
+    "title": "Notes",
+    "ownOnly": "Only you and your designer can see your notes.",
+    "empty": "No notes yet. Leave one next to a design or material, or start one here.",
+    "create": "Leave a note",
+    "body": "Note",
+    "immutableHint": "Sent notes cannot be edited. Add a follow-up in the conversation instead.",
+    "submitTitle": "Send this note?",
+    "submitBody": "You cannot edit it after sending.",
+    "submit": "Send note",
+    "created": "Note sent."
   }
 }

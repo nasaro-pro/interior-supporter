@@ -16,6 +16,7 @@ import { EstimateFormSheet } from '@/features/estimates/components/EstimateFormS
 import { EstimateVersionPicker } from '@/features/estimates/components/EstimateVersionPicker';
 import { PdfPreview } from '@/features/estimates/components/PdfPreview';
 import type { EstimateDetail } from '@/features/estimates/types';
+import { canManageEstimates } from '@/features/estimates/server/permission';
 
 export async function EstimateDetailView({
   estimate,
@@ -29,6 +30,8 @@ export async function EstimateDetailView({
   const tf = await getTranslations('files');
   const locale = (await getLocale()) === 'en' ? 'en' : 'ko';
   const editor = viewer.as === 'editor';
+  // D-37: 담당자(pm)는 보기만 — 새 버전 · 공개 · 보관은 업체관리자(owner · manager)
+  const manager = editor && (await canManageEstimates(viewer.companyId));
   const v = estimate.selected;
   const hrefFor = (no: number) =>
     editor
@@ -57,7 +60,7 @@ export async function EstimateDetailView({
               )}
             />
           ) : null}
-          {editor && !estimate.archivedAt ? (
+          {manager && !estimate.archivedAt ? (
             <EstimateFormSheet
               mode="newVersion"
               projectId={viewer.projectId}
@@ -66,7 +69,7 @@ export async function EstimateDetailView({
               estimateId={estimate.id}
             />
           ) : null}
-          {editor ? (
+          {manager ? (
             // B-05: 보관·복원 (보관 중에는 새 버전·공개 전환을 숨기고 읽기 전용)
             <ArchiveToggle
               action={setEstimateArchived}
@@ -82,6 +85,11 @@ export async function EstimateDetailView({
         </div>
         {editor && estimate.archivedAt ? (
           <Notice tone="neutral">{tc('state.archivedItem')}</Notice>
+        ) : null}
+        {editor && !manager ? (
+          <Notice tone="neutral" uiKey="estimate-view-only">
+            {t('detail.viewOnly')}
+          </Notice>
         ) : null}
       </header>
 
@@ -138,7 +146,7 @@ export async function EstimateDetailView({
                 <Download aria-hidden />
                 {t('action.download')}
               </FileDownloadLink>
-              {editor && !estimate.archivedAt ? (
+              {manager && !estimate.archivedAt ? (
                 <PublishToggle
                   action={setEstimateVersionPublic}
                   payload={{

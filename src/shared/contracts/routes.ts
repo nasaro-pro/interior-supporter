@@ -3,7 +3,7 @@
  * 소유: A · 변경 요청은 진행 기록의 변경 요청(CR)으로만 (docs/00_헌법_공통규칙.md 5.9). 문자열 리터럴로 경로를 직접 쓰는 코드는 리뷰에서 거절한다.
  * 근거: 02-뎁스구조-설계안 8절, docs/02_화면구조_뎁스_디자인.md
  */
-import type { PortalTab, ProjectTab } from './screens';
+import type { FieldTab, PortalTab, ProjectTab } from './screens';
 
 const enc = encodeURIComponent;
 
@@ -14,6 +14,8 @@ export const routes = {
   signup: () => '/signup',
   invite: (token: string) => `/invite/${enc(token)}`,
   resetPassword: () => '/reset-password',
+  /** D-15: 임시 비밀번호로 처음 로그인한 계정의 비밀번호 변경 (AUTH-06) */
+  changePassword: () => '/change-password',
   selectArea: () => '/select-area',
   authConfirm: () => '/auth/confirm',
 
@@ -76,6 +78,12 @@ export const routes = {
 
   // 시공팀
   field: {
+    /** FW-00 내 현장 카드 (F1) */
+    home: () => '/field',
+    /** 현장 입구 — 켜진 첫 탭(없으면 현장 사진)으로 이동 */
+    siteHome: (project: string) => `/field/sites/${enc(project)}`,
+    /** FW-04~06 현장 탭 — 담당자가 켠 탭만 열린다 (F2) */
+    site: (project: string, tab: FieldTab) => `/field/sites/${enc(project)}/${tab}`,
     photos: (project?: string, upload = false) => {
       const s = new URLSearchParams();
       if (project) s.set('project', project);
@@ -87,6 +95,25 @@ export const routes = {
       `/field/photos/${enc(photoId)}?project=${enc(project)}`,
     notifications: () => '/field/notifications',
   },
+
+  // 사이트 관리 (통합본 3장 A1~A11, CR-3) — 운영자 전용, 별도 로그인 주소
+  admin: {
+    login: () => '/admin/login',
+    dashboard: () => '/admin',
+    companies: (q?: string) => (q ? `/admin/companies?q=${enc(q)}` : '/admin/companies'),
+    company: (companyId: string) => `/admin/companies/${enc(companyId)}`,
+    users: (q?: string) => (q ? `/admin/users?q=${enc(q)}` : '/admin/users'),
+    settings: () => '/admin/settings',
+    cleanup: () => '/admin/cleanup',
+    audit: () => '/admin/audit',
+  },
+
+  // 약관·개인정보처리방침 (A9) · 본인 탈퇴 (A10)
+  legal: {
+    terms: () => '/terms',
+    privacy: () => '/privacy',
+  },
+  withdraw: () => '/account/withdraw',
 
   // 파일 다운로드 (권한 재검사 후 단기 서명 URL 로 302)
   file: (fileId: string, opts?: { download?: boolean }) =>

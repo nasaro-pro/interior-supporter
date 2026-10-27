@@ -78,11 +78,11 @@ describe('createRequest (REQ-201 · C-T01)', () => {
 
   it('입력이 잘못되면 VALIDATION_FAILED 와 필드 오류 키를 돌려준다', async () => {
     useFake({});
-    const res = await createRequest({ ...input, title: '' });
+    const res = await createRequest({ ...input, body: '' });
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.error.code).toBe('VALIDATION_FAILED');
-      expect(res.error.fieldErrors?.title).toContain('field.required');
+      expect(res.error.fieldErrors?.body).toContain('field.required');
     }
     expect(requireProjectAccess).not.toHaveBeenCalled();
   });

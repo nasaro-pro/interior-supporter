@@ -15,6 +15,7 @@ import { changePasswordSchema, localeSchema, loginSchema, newPasswordSchema } fr
 import { loadAccessContext } from './access';
 import { readRecoveryProof } from './recovery-proof';
 import { LAST_COMPANY_COOKIE } from '../constants';
+import { firstLoginState } from '../account-utils';
 
 const YEAR = 60 * 60 * 24 * 365;
 
@@ -44,9 +45,16 @@ export async function login(
   // REQ-008: 저장된 언어(profiles.locale)를 쿠키에 맞춘다
   const { data: profile } = await supabase
     .from('profiles')
-    .select('locale')
+    .select('locale, must_change_password, temp_password_expires_at')
     .eq('id', signed.user.id)
     .maybeSingle();
+
+  // D-16: 임시 비밀번호가 만료됐으면 로그인시키지 않는다 (디자이너에게 재발송 요청)
+  const first = firstLoginState(profile ?? null);
+  if (first === 'expired') {
+    await supabase.auth.signOut();
+    return fail('FORBIDDEN', { fieldErrors: { password: ['field.tempPasswordExpired'] } });
+  }
   if (profile?.locale === 'ko' || profile?.locale === 'en') {
     (await cookies()).set(LOCALE_COOKIE, profile.locale, {
       sameSite: 'lax',
@@ -55,6 +63,8 @@ export async function login(
     });
   }
 
+  // D-15: 임시 비밀번호로 처음 들어왔으면 먼저 새 비밀번호를 정한다
+  if (first === 'must_change') redirect(routes.changePassword());
   // next(같은 사이트 경로만) > 영역 선택(영역 1개면 그 화면이 바로 이동시킴)
   redirect(safeNext(next, routes.selectArea()));
 }

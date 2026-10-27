@@ -1,8 +1,10 @@
 // 파일 1개 업로드 실행기 — 저장은 반드시 FilesApi 시그니처로만 (헌법 4.2, integration.ts 5장)
-// intent → uploadToSignedUrl → finalize → createPhoto. 의존성 주입으로 테스트한다.
+// intent → 서명 URL 업로드(진행률, F5) → finalize → createPhoto. 의존성 주입으로 테스트한다.
+// runUploadItemWithRetry: 네트워크 실패만 자동으로 다시 (F6). files 행·사진 행 id 를 재사용하므로 중복 행이 없다
 import type { PhotoPhase } from '@/shared/contracts/domain';
 import type { ActionResult } from '@/shared/contracts/errors';
 import type { FilesApi } from '@/shared/contracts/integration';
+import { withRetry, type RetryOptions } from './retry';
 import type { QueueAction, UploadItem } from './upload-queue';
 
 export interface CommonInput {
@@ -23,6 +25,7 @@ export interface PipelineDeps {
     path: string,
     token: string,
     file: File,
+    onProgress: (fraction: number) => void,
   ): Promise<{ ok: true } | { ok: false; alreadyExists: boolean }>;
   createPhoto(input: {
     id: string;
@@ -73,7 +76,9 @@ export async function runUploadItem(
 
     // ② 서명 URL 업로드 (재시도 때 이미 올라간 객체면 통과)
     dispatch({ type: 'stage', key, stage: 'uploading' });
-    const up = await deps.upload(intent.bucket, intent.path, intent.token, file);
+    const up = await deps.upload(intent.bucket, intent.path, intent.token, file, (progress) =>
+      dispatch({ type: 'progress', key, progress }),
+    );
     if (!up.ok && !up.alreadyExists) {
       dispatch({ type: 'fail', key, error: { kind: 'network' } });
       return;
@@ -113,7 +118,7 @@ export async function runUploadItem(
       projectId: common.projectId,
       fileId,
       thumbFileId,
-      phase: common.phase,
+      phase: item.phase ?? common.phase,
       capturedOn: common.capturedOn ?? item.exifDate ?? fin.data.capturedOn ?? null,
       description: common.description,
       isPublic: common.isPublic,
@@ -131,4 +136,31 @@ export async function runUploadItem(
     // 네트워크 끊김·서버 액션 호출 실패 — 입력과 성공분은 유지, 이 파일만 재시도 (NFR-008)
     dispatch({ type: 'fail', key, error: { kind: 'network' } });
   }
+}
+
+/**
+ * F6: 네트워크 실패면 잠시 뒤 같은 항목을 다시 돌린다 (최신 상태의 fileId·intent 재사용).
+ * 거절·권한·검증 오류는 다시 해도 같으므로 바로 실패로 남긴다
+ */
+export async function runUploadItemWithRetry(
+  key: string,
+  file: File,
+  common: CommonInput,
+  deps: PipelineDeps,
+  dispatch: (a: QueueAction) => void,
+  getItem: (key: string) => UploadItem | undefined,
+  opts: Pick<RetryOptions<unknown>, 'delays' | 'sleep'> = {},
+): Promise<void> {
+  await withRetry(
+    async () => {
+      const item = getItem(key);
+      if (item) await runUploadItem(item, file, common, deps, dispatch);
+      return getItem(key);
+    },
+    {
+      ...opts,
+      shouldRetry: (item) => item?.stage === 'failed' && item.error?.kind === 'network',
+      onRetry: (attempt) => dispatch({ type: 'autoRetry', key, attempt }),
+    },
+  );
 }

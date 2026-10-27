@@ -8,8 +8,23 @@ import {
   ResetLinkButton,
 } from '@/features/core/components/settings-forms';
 import { Panel } from '@/features/core/components/summary-blocks';
-import { listMembers, listPendingInvites } from '@/features/core/server/participant-queries';
-import { removeMember, revokeInvite } from '@/features/core/server/participant-actions';
+import {
+  listAssignableProjects,
+  listExternalAccounts,
+  listMembers,
+  listPendingInvites,
+} from '@/features/core/server/participant-queries';
+import {
+  removeMember,
+  revokeCompanyAccess,
+  revokeInvite,
+} from '@/features/core/server/participant-actions';
+import { ExternalAccountSheet } from '@/features/core/components/participants';
+import {
+  CreatePermissionSwitch,
+  CreateRequestDecision,
+} from '@/features/core/components/create-permission';
+import { listCreatePermissionRequests } from '@/features/core/server/create-permission-queries';
 import { getAccessContext } from '@/features/core';
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { DateText } from '@/shared/ui/date-text';
@@ -29,10 +44,13 @@ export default async function MembersPage({ params }: { params: Promise<{ compan
     );
   }
   const isOwner = staff.role === 'owner';
-  const [ctx, members, invites] = await Promise.all([
+  const [ctx, members, invites, externals, projects, createRequests] = await Promise.all([
     getAccessContext(),
     listMembers(staff.companyId),
     listPendingInvites({ companyId: staff.companyId }),
+    listExternalAccounts(staff.companyId),
+    listAssignableProjects(staff.companyId),
+    listCreatePermissionRequests(staff.companyId),
   ]);
 
   const memberTable = (
@@ -42,6 +60,7 @@ export default async function MembersPage({ params }: { params: Promise<{ compan
           <tr className="border-b">
             <th className="py-2 font-medium">{t('auth.field.displayName')}</th>
             <th className="py-2 font-medium">{t('settings.field.role')}</th>
+            <th className="py-2 font-medium">{t('settings.field.createPermission')}</th>
             <th className="py-2 font-medium">{t('settings.field.joinedAt')}</th>
             <th className="py-2">
               <span className="sr-only">{t('common.action.moreActions')}</span>
@@ -66,6 +85,21 @@ export default async function MembersPage({ params }: { params: Promise<{ compan
                     />
                   ) : (
                     t(`settings.memberRole.${m.role}`)
+                  )}
+                </td>
+                <td className="py-2">
+                  {/* D-36 · CA-07: 담당자만 켜고 끈다 — 업체관리자(소유자·관리자)는 항상 가능 */}
+                  {m.role === 'pm' ? (
+                    <CreatePermissionSwitch
+                      companyId={staff.companyId}
+                      memberId={m.id}
+                      allowed={m.canCreateProjects}
+                      name={m.displayName}
+                    />
+                  ) : (
+                    <span className="text-muted-foreground text-meta">
+                      {t('settings.members.createAlways')}
+                    </span>
                   )}
                 </td>
                 <td className="py-2">
@@ -125,6 +159,100 @@ export default async function MembersPage({ params }: { params: Promise<{ compan
           </>
         ) : (
           memberTable
+        )}
+      </Panel>
+
+      {/* D-36 · CA-07: 담당자의 프로젝트 생성 권한 요청 */}
+      {createRequests === null ? (
+        <Panel title={t('settings.createRequests.title')}>
+          <ErrorState />
+        </Panel>
+      ) : createRequests.length > 0 ? (
+        <Panel title={t('settings.createRequests.title')}>
+          <ul className="divide-y rounded-md border" data-ui-key="create-requests">
+            {createRequests.map((r) => (
+              <li
+                key={r.id}
+                data-key={r.id}
+                className="flex flex-wrap items-center justify-between gap-2 px-3 py-2"
+              >
+                <span className="min-w-0">
+                  <span className="block font-medium wrap-anywhere">{r.displayName}</span>
+                  <span className="text-muted-foreground text-meta">
+                    <DateText value={r.createdAt} />
+                    {r.note ? ` · ${r.note}` : ''}
+                  </span>
+                </span>
+                <CreateRequestDecision
+                  companyId={staff.companyId}
+                  requestId={r.id}
+                  name={r.displayName}
+                />
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
+
+      {/* D-13·D-17: 고객·시공팀 계정 — 업체 설정에서도 만든다(프로젝트 선택). 이 업체 접근을 한 번에 회수 */}
+      <Panel
+        title={t('settings.externals.title')}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <ExternalAccountSheet role="customer" projects={projects} />
+            <ExternalAccountSheet role="field" projects={projects} />
+          </div>
+        }
+      >
+        {externals === null ? (
+          <ErrorState />
+        ) : externals.length === 0 ? (
+          <EmptyState title={t('settings.externals.empty')} />
+        ) : (
+          <ul className="divide-y rounded-md border" data-ui-key="external-accounts">
+            {externals.map((x) => (
+              <li
+                key={x.userId}
+                data-key={x.userId}
+                className="flex flex-wrap items-center justify-between gap-2 px-3 py-2"
+              >
+                <span className="max-w-full min-w-0">
+                  <span className="block font-medium wrap-anywhere">{x.displayName}</span>
+                  <span className="text-muted-foreground text-meta">
+                    {x.projects
+                      .map(
+                        (p) =>
+                          `${p.projectName} · ${t(`projects.participantRole.${p.role}`)}${
+                            p.state === 'revoked'
+                              ? ` (${t('projects.participants.stateRevoked')})`
+                              : ''
+                          }`,
+                      )
+                      .join(' / ')}
+                  </span>
+                </span>
+                {x.hasActive ? (
+                  <ConfirmDialog
+                    trigger={t('settings.externals.revokeAll')}
+                    triggerVariant="ghost"
+                    title={t('settings.externals.revokeTitle', { name: x.displayName })}
+                    body={t('settings.externals.revokeBody')}
+                    confirmLabel={t('settings.externals.revokeAll')}
+                    successMessage={t('settings.externals.revoked')}
+                    action={revokeCompanyAccess.bind(null, {
+                      companyId: staff.companyId,
+                      userId: x.userId,
+                    })}
+                    uiKey="external-revoke-all"
+                  />
+                ) : (
+                  <span className="text-muted-foreground text-meta">
+                    {t('projects.participants.stateRevoked')}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
         )}
       </Panel>
 

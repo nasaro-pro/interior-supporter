@@ -13,6 +13,7 @@ import {
   projectUpdateSchema,
 } from '../schema';
 import { findMembershipBySlug, findProjectAccess, loadAccessContext } from './access';
+import { getCreatePermission } from './create-permission-queries';
 
 function revalidateProject(slug: string, projectId: string) {
   revalidatePath(routes.app.projects(slug));
@@ -38,6 +39,10 @@ export async function createProject(
   const parsed = parseInput(projectCreateSchema, raw);
   if (!parsed.ok) return parsed.result;
   const v = parsed.data;
+
+  // D-36: 담당자는 업체관리자가 준 생성 권한이 있어야 한다 (RLS projects_insert 가 한 번 더 막는다)
+  const permission = await getCreatePermission(member.companyId, member.role, ctx.userId);
+  if (!permission.allowed) return fail('FORBIDDEN');
 
   const supabase = await createServerSupabase();
   const { error } = await supabase.from('projects').insert({

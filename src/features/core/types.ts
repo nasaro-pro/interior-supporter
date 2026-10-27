@@ -63,6 +63,8 @@ export interface MemberItem {
   role: MemberRole;
   createdAt: string;
   version: number;
+  /** D-36: 담당자(pm)의 프로젝트 생성 권한 (owner·manager 는 항상) */
+  canCreateProjects: boolean;
 }
 
 export interface ClientItem {

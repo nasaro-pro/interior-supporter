@@ -18,6 +18,8 @@ import { FormField, firstFieldError, useFieldErrorText } from '@/shared/ui/form-
 import { ActionError, useActionErrorText } from '@/shared/ui/action-error';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
+import { DesignSpaceSelect, spaceValue } from '@/features/designs/components/DesignSpaceControls';
+import type { MaterialSpace } from '@/shared/contracts/domain';
 
 export function DesignEditButton({
   projectId,
@@ -25,12 +27,15 @@ export function DesignEditButton({
   baseVersion,
   title,
   description,
+  space = null,
 }: {
   projectId: string;
   id: string;
   baseVersion: number;
   title: string;
   description: string;
+  /** D-26 */
+  space?: MaterialSpace | null;
 }) {
   const t = useTranslations('designs');
   const tc = useTranslations('common');
@@ -42,12 +47,12 @@ export function DesignEditButton({
   const [serverError, setServerError] = useState<AppError | null>(null);
   const { register, handleSubmit, formState, reset, setValue } = useForm<DesignUpdateInput>({
     resolver: zodResolver(designUpdateSchema),
-    defaultValues: { projectId, id, baseVersion, title, description },
+    defaultValues: { projectId, id, baseVersion, title, description, space },
   });
 
   const openSheet = () => {
     // 열 때만 서버 값으로 채운다 (편집 중 새로고침은 입력을 건드리지 않는다)
-    reset({ projectId, id, baseVersion, title, description });
+    reset({ projectId, id, baseVersion, title, description, space });
     setServerError(null);
     setOpen(true);
   };
@@ -120,6 +125,9 @@ export function DesignEditButton({
           {serverError?.code === 'VERSION_CONFLICT' ? <ActionError error={serverError} /> : null}
           <FormField label={t('field.title')} error={fieldErr('title')} required>
             <Input {...register('title')} maxLength={120} />
+          </FormField>
+          <FormField label={t('field.space')} hint={t('field.spaceHint')}>
+            <DesignSpaceSelect {...register('space', { setValueAs: spaceValue })} />
           </FormField>
           <FormField label={t('field.description')} error={fieldErr('description')}>
             <Textarea {...register('description')} rows={4} maxLength={2000} />

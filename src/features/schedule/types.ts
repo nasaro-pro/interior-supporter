@@ -1,5 +1,5 @@
 // schedule 화면용 타입 (camelCase) — date/time 은 KST 달력 값 그대로 (POL-023)
-import type { RelatedType } from './schema';
+import type { RelatedType, ScheduleProgress } from './schema';
 
 export interface ScheduleEvent {
   id: string;
@@ -14,6 +14,8 @@ export interface ScheduleEvent {
   endDate: string | null;
   endTime: string | null;
   isPublic: boolean;
+  /** D-30 예정 · 진행중 · 완료 */
+  progress: ScheduleProgress;
   relatedType: RelatedType | null;
   relatedId: string | null;
   archived: boolean;

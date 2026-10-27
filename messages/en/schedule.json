@@ -37,7 +37,8 @@
     "project": "Project",
     "when": "When",
     "relatedType": "Item type",
-    "visibility": "Customer visibility"
+    "visibility": "Customer visibility",
+    "progress": "Progress"
   },
   "relatedType": {
     "designs": "Design",
@@ -102,5 +103,10 @@
     "empty": "Nothing to show yet. Enter the project period or add events.",
     "label": "Schedule timeline",
     "projectPeriod": "Project period"
+  },
+  "progress": {
+    "planned": "Planned",
+    "in_progress": "In progress",
+    "done": "Done"
   }
 }

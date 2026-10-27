@@ -9,6 +9,9 @@ import { createServerSupabase } from '@/shared/lib/supabase/server';
 import {
   designArchiveSchema,
   designCreateSchema,
+  designMainSchema,
+  designMoveSchema,
+  designSpaceMoveSchema,
   designPreviewAddSchema,
   designPreviewArchiveSchema,
   designPublishSchema,
@@ -16,6 +19,7 @@ import {
   designVersionAddSchema,
 } from '@/features/designs/schema';
 import { dbFail, explainNoRow, invalid } from '@/features/designs/server/result';
+import { groupBySpace, moveSpace, moveWithinSpace } from '@/features/designs/lib/order';
 
 type Supabase = Awaited<ReturnType<typeof createServerSupabase>>;
 
@@ -43,7 +47,7 @@ function revalidateDesign(access: ProjectAccess, designId?: string) {
 export async function createDesign(raw: unknown): Promise<ActionResult<{ id: string }>> {
   const parsed = designCreateSchema.safeParse(raw);
   if (!parsed.success) return invalid(parsed.error);
-  const { projectId, title, description, note, isPublic, fileId } = parsed.data;
+  const { projectId, title, description, note, isPublic, fileId, space } = parsed.data;
   const access = await requireProjectAccess(projectId, ['editor']);
   const supabase = await createServerSupabase();
   const { data, error } = await supabase.rpc('create_design', {
@@ -55,6 +59,15 @@ export async function createDesign(raw: unknown): Promise<ActionResult<{ id: str
     p_is_public: isPublic,
   });
   if (error) return dbFail('design.create.failed', error, { projectId });
+  // D-26: 공간은 생성 뒤 바로 지정 (create_design RPC 는 베이스라인 고정). 실패해도 도안은 남고 수정 화면에서 다시 지정
+  if (space) {
+    const { error: spaceError } = await supabase
+      .from('designs')
+      .update({ space })
+      .eq('id', data)
+      .eq('project_id', projectId);
+    if (spaceError) dbFail('design.create.space_failed', spaceError, { projectId, objectId: data });
+  }
   revalidateDesign(access, data);
   return ok({ id: data });
 }
@@ -125,12 +138,13 @@ async function reconfirmedBy(supabase: Supabase, designId: string, versionId: st
 export async function updateDesign(raw: unknown): Promise<ActionResult<{ version: number }>> {
   const parsed = designUpdateSchema.safeParse(raw);
   if (!parsed.success) return invalid(parsed.error);
-  const { projectId, id, baseVersion, title, description } = parsed.data;
+  const { projectId, id, baseVersion, title, description, space } = parsed.data;
   const access = await requireProjectAccess(projectId, ['editor']);
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('designs')
-    .update({ title, description })
+    // D-26: space 를 보내지 않은 호출(기존 화면)은 공간을 건드리지 않는다
+    .update(space === undefined ? { title, description } : { title, description, space })
     .eq('id', id)
     .eq('project_id', projectId)
     .eq('version', baseVersion)
@@ -268,4 +282,78 @@ export async function archiveDesignPreview(raw: unknown): Promise<ActionResult> 
   if (!data) return fail('NOT_FOUND');
   revalidateDesign(access, designId);
   return ok(undefined);
+}
+
+/** D-27: 대표 도안 지정 (같은 프로젝트의 기존 대표는 내려간다 — set_main_design RPC) */
+export async function setMainDesign(raw: unknown): Promise<ActionResult<null>> {
+  const parsed = designMainSchema.safeParse(raw);
+  if (!parsed.success) return invalid(parsed.error);
+  const { projectId, id } = parsed.data;
+  const access = await requireProjectAccess(projectId, ['editor']);
+  const supabase = await createServerSupabase();
+  const { data: design } = await lockedDesign(supabase, projectId, id);
+  if (!design) return fail('NOT_FOUND');
+  if (design.archived_at) return fail('CONFLICT');
+  const { error } = await supabase.rpc('set_main_design', { p_design: id });
+  if (error) return dbFail('design.main.failed', error, { projectId, objectId: id });
+  revalidateDesign(access, id);
+  return ok(null);
+}
+
+/** D-28: 목록에서 한 칸 위·아래로 (보관되지 않은 도안의 현재 순서를 기준으로 바꿔 저장) */
+/** 보관되지 않은 도안을 목록과 같은 순서로 읽어 공간별로 묶는다 */
+async function loadOrderGroups(
+  supabase: Awaited<ReturnType<typeof createServerSupabase>>,
+  projectId: string,
+) {
+  const { data, error } = await supabase
+    .from('designs')
+    .select('id, space, is_main')
+    .eq('project_id', projectId)
+    .is('archived_at', null)
+    .order('sort_order', { ascending: true })
+    .order('updated_at', { ascending: false })
+    .order('id', { ascending: false });
+  if (error) return { error };
+  return {
+    groups: groupBySpace(
+      (data ?? []).map((r) => ({ id: r.id, space: r.space, isMain: r.is_main })),
+    ),
+  };
+}
+
+/** D-28 도안 한 칸 이동 — 같은 공간 안에서만 */
+export async function moveDesign(raw: unknown): Promise<ActionResult<null>> {
+  const parsed = designMoveSchema.safeParse(raw);
+  if (!parsed.success) return invalid(parsed.error);
+  const { projectId, id, direction } = parsed.data;
+  const access = await requireProjectAccess(projectId, ['editor']);
+  const supabase = await createServerSupabase();
+  const loaded = await loadOrderGroups(supabase, projectId);
+  if (loaded.error) return dbFail('design.move.list_failed', loaded.error, { projectId });
+  const ids = moveWithinSpace(loaded.groups, id, direction);
+  if (ids === 'missing') return fail('NOT_FOUND');
+  if (ids === 'edge') return ok(null); // 이미 공간의 맨 위·맨 아래
+  const { error } = await supabase.rpc('reorder_designs', { p_project: projectId, p_ids: ids });
+  if (error) return dbFail('design.move.failed', error, { projectId, objectId: id });
+  revalidateDesign(access);
+  return ok(null);
+}
+
+/** D-28 공간 순서 한 칸 이동 — 그 공간 도안 묶음을 통째로 옮긴다 (고객 화면 공간 순서도 같이 바뀜) */
+export async function moveDesignSpace(raw: unknown): Promise<ActionResult<null>> {
+  const parsed = designSpaceMoveSchema.safeParse(raw);
+  if (!parsed.success) return invalid(parsed.error);
+  const { projectId, space, direction } = parsed.data;
+  const access = await requireProjectAccess(projectId, ['editor']);
+  const supabase = await createServerSupabase();
+  const loaded = await loadOrderGroups(supabase, projectId);
+  if (loaded.error) return dbFail('design.move_space.list_failed', loaded.error, { projectId });
+  const ids = moveSpace(loaded.groups, space, direction);
+  if (ids === 'missing') return fail('NOT_FOUND');
+  if (ids === 'edge') return ok(null);
+  const { error } = await supabase.rpc('reorder_designs', { p_project: projectId, p_ids: ids });
+  if (error) return dbFail('design.move_space.failed', error, { projectId });
+  revalidateDesign(access);
+  return ok(null);
 }

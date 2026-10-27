@@ -2,7 +2,7 @@
 // 카드 면 위 행 목록. 행 전체가 상세 링크(제목 링크가 행을 덮는다), 키보드 포커스는 제목 링크
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { Archive, MessageSquareReply, MessageSquareDashed } from 'lucide-react';
+import { Archive, Link2, MessageSquareReply, MessageSquareDashed } from 'lucide-react';
 import { formatDateTime, type DateLocale } from '@/shared/lib/dates';
 import { ToneBadge } from '@/shared/ui/tone-badge';
 import type { RequestListItem } from '../types';
@@ -39,6 +39,13 @@ export function RequestList({
             </Link>
             <p className="text-muted-foreground text-meta mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5">
               {showAuthor ? <span>{r.authorName ?? t('author.unknown')}</span> : null}
+              {/* D-33: 항목에 연결된 메모는 "도안: 거실" 처럼 */}
+              {r.target ? (
+                <span className="inline-flex items-center gap-1" data-ui-key="request-target">
+                  <Link2 aria-hidden className="size-3" />
+                  {t(`target.${r.target.type}`, { label: r.target.label ?? t('target.unknown') })}
+                </span>
+              ) : null}
               <span>
                 {t('list.lastActivity')}{' '}
                 <time dateTime={r.lastActivityAt} data-numeric>

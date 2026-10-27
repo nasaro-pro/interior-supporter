@@ -1,0 +1,67 @@
+{
+  "screen": {
+    "sites": "내 현장",
+    "schedule": "현장 일정",
+    "designs": "확정 도안",
+    "materials": "확정 자재"
+  },
+  "nav": {
+    "sites": "내 현장"
+  },
+  "sites": {
+    "description": "배정된 현장과 오늘 일정을 확인하세요.",
+    "empty": "배정된 현장이 없습니다",
+    "emptyHint": "담당자가 현장에 초대하면 여기에 나타납니다."
+  },
+  "card": {
+    "period": "배정 기간",
+    "noLimit": "기간 제한 없음",
+    "today": "오늘 일정",
+    "noToday": "오늘 일정 없음",
+    "photos": "현장 사진"
+  },
+  "tab": {
+    "schedule": "일정",
+    "designs": "도안",
+    "materials": "자재",
+    "photos": "사진"
+  },
+  "schedule": {
+    "empty": "등록된 일정이 없습니다"
+  },
+  "designs": {
+    "empty": "확정된 도안이 없습니다"
+  },
+  "materials": {
+    "empty": "확정된 자재가 없습니다"
+  },
+  "design": {
+    "version": "확정 리비전 {no}",
+    "download": "원본 내려받기",
+    "noPreview": "미리보기가 없습니다"
+  },
+  "material": {
+    "location": "위치"
+  },
+  "access": {
+    "title": "시공팀 공개 범위",
+    "hint": "시공팀은 켠 항목만 볼 수 있습니다(보기만 가능). 기본은 모두 꺼짐입니다.",
+    "saved": "시공팀 공개 범위를 저장했습니다",
+    "showSchedule": {
+      "label": "일정",
+      "hint": "현장 일정과 변경 알림을 시공팀에게 보여 줍니다."
+    },
+    "showDesigns": {
+      "label": "확정 도안",
+      "hint": "확정된 도안의 미리보기와 원본을 보여 줍니다."
+    },
+    "showMaterials": {
+      "label": "확정 자재",
+      "hint": "확정된 자재의 사양·수량·위치를 보여 줍니다. 단가는 보이지 않습니다."
+    },
+    "photoAutoPublic": {
+      "label": "시공팀 사진 바로 공개",
+      "hint": "켜면 시공팀이 올린 사진이 고객에게 바로 공개됩니다. 끄면 담당자가 확인 후 공개합니다."
+    }
+  }
+}

@@ -38,6 +38,9 @@
     "select": "Select an option from the list.",
     "fileRequired": "Select a file.",
     "invalid": "This value isn’t valid. Please check it.",
-    "slugTaken": "This company address is already in use. Enter a different one."
+    "slugTaken": "This company address is already in use. Enter a different one.",
+    "tempPasswordExpired": "Your temporary password expired. Ask the designer to resend it.",
+    "sameAsTemp": "Choose a password different from the temporary one.",
+    "staffEmail": "That's a designer account in your company. Use a different email for customers and field crews."
   }
 }
