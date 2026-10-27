@@ -87,6 +87,16 @@ describe('TC-105 CompareSlider (B-T03·B-T04)', () => {
     expect(a.className).toContain('inset-0');
   });
 
+  it('X1: A 레이어는 불투명 배경이라 비율이 달라 생긴 A 쪽 빈 여백에 B 가 비치지 않는다', async () => {
+    renderSlider();
+    await settle();
+    const frame = screen.getByTestId('compare-frame');
+    const a = screen.getByTestId('compare-a');
+    expect(frame.className).toContain('bg-muted');
+    expect(a.className).toContain('bg-muted'); // 틀과 같은 색으로 여백을 덮는다
+    expect(screen.getByTestId('compare-b').className).not.toContain('bg-muted');
+  });
+
   it('이미지가 2개 미만이면 사유를 보이고 슬라이더를 그리지 않는다', async () => {
     renderSlider(images.slice(0, 1));
     await settle();

@@ -252,7 +252,8 @@ export function CompareSlider({
             onLoad={() => onImgLoad(imgA.id)}
             onError={() => onImgError(imgA.id)}
             style={{ clipPath: clipForPosition(pos) }}
-            className="absolute inset-0 h-full w-full object-contain"
+            // X1: object-contain 여백은 투명이라 아래 B 가 비친다 → 틀과 같은 불투명 배경으로 A 쪽을 덮는다
+            className="bg-muted absolute inset-0 h-full w-full object-contain"
             data-testid="compare-a"
           />
         ) : null}
