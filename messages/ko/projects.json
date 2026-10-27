@@ -70,7 +70,12 @@
     "previewNotice": "미리보기는 고객과 같은 공개 범위로 표시됩니다.",
     "empty": "아직 안내할 내용이 없습니다.",
     "sectionsLabel": "고객 홈 영역 순서와 표시",
-    "privateProjectNotice": "이 프로젝트는 아직 비공개라 고객이 들어올 수 없습니다."
+    "privateProjectNotice": "이 프로젝트는 아직 비공개라 고객이 들어올 수 없습니다.",
+    "themeLabel": "색상 테마",
+    "pageToneLabel": "페이지 분위기",
+    "pageImagesLabel": "페이지별 이미지",
+    "pageImagesHint": "페이지 이미지는 업체 설정 > 기본 템플릿에서 바꿀 수 있습니다. 여기서는 표시 여부만 고릅니다.",
+    "showImage": "표시"
   },
   "settings": {
     "basic": "기본 정보",
@@ -168,5 +173,22 @@
     "request": "프로젝트 생성 권한 요청",
     "requested": "업체관리자에게 생성 권한을 요청했습니다.",
     "pending": "생성 권한 요청 중 — 업체관리자 승인을 기다리고 있습니다."
+  },
+  "homeTheme": {
+    "brand": "청록(기본)",
+    "info": "파랑",
+    "positive": "초록",
+    "caution": "노랑",
+    "attention": "주황",
+    "neutral": "회색"
+  },
+  "pageTone": {
+    "default": "기본",
+    "ivory": "아이보리",
+    "sand": "샌드",
+    "greige": "그레이지",
+    "sage": "세이지",
+    "mist": "미스트",
+    "clay": "클레이"
   }
 }
