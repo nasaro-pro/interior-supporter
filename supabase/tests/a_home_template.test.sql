@@ -86,6 +86,11 @@ select is((select default_home_theme from public.company_settings where company_
 set local role authenticated;
 
 -- ===== 신규 프로젝트에 템플릿 복사 (pm 생성) =====
+-- D-35: pm 은 생성 권한이 있어야 프로젝트를 만들 수 있다
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-000000000001","role":"authenticated"}', true);
+select public.set_project_create_permission(
+  (select id from public.company_members
+    where company_id = 'c0000000-0000-0000-0000-000000000001' and user_id = 'a0000000-0000-0000-0000-000000000002'), true);
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-000000000002","role":"authenticated"}', true);
 insert into public.projects (id, company_id, name, created_by) values
   ('b0000000-0000-0000-0000-000000000010', 'c0000000-0000-0000-0000-000000000001', '새 현장', 'a0000000-0000-0000-0000-000000000002');
