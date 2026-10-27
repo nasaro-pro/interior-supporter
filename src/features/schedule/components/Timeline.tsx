@@ -9,6 +9,7 @@ import { linkClass } from '@/shared/ui/styles';
 import { eventEnd, spanPercent, timelineRange } from '../lib/calendar';
 import { formatEventWhen } from '../lib/format';
 import type { ScheduleEvent } from '../types';
+import { ScheduleProgressBadge } from './ScheduleProgress';
 
 const row = 'grid gap-2 px-4 py-3 md:grid-cols-[200px_minmax(0,1fr)] md:gap-4';
 
@@ -58,16 +59,26 @@ export function Timeline({
                 {formatEventWhen(e, locale, { allDay: t('field.allDay') })}
               </span>
               <div className="flex min-w-0 flex-col gap-2">
-                <Link
-                  href={eventHref(e)}
-                  className={cn(linkClass, 'truncate font-medium')}
-                  data-ui-key="schedule-event-open"
-                >
-                  {e.title}
-                </Link>
+                <div className="flex min-w-0 items-center gap-2">
+                  <Link
+                    href={eventHref(e)}
+                    className={cn(linkClass, 'min-w-0 truncate font-medium')}
+                    data-ui-key="schedule-event-open"
+                  >
+                    {e.title}
+                  </Link>
+                  <ScheduleProgressBadge progress={e.progress} />
+                </div>
                 <div className="bg-muted relative h-2 rounded-full" aria-hidden>
                   <div
-                    className="bg-primary absolute inset-y-0 rounded-full"
+                    className={cn(
+                      'absolute inset-y-0 rounded-full',
+                      e.progress === 'done'
+                        ? 'bg-tone-positive-fg'
+                        : e.progress === 'in_progress'
+                          ? 'bg-tone-info-fg'
+                          : 'bg-primary/50',
+                    )}
                     style={{ left: `${span.left}%`, width: `${span.width}%` }}
                   />
                 </div>

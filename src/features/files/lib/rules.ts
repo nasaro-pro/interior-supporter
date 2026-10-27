@@ -2,32 +2,77 @@
 import { FILE_RULES, type FileKind } from '@/shared/contracts/domain';
 
 export type UploadKind = Exclude<FileKind, 'photo_thumb'>;
-export type DetectedFormat = 'pdf' | 'dwg' | 'skp' | 'png' | 'jpeg' | 'webp';
+/** D-20: 인테리어 업계 도안 형식. 'ole' = MS 복합 문서(3ds Max .max · Revit .rvt), 'ps' = PostScript(구버전 .ai) */
+export type DetectedFormat =
+  | 'pdf'
+  | 'dwg'
+  | 'dxf'
+  | 'skp'
+  | '3ds'
+  | 'ole'
+  | 'obj'
+  | 'fbx'
+  | '3dm'
+  | 'png'
+  | 'jpeg'
+  | 'webp'
+  | 'tiff'
+  | 'heic'
+  | 'psd'
+  | 'ps';
 export type RejectReason = 'type' | 'size' | 'corrupt' | 'pixels';
 
-/** 형식 헤더 판정에 필요한 앞부분 바이트 수 */
-export const SNIFF_BYTES = 64;
+/** 형식 헤더 판정에 필요한 앞부분 바이트 수 (OBJ·DXF 같은 텍스트 형식은 앞쪽 몇 줄을 본다) */
+export const SNIFF_BYTES = 512;
 
-const EXT_FORMAT: Record<string, DetectedFormat> = {
-  '.pdf': 'pdf',
-  '.dwg': 'dwg',
-  '.skp': 'skp',
-  '.png': 'png',
-  '.jpg': 'jpeg',
-  '.jpeg': 'jpeg',
-  '.webp': 'webp',
+/** 확장자 → 그 확장자로 인정하는 실제 형식들 (AI 는 PDF 호환 또는 PostScript) */
+const EXT_FORMATS: Record<string, readonly DetectedFormat[]> = {
+  '.pdf': ['pdf'],
+  '.dwg': ['dwg'],
+  '.dxf': ['dxf'],
+  '.skp': ['skp'],
+  '.3ds': ['3ds'],
+  '.max': ['ole'],
+  '.rvt': ['ole'],
+  '.obj': ['obj'],
+  '.fbx': ['fbx'],
+  '.3dm': ['3dm'],
+  '.png': ['png'],
+  '.jpg': ['jpeg'],
+  '.jpeg': ['jpeg'],
+  '.webp': ['webp'],
+  '.tif': ['tiff'],
+  '.tiff': ['tiff'],
+  '.heic': ['heic'],
+  '.heif': ['heic'],
+  '.psd': ['psd'],
+  '.ai': ['pdf', 'ps'],
 };
 
+/** 서버가 다시 인코딩(메타데이터 제거)하는 이미지. 나머지는 원본 그대로 보관한다 */
 export const IMAGE_FORMATS: readonly DetectedFormat[] = ['png', 'jpeg', 'webp'];
 
 export const FORMAT_MIME: Record<DetectedFormat, string> = {
   pdf: 'application/pdf',
   dwg: 'image/vnd.dwg',
+  dxf: 'image/vnd.dxf',
   skp: 'application/vnd.sketchup.skp',
+  '3ds': 'application/x-3ds',
+  ole: 'application/octet-stream',
+  obj: 'model/obj',
+  fbx: 'application/octet-stream',
+  '3dm': 'model/vnd.3dm',
   png: 'image/png',
   jpeg: 'image/jpeg',
   webp: 'image/webp',
+  tiff: 'image/tiff',
+  heic: 'image/heic',
+  psd: 'image/vnd.adobe.photoshop',
+  ps: 'application/postscript',
 };
+
+/** 미리보기(브라우저에서 바로 보기)가 되는 형식 — 나머지는 다운로드만 (브라우저 CAD·3D 뷰어는 제외 범위) */
+export const PREVIEWABLE_FORMATS: readonly DetectedFormat[] = ['pdf', 'png', 'jpeg', 'webp'];
 
 /** 확장자 (소문자, 점 포함). 없으면 '' — REQ-101: 대소문자 무시 */
 export function extOf(fileName: string): string {
@@ -58,18 +103,55 @@ function includesSeq(b: Uint8Array, seq: number[], limit: number): boolean {
   return false;
 }
 
+const HEIF_BRANDS = ['heic', 'heix', 'hevc', 'hevx', 'heim', 'heis', 'mif1', 'msf1'];
+
+function textHead(b: Uint8Array): string | null {
+  // 텍스트 형식(OBJ·ASCII DXF·ASCII FBX) 판정: NUL 바이트가 없어야 한다
+  const n = Math.min(b.length, SNIFF_BYTES);
+  for (let i = 0; i < n; i++) if (b[i] === 0) return null;
+  return String.fromCharCode(...b.subarray(0, n)).replace(/^\uFEFF|^\xEF\xBB\xBF/, '');
+}
+
 /**
  * 실제 바이트로 형식 판정 (THR-006: 확장자 위장 거절).
- * - PDF `%PDF-` · DWG `AC10xx` · PNG·JPEG·WebP 시그니처
- * - SKP: 앞부분에 UTF-16LE "SketchUp Model" 표식 (구버전 확인 형식). 신버전 헤더는 실제 파일로 확인 필요(progress/B.md 5번)
+ * - PDF `%PDF-` · PostScript `%!PS` · DWG `AC10xx`/`AC1.x`·`AC2.x` · DXF(ASCII `0 SECTION` / 바이너리 표식)
+ * - SKP: 앞부분 UTF-16LE "SketchUp Model" — 신버전 헤더는 실제 파일로 확인 필요 (D-23)
+ * - 3DS `MM` 청크 · MAX/RVT = MS 복합 문서(D0 CF 11 E0) · FBX(`Kaydara FBX Binary` / `; FBX`)
+ * - 3DM `3D Geometry File Format` · OBJ = 텍스트이고 OBJ 문장(v·vt·vn·o·g·f·mtllib·usemtl·#)으로 시작
+ * - PNG·JPEG·WebP·TIFF·HEIC(ftyp 브랜드)·PSD `8BPS`
  */
 export function sniffFormat(bytes: Uint8Array): DetectedFormat | null {
   if (startsWith(bytes, ascii('%PDF-'))) return 'pdf';
-  if (startsWith(bytes, ascii('AC10'))) return 'dwg';
+  if (startsWith(bytes, ascii('%!PS'))) return 'ps';
+  if (
+    startsWith(bytes, ascii('AC10')) ||
+    startsWith(bytes, ascii('AC1.')) ||
+    startsWith(bytes, ascii('AC2.'))
+  )
+    return 'dwg';
   if (startsWith(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) return 'png';
   if (startsWith(bytes, [0xff, 0xd8, 0xff])) return 'jpeg';
   if (startsWith(bytes, ascii('RIFF')) && startsWith(bytes, ascii('WEBP'), 8)) return 'webp';
+  if (startsWith(bytes, [0x49, 0x49, 0x2a, 0x00]) || startsWith(bytes, [0x4d, 0x4d, 0x00, 0x2a]))
+    return 'tiff';
+  if (startsWith(bytes, ascii('ftyp'), 4)) {
+    const brand = String.fromCharCode(...bytes.subarray(8, 12));
+    if (HEIF_BRANDS.includes(brand)) return 'heic';
+  }
+  if (startsWith(bytes, ascii('8BPS'))) return 'psd';
+  if (startsWith(bytes, [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1])) return 'ole';
+  if (startsWith(bytes, ascii('Kaydara FBX Binary'))) return 'fbx';
+  if (startsWith(bytes, ascii('3D Geometry File Format'))) return '3dm';
+  if (startsWith(bytes, ascii('AutoCAD Binary DXF'))) return 'dxf';
   if (includesSeq(bytes, utf16le('SketchUp Model'), SNIFF_BYTES)) return 'skp';
+  // 3DS: 주 청크 0x4D4D(리틀 엔디언) + 청크 길이(4바이트) + 버전 청크 0x0002
+  if (startsWith(bytes, [0x4d, 0x4d]) && startsWith(bytes, [0x02, 0x00], 6)) return '3ds';
+  const text = textHead(bytes);
+  if (text !== null) {
+    if (/^\s*0\s*\r?\n\s*SECTION\b/.test(text)) return 'dxf';
+    if (/^\s*;\s*FBX/.test(text)) return 'fbx';
+    if (/^\s*(#|v |vt |vn |vp |o |g |f |s |mtllib |usemtl )/m.test(text)) return 'obj';
+  }
   return null;
 }
 
@@ -77,7 +159,7 @@ export function sniffFormat(bytes: Uint8Array): DetectedFormat | null {
 export function formatMatches(kind: UploadKind, fileName: string, format: DetectedFormat | null) {
   if (!format) return false;
   const ext = extOf(fileName);
-  return EXT_FORMAT[ext] === format && FILE_RULES[kind].exts.includes(ext);
+  return (EXT_FORMATS[ext] ?? []).includes(format) && FILE_RULES[kind].exts.includes(ext);
 }
 
 /** 'company/{companyId}/project/{projectId 또는 _}/{kind}/{fileId}{ext}' (03 문서 3.3) */

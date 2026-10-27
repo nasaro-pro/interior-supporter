@@ -19,7 +19,9 @@ import {
   requestCreateSchema,
   requestEntrySchema,
   requestStatusSchema,
+  type RequestTargetType,
 } from '../schema';
+import { autoTitle } from '../lib/memo';
 
 function revalidateRequest(access: ProjectAccess, requestId?: string) {
   const { companySlug, projectId } = access;
@@ -31,11 +33,23 @@ function revalidateRequest(access: ProjectAccess, requestId?: string) {
   }
 }
 
+/** D-32: 메모가 보이는 도안 · 자재 상세 화면도 갱신 */
+function revalidateTarget(access: ProjectAccess, type: RequestTargetType, targetId: string) {
+  const { companySlug: c, projectId: p } = access;
+  if (type === 'designs') {
+    revalidatePath(routes.app.design(c, p, targetId));
+    revalidatePath(routes.portal.design(p, targetId));
+  } else {
+    revalidatePath(routes.app.material(c, p, targetId));
+    revalidatePath(routes.portal.material(p, targetId));
+  }
+}
+
 /** REQ-201: 고객만 작성. 상태 open·작성자·범위는 DB 트리거가 강제 */
 export async function createRequest(raw: unknown): Promise<ActionResult<{ id: string }>> {
   const parsed = requestCreateSchema.safeParse(raw);
   if (!parsed.success) return validationFail(parsed.error);
-  const { id, projectId, title, body } = parsed.data;
+  const { id, projectId, title, body, targetType, targetId } = parsed.data;
   const access = await requireProjectAccess(projectId, ['customer']);
   const ctx = await getAccessContext();
   const supabase = await createServerSupabase();
@@ -44,8 +58,12 @@ export async function createRequest(raw: unknown): Promise<ActionResult<{ id: st
     project_id: projectId,
     company_id: access.companyId,
     author_id: ctx.userId,
-    title,
+    // D-33: 제목을 비우면 본문 앞부분으로
+    title: title || autoTitle(body),
     body,
+    // D-32: 연결 항목 — 같은 프로젝트의 공개 항목만 (DB 트리거가 확인)
+    target_type: targetType,
+    target_id: targetId,
   });
   if (error) {
     if (isUniqueViolation(error)) {
@@ -57,9 +75,13 @@ export async function createRequest(raw: unknown): Promise<ActionResult<{ id: st
       }
       return fail('CONFLICT');
     }
+    if (error.message === 'invalid_target') {
+      return fail('VALIDATION_FAILED', { fieldErrors: { targetId: ['field.invalid'] } });
+    }
     return dbFail('request.create.failed', error, { projectId, objectId: id });
   }
   revalidateRequest(access, id);
+  if (targetType && targetId) revalidateTarget(access, targetType, targetId);
   return ok({ id });
 }
 

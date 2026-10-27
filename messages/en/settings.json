@@ -18,6 +18,7 @@
     "defaultHomeMessage": "Default customer home message",
     "role": "Role",
     "joinedAt": "Joined",
+    "createPermission": "Create projects",
     "homeSections": "Customer home section order and visibility",
     "homeTheme": "Color theme",
     "pageImages": "Images by page",
@@ -30,7 +31,9 @@
     "ownerLocked": "The owner’s role can’t be changed or removed.",
     "resetLinkCreated": "Reset link created. Copy it now and give it directly to the person. It can be used once within 1 hour.",
     "resetOwnerHint": "The owner’s password can only be reset through the operations procedure.",
-    "empty": "No members invited yet. Invite PMs to work together."
+    "empty": "No members invited yet. Invite PMs to work together.",
+    "createAlways": "Always",
+    "createPermissionFor": "Project creation for {name}"
   },
   "storage": {
     "used": "{used} of {total} used",
@@ -48,7 +51,11 @@
   "toast": {
     "logoUpdated": "Logo updated.",
     "memberRemoved": "Member removed.",
-    "roleChanged": "Role updated."
+    "roleChanged": "Role updated.",
+    "createPermissionOn": "Project creation turned on.",
+    "createPermissionOff": "Project creation turned off.",
+    "createRequestApproved": "Request approved. They can now create projects.",
+    "createRequestRejected": "Request rejected."
   },
   "confirm": {
     "removeMember": {
@@ -75,5 +82,20 @@
     "imageUploaded": "Image for {page} uploaded. Save to apply it to the template.",
     "previewPage": "Page to preview",
     "previewPlaceholder": "{page} content appears here."
+  },
+  "externals": {
+    "title": "Customer and field crew accounts",
+    "empty": "No customer or field crew accounts yet.",
+    "revokeAll": "Revoke access to this company",
+    "revokeTitle": "Revoke all of {name}'s access to this company?",
+    "revokeBody": "All customer and field crew assignments in this company's projects are revoked right away. The account stays, so projects with other companies keep working.",
+    "revoked": "Access to this company revoked."
+  },
+  "createRequests": {
+    "title": "Requests to create projects",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveFor": "Approve request from {name}",
+    "rejectFor": "Reject request from {name}"
   }
 }

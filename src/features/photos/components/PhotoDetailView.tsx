@@ -15,6 +15,7 @@ import { uploaderLabel } from '../lib/uploader-label';
 import type { PhotoItem } from '../types';
 import { PhotoImage } from './PhotoImage';
 import { PhotoVisibilityBadge } from './PhotoVisibilityBadge';
+import { PhotoComments } from './PhotoComments';
 
 export function PhotoDetailView({
   photo,
@@ -117,6 +118,13 @@ export function PhotoDetailView({
               {actions}
             </Section>
           ) : null}
+          {/* D-34 · CU-07: 댓글 (시공팀 화면에는 그리지 않음) */}
+          <PhotoComments
+            projectId={photo.projectId}
+            photoId={photo.id}
+            isPublic={photo.isPublic}
+            archived={photo.archived}
+          />
         </aside>
       </div>
     </>

@@ -3,6 +3,7 @@
 import { useActionState, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useSearchParamState } from '@/shared/hooks/use-search-param-state';
 import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
 import { Input } from '@/shared/ui/input';
@@ -62,16 +63,13 @@ function ClientFields({ fe, c }: { fe?: Record<string, string[]>; c?: ClientItem
   );
 }
 
-export function ClientCreateSheet({
-  companySlug,
-  defaultOpen,
-}: {
-  companySlug: string;
-  defaultOpen?: boolean;
-}) {
+export function ClientCreateSheet({ companySlug }: { companySlug: string }) {
   const t = useTranslations();
   const [state, action] = useActionState(createClient, null);
   const [id] = useState(() => crypto.randomUUID());
+  // D-02: 열림 상태를 ?mode=new 와 동기화 — 빈 화면 '생성' 링크·버튼·새로고침 모두 같은 상태
+  const [mode, setMode] = useSearchParamState('mode');
+  const open = mode === 'new';
   const fe = state && !state.ok ? state.error.fieldErrors : undefined;
   return (
     <FormSheet
@@ -80,7 +78,8 @@ export function ClientCreateSheet({
       title={t('clients.list.create')}
       description={t('clients.detail.cardVsAccount')}
       uiKey="client-create"
-      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={(next) => setMode(next ? 'new' : null)}
     >
       <form action={action} className="flex flex-col gap-4" noValidate>
         <input type="hidden" name="companySlug" value={companySlug} />

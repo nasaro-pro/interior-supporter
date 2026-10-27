@@ -82,6 +82,11 @@ select is((select name from public.projects where id = 'b0000000-0000-0000-0000-
   'TC-017 미배정 프로젝트 수정은 반영되지 않는다');
 
 -- TC-011 프로젝트 생성 → 생성자 pm 자동 배정, 회사 id 위조 불가
+-- (D-36 · CR-9: 담당자는 업체관리자가 준 생성 권한이 있어야 만든다 — 여기서는 권한을 준 상태로 확인)
+select set_config('app.system_write', 'on', true);
+update public.company_members set can_create_projects = true
+ where user_id = 'a0000000-0000-0000-0000-000000000002';
+select set_config('app.system_write', 'off', true);
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-000000000002","role":"authenticated"}', true);
 insert into public.projects (id, company_id, name, created_by)

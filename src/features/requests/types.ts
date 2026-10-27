@@ -1,5 +1,13 @@
 // requests 화면용 타입 (camelCase)
 import type { RequestStatus } from '@/shared/contracts/domain';
+import type { RequestTargetType } from './schema';
+
+/** D-32 메모가 달린 항목 (볼 수 없거나 없으면 label null) */
+export interface RequestTarget {
+  type: RequestTargetType;
+  id: string;
+  label: string | null;
+}
 
 export interface RequestListItem {
   id: string;
@@ -13,6 +21,7 @@ export interface RequestListItem {
   lastActivityAt: string;
   hasReply: boolean;
   archived: boolean;
+  target: RequestTarget | null;
 }
 
 export interface RequestListFilters {
@@ -43,5 +52,6 @@ export interface RequestDetail {
   authorName: string | null;
   createdAt: string;
   archivedAt: string | null;
+  target: RequestTarget | null;
   entries: RequestThreadEntry[];
 }

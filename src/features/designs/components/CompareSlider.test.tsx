@@ -57,6 +57,12 @@ describe('TC-105 CompareSlider (B-T03·B-T04)', () => {
     vi.unstubAllGlobals();
   });
 
+  it('D-06: 비교 영역은 화면 높이의 70% 를 넘지 않는다 (큰 모니터 넘침 방지)', async () => {
+    renderSlider();
+    await settle();
+    expect(screen.getByTestId('compare-frame').className).toContain('max-h-[70svh]');
+  });
+
   it('기본 50%, 키보드로 1%·10%·Home·End 조작, A 레이어 노출만 바뀐다', async () => {
     renderSlider();
     await settle();

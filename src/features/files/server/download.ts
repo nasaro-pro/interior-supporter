@@ -10,6 +10,7 @@ import { createServerSupabase } from '@/shared/lib/supabase/server';
 
 const NO_STORE = { 'Cache-Control': 'no-store' } as const;
 export const SIGNED_URL_TTL_SECONDS = 60;
+const INLINE_MIMES = new Set(['application/pdf', 'image/png', 'image/jpeg', 'image/webp']);
 
 const notFound = () => new NextResponse(null, { status: 404, headers: NO_STORE });
 
@@ -26,7 +27,7 @@ export async function respondWithFile(fileId: string, download: boolean): Promis
   // 3) 사용자 클라이언트 조회 → RLS(can_view_file)가 소유 객체 열람 가능 여부를 판정한다
   const { data: file, error: selectError } = await supabase
     .from('files')
-    .select('id, bucket, path, original_name, status')
+    .select('id, bucket, path, original_name, status, mime')
     .eq('id', fileId)
     .maybeSingle();
   if (selectError) {
@@ -41,13 +42,16 @@ export async function respondWithFile(fileId: string, download: boolean): Promis
   // 준비(ready) 전·거부 파일은 업로더 본인에게도 내려주지 않는다 (THR-006, DB-07)
   if (!file || file.status !== 'ready') return notFound();
 
+  // D-20: 브라우저에서 바로 볼 수 있는 형식(PDF·PNG·JPEG·WebP)만 인라인. CAD·3D·PSD 등은 항상 내려받기
+  //       (업로드 때 브라우저가 보낸 content-type 을 믿지 않는다)
+  const inline = !download && INLINE_MIMES.has(file.mime ?? '');
   const admin = createAdminSupabase();
   const { data, error } = await admin.storage
     .from(file.bucket)
     .createSignedUrl(
       file.path,
       SIGNED_URL_TTL_SECONDS,
-      download ? { download: file.original_name } : undefined,
+      inline ? undefined : { download: file.original_name },
     );
   if (error || !data) {
     const ref = newRef();

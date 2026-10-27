@@ -14,6 +14,7 @@ import {
 } from '@/features/requests/lib/action-helpers';
 import {
   photoArchiveSchema,
+  photoCommentSchema,
   photoCreateSchema,
   photoUpdateSchema,
   photoVisibilitySchema,
@@ -170,4 +171,44 @@ export async function setPhotoArchived(raw: unknown): Promise<ActionResult<{ ver
   if (!data) return fail('VERSION_CONFLICT');
   revalidatePhotos(access, photoId);
   return ok({ version: data.version });
+}
+
+/**
+ * D-34 · CU-07 사진 댓글. 고객 = 자기 대화에 댓글(공개 사진만), 편집자 = threadOwner 고객 대화에 답글.
+ * 추가 전용. 볼 수 없는 사진 · 댓글 없는 고객에게 먼저 답글 → RLS 가 막는다 (FORBIDDEN)
+ */
+export async function addPhotoComment(raw: unknown): Promise<ActionResult<{ id: string }>> {
+  const parsed = photoCommentSchema.safeParse(raw);
+  if (!parsed.success) return validationFail(parsed.error);
+  const { id, projectId, photoId, body, threadOwner } = parsed.data;
+  const access = await requireProjectAccess(projectId, ['editor', 'customer']);
+  const ctx = await getAccessContext();
+  // 고객은 자기 대화에만, 편집자는 답할 고객이 꼭 있어야 한다
+  if (access.as === 'customer' && threadOwner && threadOwner !== ctx.userId)
+    return fail('FORBIDDEN');
+  if (access.as === 'editor' && (!threadOwner || threadOwner === ctx.userId)) {
+    return fail('VALIDATION_FAILED', { fieldErrors: { threadOwner: ['field.invalid'] } });
+  }
+  const supabase = await createServerSupabase();
+  // 같은 프로젝트의 사진인지 먼저 (다른 프로젝트 id 바꿔치기 차단 · 존재 숨김)
+  const { data: photo } = await supabase
+    .from('photos')
+    .select('id')
+    .eq('id', photoId)
+    .eq('project_id', projectId)
+    .maybeSingle();
+  if (!photo) return fail('NOT_FOUND');
+  const { error } = await supabase.from('photo_comments').insert({
+    id,
+    photo_id: photoId,
+    author_id: ctx.userId,
+    thread_owner: access.as === 'customer' ? ctx.userId : threadOwner!,
+    body,
+  });
+  if (error) {
+    if (error.code === '23505') return ok({ id }); // POL-038 같은 id 재시도
+    return dbFail('photo.comment.failed', error, { projectId, objectId: photoId });
+  }
+  revalidatePhotos(access, photoId);
+  return ok({ id });
 }

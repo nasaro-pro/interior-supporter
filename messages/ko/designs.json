@@ -21,7 +21,10 @@
     "linkedVersion": "연결 버전",
     "wholeDesign": "도안 전체",
     "reason": "사유",
-    "pageNumber": "페이지 번호"
+    "pageNumber": "페이지 번호",
+    "originalHint": "DWG·DXF·SKP·3DS·MAX·OBJ·FBX·3DM·RVT·JPG·PNG·WebP·TIFF·HEIC·PDF·AI·PSD, 최대 50MB. 이미지(JPG·PNG·WebP)를 올리면 첫 비교 이미지로도 등록됩니다.",
+    "space": "공간",
+    "spaceHint": "고객 화면에서 대표 도안을 누르면 공간별로 나눠 보여 줍니다. 집 전체 도안은 \"전체\"로 두세요."
   },
   "action": {
     "create": "도안 올리기",
@@ -33,7 +36,12 @@
     "confirm": "이 도안 확정",
     "requestReconfirm": "재확인 요청",
     "versionHistory": "버전 이력",
-    "reconfirm": "변경됨 — 다시 확정"
+    "reconfirm": "변경됨 — 다시 확정",
+    "setMain": "대표 도안으로 지정",
+    "moveUp": "{title} 위로 옮기기",
+    "moveDown": "{title} 아래로 옮기기",
+    "spaceUp": "{space} 공간 위로 옮기기",
+    "spaceDown": "{space} 공간 아래로 옮기기"
   },
   "compare": {
     "sideA": "A",
@@ -65,12 +73,14 @@
     "versionAddedReconfirm": "새 버전을 올려 확정 상태가 재확인 필요로 바뀌었습니다. 확정권 고객에게 알림을 보냈습니다.",
     "confirmed": "도안을 확정했습니다.",
     "reconfirmRequested": "재확인을 요청했습니다.",
-    "previewAdded": "비교 이미지를 등록했습니다."
+    "previewAdded": "비교 이미지를 등록했습니다.",
+    "previewAutoFailed": "도안은 만들었지만 비교 이미지를 자동으로 등록하지 못했습니다. 상세 화면에서 추가하세요.",
+    "mainSet": "대표 도안으로 지정했습니다."
   },
   "preview": {
     "empty": "비교 이미지가 없습니다. 원본은 내려받아 확인할 수 있습니다.",
     "loadFailed": "이미지를 불러오지 못했습니다. 다른 이미지를 선택하거나 다시 시도하세요.",
-    "cadHint": "SKP·DWG 원본은 브라우저에서 미리 볼 수 없습니다. 비교 이미지를 연결하세요.",
+    "cadHint": "이 형식은 브라우저에서 미리 볼 수 없습니다. 비교 이미지를 연결하세요.",
     "modeImage": "이미지 올리기",
     "none": "비교 이미지 없음"
   },
@@ -109,5 +119,26 @@
     "reasonCoreChanged": "핵심 정보 변경",
     "reasonNewVersion": "새 버전 업로드",
     "reasonPm": "재확인 요청 — {reason}"
+  },
+  "empty": "등록된 도안이 없습니다. 도안 원본(CAD·3D·이미지·PDF)이나 이미지 1장으로 시작하세요.",
+  "space": {
+    "all": "전체"
+  },
+  "main": {
+    "badge": "대표",
+    "hiddenShort": "비공개 · 고객에게 안 보임",
+    "hiddenNotice": "대표 도안이 비공개라 고객에게 보이지 않습니다. 공개로 바꾸면 고객 도안 첫 화면에 크게 보입니다. 그 전까지 고객에게는 이미지가 있는 최근 공개 도안이 대신 보입니다.",
+    "noPreviewNotice": "대표 도안에 비교 이미지가 없어 고객 첫 화면에 크게 보여 줄 그림이 없습니다. 아래 비교 이미지에서 렌더 이미지(JPG·PNG·WebP)를 추가하세요. 그 전까지 고객에게는 이미지가 있는 최근 공개 도안이 대신 보입니다.",
+    "setHint": "대표 도안으로 지정하려면 비교 이미지를 먼저 추가하는 것을 권장합니다. 고객 도안 첫 화면에 이 이미지가 크게 보입니다."
+  },
+  "customer": {
+    "heroLabel": "대표 도안",
+    "browseSpaces": "공간별 도안 보기 ({count})",
+    "heroHint": "대표 도안을 누르면 공간별 도안을 볼 수 있습니다.",
+    "backToHero": "← 대표 도안으로",
+    "spaceNav": "공간",
+    "allSpaces": "전체",
+    "spaceEmpty": "이 공간에는 아직 공개된 도안이 없습니다.",
+    "wholeHome": "집 전체"
   }
 }

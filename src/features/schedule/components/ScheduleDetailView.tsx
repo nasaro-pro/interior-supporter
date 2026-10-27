@@ -15,6 +15,7 @@ import { ToneBadge } from '@/shared/ui/tone-badge';
 import { formatEventWhen } from '../lib/format';
 import type { RelatedType } from '../schema';
 import type { ScheduleEvent } from '../types';
+import { ScheduleProgressBadge } from './ScheduleProgress';
 
 export function ScheduleDetailView({
   event,
@@ -62,6 +63,7 @@ export function ScheduleDetailView({
               </ToneBadge>
             ) : null}
             {/* 공개/비공개 배지는 사진과 같은 표시 (02 문서 7.2) */}
+            <ScheduleProgressBadge progress={event.progress} />
             {showVisibility ? <PhotoVisibilityBadge isPublic={event.isPublic} /> : null}
           </div>
         </div>

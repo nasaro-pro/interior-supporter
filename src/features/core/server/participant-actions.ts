@@ -9,6 +9,7 @@ import { routes } from '@/shared/contracts/routes';
 import { dbFail, formToObject, parseInput } from '@/shared/lib/action';
 import {
   assignPmSchema,
+  companyAccessRevokeSchema,
   inviteRevokeSchema,
   memberInviteSchema,
   memberRemoveSchema,
@@ -290,4 +291,35 @@ export async function removeMember(raw: unknown): Promise<ActionResult<null>> {
   if (!data) return fail('VERSION_CONFLICT');
   revalidatePath(routes.app.settings(me.slug, 'members'));
   return ok(null);
+}
+
+/**
+ * D-17: 이 업체에서의 고객·시공팀 접근 일괄 회수. 계정 자체는 그대로 둔다
+ * (다른 업체 프로젝트에도 참여할 수 있으므로 계정 정지 대신 이 업체 배정만 회수).
+ * 디자이너 세션으로 update — RLS(participants_update = 편집 가능한 프로젝트)가 범위를 다시 제한한다.
+ */
+export async function revokeCompanyAccess(
+  raw: unknown,
+): Promise<ActionResult<{ revoked: number }>> {
+  const parsed = parseInput(companyAccessRevokeSchema, raw);
+  if (!parsed.ok) return parsed.result;
+  const v = parsed.data;
+  const ctx = await loadAccessContext();
+  const member = ctx?.memberships.find((m) => m.companyId === v.companyId);
+  if (!ctx || !member) return fail('NOT_FOUND');
+  if (v.userId === ctx.userId) return fail('FORBIDDEN');
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('project_participants')
+    .update({ revoked_at: new Date().toISOString() })
+    .eq('company_id', v.companyId)
+    .eq('user_id', v.userId)
+    .in('role', ['customer', 'field'])
+    .is('revoked_at', null)
+    .select('project_id');
+  if (error) return dbFail('participant.company_revoke.failed', error, { companyId: v.companyId });
+  if (!data.length) return fail('NOT_FOUND');
+  revalidatePath(routes.app.settings(member.slug, 'members'));
+  for (const p of data) revalidateSettings(member.slug, p.project_id);
+  return ok({ revoked: data.length });
 }

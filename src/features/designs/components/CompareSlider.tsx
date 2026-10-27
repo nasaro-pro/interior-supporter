@@ -221,7 +221,8 @@ export function CompareSlider({
 
       <div
         ref={frame}
-        className="bg-muted relative aspect-[16/10] w-full min-w-0 touch-none overflow-hidden rounded-md border select-none"
+        // D-06: 큰 모니터에서 세로가 화면을 넘지 않도록 높이 상한(화면의 70%) — 이미지는 object-contain 으로 비율 유지
+        className="bg-muted relative aspect-[16/10] max-h-[70svh] w-full min-w-0 touch-none overflow-hidden rounded-md border select-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

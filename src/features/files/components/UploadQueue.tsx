@@ -17,7 +17,12 @@ interface Item {
   outcome?: UploadOutcome;
 }
 
-export type UploadedFile = FinalizedFile & { status: 'ready'; name: string };
+export type UploadedFile = FinalizedFile & {
+  status: 'ready';
+  name: string;
+  /** D-21: 브라우저에서 고른 원본 파일 (같은 이미지를 비교 이미지로도 올릴 때 사용) */
+  source?: File;
+};
 
 export function UploadQueue({
   target,
@@ -67,7 +72,7 @@ export function UploadQueue({
       for (const item of queue) {
         const outcome = await uploadFile(item.file, target, (phase) => patch(item.key, { phase }));
         patch(item.key, { phase: outcome.ok ? 'done' : 'failed', outcome });
-        if (outcome.ok) onUploaded({ ...outcome.file, name: item.file.name });
+        if (outcome.ok) onUploaded({ ...outcome.file, name: item.file.name, source: item.file });
       }
       running.current = false;
     },

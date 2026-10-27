@@ -10,6 +10,7 @@ import { isWithin, todayKst } from '@/shared/lib/dates';
 import { logger } from '@/shared/lib/logger';
 import type { AccessContext, ProjectAccess } from '@/shared/contracts/integration';
 import type { MemberRole } from '@/shared/contracts/domain';
+import { firstLoginState } from '../account-utils';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -81,10 +82,46 @@ export const loadAccessContext = cache(async (): Promise<AccessContext | null> =
   };
 });
 
-/** 미로그인 → 로그인 화면(현재 경로를 next 로) */
+/** D-15: 첫 로그인 비밀번호 변경 상태 (본인 프로필만 읽는다) */
+export const loadFirstLoginState = cache(
+  async (userId: string): Promise<'ready' | 'must_change' | 'expired'> => {
+    const supabase = await createServerSupabase();
+    const { data } = await supabase
+      .from('profiles')
+      .select('must_change_password, temp_password_expires_at')
+      .eq('id', userId)
+      .maybeSingle();
+    return firstLoginState(data ?? null);
+  },
+);
+
+/** D-11: 내 업체 중 아직 쓸 수 없는 업체(승인 대기·정지) — 영역 선택 화면 안내용 */
+export const loadInactiveCompanies = cache(
+  async (): Promise<{ id: string; name: string; status: 'pending' | 'suspended' }[]> => {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.rpc('my_inactive_companies');
+    if (error) {
+      logger.warn('access.inactive_companies.failed', { dbCode: error.code });
+      return [];
+    }
+    return (data ?? []).map((c) => ({
+      id: c.id,
+      name: c.name,
+      status: c.status === 'suspended' ? 'suspended' : 'pending',
+    }));
+  },
+);
+
+/**
+ * 미로그인 → 로그인 화면(현재 경로를 next 로).
+ * D-15: 임시 비밀번호 상태면 어떤 화면보다 먼저 비밀번호 변경(AUTH-06)으로 보낸다.
+ */
 export async function getAccessContext(): Promise<AccessContext> {
   const ctx = await loadAccessContext();
-  if (ctx) return ctx;
+  if (ctx) {
+    if ((await loadFirstLoginState(ctx.userId)) !== 'ready') redirect(routes.changePassword());
+    return ctx;
+  }
   const h = await headers();
   redirect(routes.login(h.get('x-pathname') ?? undefined));
 }

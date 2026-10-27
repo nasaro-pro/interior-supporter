@@ -85,13 +85,30 @@ describe('A-03 signupCompany 중립 응답', () => {
     expect(typeof h.level.mock.calls[0]?.[0]).toBe('number');
   });
 
-  it('A-03 주소명 중복은 계정을 만들기 전에 판정한다 (SLUG_TAKEN 이 이메일 존재를 드러내지 않음)', async () => {
+  it('D-10 업체 주소는 자동 생성 — 겹치면 다시 만들고, 계속 겹치면 계정을 만들기 전에 중립 응답', async () => {
     const { admin } = setup({ data: { user: { id: 'u1' } }, error: null }, (q) =>
       q.table === 'companies' ? { data: { id: 'c1' } } : undefined,
     );
     const res = await run(signupCompany(null, signupForm()));
-    expect(res).toMatchObject({ ok: false, error: { code: 'SLUG_TAKEN' } });
+    expect(res).toMatchObject({ ok: false, error: { code: 'CONFLICT' } });
     expect(admin.auth.admin.createUser).not.toHaveBeenCalled();
+  });
+
+  it('D-10 한 번 겹치면 새 주소로 다시 시도해 가입한다', async () => {
+    let checks = 0;
+    const { fake } = setup({ data: { user: { id: 'u1' } }, error: null }, (q) =>
+      q.table === 'companies'
+        ? checks++ === 0
+          ? { data: { id: 'c1' } }
+          : { data: null }
+        : undefined,
+    );
+    expect(await run(signupCompany(null, signupForm()))).toEqual({
+      redirect: 'REDIRECT:/select-area',
+    });
+    expect(checks).toBe(2);
+    const rpc = fake.of('rpc:create_company_with_owner')[0];
+    expect(JSON.stringify(rpc?.calls)).toMatch(/"p_slug":"owner-[a-z2-9]{4}"/);
   });
 
   it('A-03 업체 생성 RPC 실패(주소명 외)도 같은 중립 응답 + 계정 삭제(보상)', async () => {
@@ -104,10 +121,10 @@ describe('A-03 signupCompany 중립 응답', () => {
     expect(h.level).toHaveBeenCalledTimes(1);
   });
 
-  it('정상: 가입 성공 → 업체 화면으로 이동', async () => {
+  it('정상: 가입 성공 → 영역 선택(승인 대기 안내)으로 이동, 주소명 입력은 무시', async () => {
     setup({ data: { user: { id: 'u1' } }, error: null });
     expect(await run(signupCompany(null, signupForm()))).toEqual({
-      redirect: 'REDIRECT:/app/test-co/projects',
+      redirect: 'REDIRECT:/select-area',
     });
     expect(h.level).not.toHaveBeenCalled(); // 성공 경로는 대기 없음
   });

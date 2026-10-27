@@ -80,10 +80,12 @@ describe('RequestCreateSheet', () => {
       'request-create-sheet',
     );
     await userEvent.click(byKey('request-form-submit')!);
-    const title = document.getElementById('request-title')!;
-    await waitFor(() => expect(title).toHaveAttribute('aria-invalid', 'true'));
-    expect(title.getAttribute('aria-describedby')).toContain('request-title-error');
-    expect(document.getElementById('request-title-error')).toHaveAttribute('role', 'alert');
+    // D-33 · CU-06: 제목 칸 없음 — 본문만
+    expect(document.getElementById('request-title')).toBeNull();
+    const body = document.getElementById('request-body')!;
+    await waitFor(() => expect(body).toHaveAttribute('aria-invalid', 'true'));
+    expect(body.getAttribute('aria-describedby')).toContain('request-body-error');
+    expect(document.getElementById('request-body-error')).toHaveAttribute('role', 'alert');
     expect(createRequest).not.toHaveBeenCalled();
   });
 
@@ -91,7 +93,6 @@ describe('RequestCreateSheet', () => {
     search = new URLSearchParams('mode=new');
     createRequest.mockResolvedValue({ ok: true, data: { id: 'new-id' } });
     renderKo(<RequestCreateSheet projectId="p1" />);
-    await userEvent.type(document.getElementById('request-title')!, '거실 조명');
     await userEvent.type(document.getElementById('request-body')!, '창가 쪽으로');
     await userEvent.click(byKey('request-form-submit')!);
     const confirm = await waitFor(() => byKey('request-submit-confirm')!);
@@ -100,7 +101,7 @@ describe('RequestCreateSheet', () => {
     await userEvent.click(confirm);
     await waitFor(() =>
       expect(createRequest).toHaveBeenCalledWith(
-        expect.objectContaining({ projectId: 'p1', title: '거실 조명', body: '창가 쪽으로' }),
+        expect.objectContaining({ projectId: 'p1', body: '창가 쪽으로' }),
       ),
     );
     await waitFor(() => expect(push).toHaveBeenCalledWith('/portal/projects/p1/requests/new-id'));

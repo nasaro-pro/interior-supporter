@@ -5,6 +5,7 @@ import { getAccessContext } from '@/features/core';
 import type { SummaryItem, SummaryProvider } from '@/shared/contracts/integration';
 import { routes } from '@/shared/contracts/routes';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
+import { isUnanswered } from '../lib/memo';
 
 export const summaryProvider: SummaryProvider = {
   async recent(projectId, viewer, limit = 5) {
@@ -35,5 +36,22 @@ export const summaryProvider: SummaryProvider = {
     }));
   },
 };
+
+/**
+ * D-31 · REQ-010 '내 미답변 요청' — 내가 편집할 수 있는 프로젝트(RLS: 담당자는 배정 프로젝트, 업체관리자는 전체)의
+ * 보관 · 해결되지 않은 요청 중 고객의 마지막 글 뒤에 답변이 없는 것. 조회 실패는 null (요약 칸을 비운다)
+ */
+export async function countUnansweredRequests(companyId: string): Promise<number | null> {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('requests')
+    .select('id, created_at, request_replies(created_at), request_corrections(created_at)')
+    .eq('company_id', companyId)
+    .is('archived_at', null)
+    .neq('status', 'resolved')
+    .limit(1000);
+  if (error) return null;
+  return (data ?? []).filter(isUnanswered).length;
+}
 
 export default summaryProvider;

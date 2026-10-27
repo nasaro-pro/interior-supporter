@@ -56,6 +56,7 @@ const toColumns = (v: ScheduleFormValues) => ({
   end_date: v.endDate,
   end_time: v.endTime,
   is_public: v.isPublic,
+  ...(v.progress ? { progress: v.progress } : {}),
   related_type: v.relatedType,
   related_id: v.relatedId,
 });

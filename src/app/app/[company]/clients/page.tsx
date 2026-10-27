@@ -34,7 +34,7 @@ export default async function ClientsPage({
       <PageHeader
         title={t('clients.screen.list')}
         description={t('clients.detail.cardVsAccount')}
-        actions={<ClientCreateSheet companySlug={slug} defaultOpen={sp.mode === 'new'} />}
+        actions={<ClientCreateSheet companySlug={slug} />}
       />
       <form method="get" action={listHref} role="search" className="flex flex-wrap items-end gap-2">
         <div className="min-w-48 flex-1">

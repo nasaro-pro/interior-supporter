@@ -91,12 +91,30 @@ describe('A-09 requireCompanyStaff', () => {
 
 describe('A-09 createProject', () => {
   it('정상: `/app/X-Co` 에서 만든 폼(대문자 slug)도 생성되고 정규 경로로 이동', async () => {
-    const fake = setup(PM_X); // 정책(CR-A-07): PM 구성원도 생성 가능 — RLS insert 정책과 같음
+    // D-36 · CR-9: 담당자(PM)는 업체관리자가 준 생성 권한이 있을 때만 — RLS insert 정책과 같음
+    const fake = setup(PM_X, (q) =>
+      q.table === 'company_members' && called(q, 'select', 'can_create_projects')
+        ? { data: { can_create_projects: true } }
+        : undefined,
+    );
     const res = await run(createProject(null, projectForm('X-Co')));
     expect(res).toEqual({ thrown: expect.stringContaining(`/app/x-co/projects/${NEW_ID}`) });
     const ins = inserts(fake, 'projects');
     expect(ins).toHaveLength(1);
     expect(JSON.stringify(ins[0]!.calls)).toContain(X);
+  });
+
+  it('권한 거부(D-36): 생성 권한 없는 담당자 → FORBIDDEN, insert 없음', async () => {
+    const fake = setup(PM_X, (q) =>
+      q.table === 'company_members' && called(q, 'select', 'can_create_projects')
+        ? { data: { can_create_projects: false } }
+        : undefined,
+    );
+    expect(await run(createProject(null, projectForm('x-co')))).toEqual({
+      ok: false,
+      error: { code: 'FORBIDDEN' },
+    });
+    expect(inserts(fake, 'projects')).toHaveLength(0);
   });
 
   it('정상: 같은 id 재시도(23505)이고 행이 내 업체 것 → 성공(이동)', async () => {
