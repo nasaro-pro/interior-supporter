@@ -88,6 +88,25 @@ export const routes = {
     notifications: () => '/field/notifications',
   },
 
+  // 사이트 관리 (통합본 3장 A1~A11, CR-3) — 운영자 전용, 별도 로그인 주소
+  admin: {
+    login: () => '/admin/login',
+    dashboard: () => '/admin',
+    companies: (q?: string) => (q ? `/admin/companies?q=${enc(q)}` : '/admin/companies'),
+    company: (companyId: string) => `/admin/companies/${enc(companyId)}`,
+    users: (q?: string) => (q ? `/admin/users?q=${enc(q)}` : '/admin/users'),
+    settings: () => '/admin/settings',
+    cleanup: () => '/admin/cleanup',
+    audit: () => '/admin/audit',
+  },
+
+  // 약관·개인정보처리방침 (A9) · 본인 탈퇴 (A10)
+  legal: {
+    terms: () => '/terms',
+    privacy: () => '/privacy',
+  },
+  withdraw: () => '/account/withdraw',
+
   // 파일 다운로드 (권한 재검사 후 단기 서명 URL 로 302)
   file: (fileId: string, opts?: { download?: boolean }) =>
     `/api/files/${enc(fileId)}${opts?.download ? '?download=1' : ''}`,

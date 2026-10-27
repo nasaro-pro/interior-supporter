@@ -4,10 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Bell,
+  Building2,
   CalendarDays,
   Camera,
+  Eraser,
   FolderKanban,
   History,
+  LayoutDashboard,
   Menu,
   Settings,
   Users,
@@ -29,6 +32,10 @@ const ICONS = {
   settings: Settings,
   photos: Camera,
   more: Menu,
+  // 사이트 관리 (CR-3)
+  dashboard: LayoutDashboard,
+  companies: Building2,
+  cleanup: Eraser,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;
