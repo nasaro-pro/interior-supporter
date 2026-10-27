@@ -1,5 +1,5 @@
 // src/app/app/[company]/projects/[project]/settings/page.tsx (A · TASK-007·012) — PM-10 프로젝트 설정
-// 기본 정보·공개 / 참여자(pm 배정·초대 링크·기간·회수·확정권) / 보관 — 같은 화면의 구역 (별도 /access 화면 없음, POL-007)
+// 기본 정보·공개 / 참여자(pm 배정·초대 링크·기간·회수·확정권) / 시공팀 공개 범위(F2·F9, CR-11) / 보관 — 같은 화면의 구역 (별도 /access 화면 없음, POL-007)
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { requireProjectAccess } from '@/features/core';
@@ -18,6 +18,8 @@ import {
 } from '@/features/core/server/participant-queries';
 import { revokeInvite, revokeParticipant } from '@/features/core/server/participant-actions';
 import { setProjectArchived } from '@/features/core/server/project-actions';
+import { FieldAccessForm } from '@/features/field/components/FieldAccessForm';
+import { getFieldAccessSettings } from '@/features/field/server/queries';
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { DateText, PeriodText } from '@/shared/ui/date-text';
 import { EmptyState, ErrorState } from '@/shared/ui/states';
@@ -33,10 +35,11 @@ export default async function ProjectSettingsPage({
   const access = await requireProjectAccess(projectId, ['editor']);
   const project = await getProject(projectId);
   if (!project) notFound();
-  const [participants, invites, members, t] = await Promise.all([
+  const [participants, invites, members, fieldAccess, t] = await Promise.all([
     listParticipants(projectId),
     listPendingInvites({ projectId }),
     listMembers(access.companyId),
+    getFieldAccessSettings(projectId),
     getTranslations(),
   ]);
   const activePm = new Set(
@@ -192,6 +195,14 @@ export default async function ProjectSettingsPage({
             )}
           </div>
         </div>
+      </Panel>
+
+      <Panel title={t('field.access.title')}>
+        <FieldAccessForm
+          key={JSON.stringify(fieldAccess)}
+          projectId={projectId}
+          value={fieldAccess}
+        />
       </Panel>
 
       <Panel title={t('projects.settings.archive')}>

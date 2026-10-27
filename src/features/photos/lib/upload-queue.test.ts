@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  RAW_MAX_BYTES,
   createUploadItem,
+  fitsUploadLimit,
+  itemProgress,
   summarizeQueue,
   uploadQueueReducer,
   validatePhotoFile,
@@ -17,12 +20,30 @@ describe('validatePhotoFile (POL-021)', () => {
     expect(validatePhotoFile({ name: 'IMG_1.HEIC', size: 10, type: 'image/heic' })).toBe('heic');
     expect(validatePhotoFile({ name: 'a.heif', size: 10, type: '' })).toBe('heic');
   });
-  it('허용 확장자 밖은 type, 20MB 초과는 size', () => {
-    expect(validatePhotoFile({ name: 'a.gif', size: 10, type: 'image/gif' })).toBe('type');
-    expect(
-      validatePhotoFile({ name: 'a.jpg', size: 20 * 1024 * 1024 + 1, type: 'image/jpeg' }),
-    ).toBe('size');
+  it('허용 확장자 밖은 type, 원본 상한(20MB×3) 초과는 size (F4: 줄인 뒤 20MB 재검사)', () => {
+    expect(validatePhotoFile({ name: 'a.tiff', size: 10, type: 'image/tiff' })).toBe('type');
+    expect(validatePhotoFile({ name: 'a.jpg', size: RAW_MAX_BYTES + 1, type: 'image/jpeg' })).toBe(
+      'size',
+    );
     expect(validatePhotoFile({ name: 'a.JPEG', size: 10, type: 'image/jpeg' })).toBeNull();
+  });
+  it('GIF·BMP 는 받는다 (F3: 브라우저가 JPEG 로 변환)', () => {
+    expect(validatePhotoFile({ name: 'a.gif', size: 10, type: 'image/gif' })).toBeNull();
+    expect(validatePhotoFile({ name: 'a.BMP', size: 10, type: 'image/bmp' })).toBeNull();
+  });
+  it('준비 뒤 최종 크기는 20MB 이하', () => {
+    expect(fitsUploadLimit(20 * 1024 * 1024)).toBe(true);
+    expect(fitsUploadLimit(20 * 1024 * 1024 + 1)).toBe(false);
+    expect(fitsUploadLimit(0)).toBe(false);
+  });
+});
+
+describe('itemProgress (F5)', () => {
+  it('업로드 중에는 바이트 진행률로 5~70', () => {
+    expect(itemProgress({ stage: 'uploading', progress: 0 })).toBe(5);
+    expect(itemProgress({ stage: 'uploading', progress: 0.5 })).toBe(38);
+    expect(itemProgress({ stage: 'uploading', progress: 1 })).toBe(70);
+    expect(itemProgress({ stage: 'saving', progress: 1 })).toBe(90);
   });
 });
 

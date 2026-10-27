@@ -65,7 +65,8 @@
     "privateNotice": "Photos you upload stay hidden from customers until the studio shares them.",
     "chooseSite": "Choose site",
     "move": "Go",
-    "uploadNeedsSite": "Choose a site before uploading photos."
+    "uploadNeedsSite": "Choose a site before uploading photos.",
+    "autoPublicNotice": "On this site, photos you upload are shared with the customer right away."
   },
   "toast": {
     "uploaded": "Uploaded {count} photos.",
@@ -111,6 +112,10 @@
       "saving": "Saving",
       "done": "Done",
       "failed": "Failed"
-    }
+    },
+    "prepNotice": "GIF and BMP are converted to JPEG, and photos longer than 4000px are resized before upload.",
+    "preparing": "Preparing {count} photo(s)…",
+    "autoRetry": "Auto-retry {attempt}",
+    "itemPhase": "Phase for {name}"
   }
 }
