@@ -1,4 +1,4 @@
-// src/app/portal/projects/page.tsx (A · TASK-009, REQ-015) — CL-01 내 프로젝트: 초대된 공개 프로젝트만, 업체명으로 묶음
+// src/app/portal/projects/(list)/page.tsx (A · TASK-009, REQ-015) — CL-01 내 프로젝트: 초대된 공개 프로젝트만, 업체명으로 묶음
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { getAccessContext } from '@/features/core';

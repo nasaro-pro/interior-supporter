@@ -1,4 +1,4 @@
-// src/app/app/[company]/projects/page.tsx (A · TASK-005) — PM-01 프로젝트 목록·검색·상태 필터·요약·생성 Sheet (REQ-010·011)
+// src/app/app/[company]/projects/(list)/page.tsx (A · TASK-005) — PM-01 프로젝트 목록·검색·상태 필터·요약·생성 Sheet (REQ-010·011)
 // 별도 대시보드 없음 — 요약 수치는 목록 위 (목록과 같은 권한 범위)
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
