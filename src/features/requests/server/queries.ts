@@ -184,6 +184,34 @@ export async function getRequestDetail(
   };
 }
 
+/**
+ * CU-04: 목록 카드에 보일 항목별 메모 수 — listItemMemos 와 같은 조건(보관 제외 · 고객은 본인 메모만).
+ * 결과: { [targetId]: 개수 } (메모가 없는 항목은 키가 없다)
+ */
+export async function countItemMemos(
+  projectId: string,
+  viewer: ProjectAccess,
+  userId: string,
+  targetType: RequestTargetType,
+): Promise<Record<string, number>> {
+  if (viewer.as === 'field') return {};
+  const supabase = await createServerSupabase();
+  let query = supabase
+    .from('requests')
+    .select('target_id')
+    .eq('project_id', projectId)
+    .eq('target_type', targetType)
+    .is('archived_at', null);
+  if (viewer.as !== 'editor') query = query.eq('author_id', userId);
+  const { data, error } = await query.limit(1000);
+  if (error) throw new Error(`requests.item_memo_counts:${error.code ?? 'unknown'}`);
+  const counts: Record<string, number> = {};
+  for (const r of data ?? []) {
+    if (r.target_id) counts[r.target_id] = (counts[r.target_id] ?? 0) + 1;
+  }
+  return counts;
+}
+
 export interface ItemMemo {
   id: string;
   status: RequestDetail['status'];

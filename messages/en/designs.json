@@ -65,7 +65,8 @@
   },
   "list": {
     "empty": "No designs yet. Upload an original file (SKP, PDF, or DWG) to get started.",
-    "emptyCustomer": "No designs have been shared yet."
+    "emptyCustomer": "No designs have been shared yet.",
+    "memoCount": "Notes {count}"
   },
   "toast": {
     "created": "Design uploaded. Customers won’t see it until you make it visible.",

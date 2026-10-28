@@ -65,7 +65,8 @@
   },
   "list": {
     "empty": "등록된 도안이 없습니다. 도안 원본(SKP·PDF·DWG)을 올려 시작하세요.",
-    "emptyCustomer": "공개된 도안이 아직 없습니다."
+    "emptyCustomer": "공개된 도안이 아직 없습니다.",
+    "memoCount": "메모 {count}"
   },
   "toast": {
     "created": "도안을 올렸습니다. 공개하기 전까지 고객에게 보이지 않습니다.",
