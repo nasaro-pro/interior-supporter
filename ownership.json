@@ -38,8 +38,10 @@
     "src/app/app/[company]/history/**",
     "src/app/app/[company]/notifications/**",
     "src/app/app/[company]/settings/**",
+    "src/app/app/[company]/projects/(list)/**",
     "src/app/portal/*",
     "src/app/portal/projects/*",
+    "src/app/portal/projects/(list)/**",
     "src/app/portal/projects/[project]/*",
     "src/app/portal/projects/[project]/home/**",
     "src/app/portal/notifications/**",
@@ -153,6 +155,20 @@
     "next-env.d.ts",
     "package-lock.json",
     "src/shared/contracts/database.types.ts"
+  ],
+  "$comment_integrator_owned": "2차 수정 이후 생긴 사이트 관리·시공팀 영역(통합 책임자 담당). check-ownership 은 A/B/C 만 판정하므로 이 목록은 기록용이다 — A/B/C 는 이 경로를 고치지 않는다. (list)·(home)·(dashboard)·(console) 같은 괄호 폴더는 Next.js 라우트 그룹(주소에 안 나옴)이다.",
+  "integrator_owned": [
+    "messages/*/admin.json",
+    "messages/*/field.json",
+    "src/features/admin/**",
+    "src/features/field/**",
+    "src/app/admin/**",
+    "src/app/account/**",
+    "src/app/field/(home)/**",
+    "src/app/field/sites/**",
+    "progress/site-admin.md",
+    "progress/field.md",
+    ".github/**"
   ],
   "shared_readonly": [
     "src/shared/**",

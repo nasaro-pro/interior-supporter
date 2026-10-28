@@ -4,7 +4,7 @@ import type { AccessContext } from '@/shared/contracts/integration';
 
 vi.mock('@/shared/lib/supabase/server', () => ({ createServerSupabase: vi.fn() }));
 import { createServerSupabase } from '@/shared/lib/supabase/server';
-import { listEditableProjects, listEventsInRange } from './queries';
+import { countEventsThisWeek, listEditableProjects, listEventsInRange } from './queries';
 
 const ctx = (role: 'owner' | 'manager' | 'pm'): AccessContext => ({
   userId: 'u',
@@ -71,5 +71,47 @@ describe('listEventsInRange', () => {
         publicOnly: false,
       }),
     ).toEqual([]);
+  });
+});
+
+describe('countEventsThisWeek (PM-01 이번 주 일정)', () => {
+  it('정상: 편집 가능한 프로젝트의 이번 주(일~토) 일정 수 · 비공개 포함 · 보관 제외', async () => {
+    const fake = createSupabaseFake({
+      projects: [{ data: [{ id: 'p1', name: 'A' }] }],
+      schedule_events: [
+        {
+          data: [{ id: 'e1' }, { id: 'e2' }].map((e) => ({
+            ...e,
+            start_time: null,
+            end_time: null,
+          })),
+        },
+      ],
+    });
+    vi.mocked(createServerSupabase).mockResolvedValue(fake.client as never);
+    // 2026-10-28(수) → 2026-10-25(일) ~ 2026-10-31(토)
+    expect(await countEventsThisWeek(ctx('pm'), 'c1', '2026-10-28')).toBe(2);
+    const ops = fake.opsOf('schedule_events');
+    expect(ops).toContainEqual({ op: 'in', args: ['project_id', ['p1']] });
+    expect(ops).toContainEqual({ op: 'lte', args: ['start_date', '2026-10-31'] });
+    expect(ops).toContainEqual({
+      op: 'or',
+      args: ['end_date.gte.2026-10-25,and(end_date.is.null,start_date.gte.2026-10-25)'],
+    });
+    expect(ops.some((o) => o.args[0] === 'is_public')).toBe(false);
+    expect(ops).toContainEqual({ op: 'is', args: ['archived_at', null] });
+  });
+
+  it('편집 가능한 프로젝트가 없으면 0', async () => {
+    expect(await countEventsThisWeek(ctx('owner'), 'c9', '2026-10-28')).toBe(0);
+  });
+
+  it('예외: 일정 조회 실패면 null (화면은 —)', async () => {
+    const fake = createSupabaseFake({
+      projects: [{ data: [{ id: 'p1', name: 'A' }] }],
+      schedule_events: [{ error: { code: '42501' } }],
+    });
+    vi.mocked(createServerSupabase).mockResolvedValue(fake.client as never);
+    expect(await countEventsThisWeek(ctx('manager'), 'c1', '2026-10-28')).toBeNull();
   });
 });

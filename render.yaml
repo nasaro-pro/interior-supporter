@@ -1,8 +1,14 @@
 # render.yaml — Render Blueprint (ADR-003, docs/03_아키텍처_데이터_보안.md)
-# 소유: 통합 책임자 · 운영 배포는 통합 책임자만. Render 는 Git 저장소가 필요하므로 배포 때만 통합본을 배포 전용 비공개 저장소에 올려 연결한다 (00 헌법 15장).
-# 사용법: Render 대시보드 → New → Blueprint → 배포 전용 저장소 연결 → sync:false 값 입력 → Apply
+# 소유: 통합 책임자 · 운영 배포는 통합 책임자만.
+# 연결(2026-10-28 확인): Render 는 이 저장소(nasaro-pro/interior-supporter)의 main 에 연결돼 있다
+#   (배포 기록이 GitHub Deployments 에 남음: b400b2e 10/24 · 507960f 10/27).
+# ⚠ 자동 배포는 실제로 동작하지 않는다 — 507960f(10/27)·cd46882(10/28)는 main 병합 후 배포가 시작되지 않았다.
+#   아래 autoDeployTrigger 는 Blueprint 로 동기화될 때만 적용되므로, 대시보드 Settings → Auto-Deploy 를
+#   'On Commit' 으로 직접 켜거나 병합할 때마다 Manual Deploy 한다.
+# 사용법(새로 만들 때): Render 대시보드 → New → Blueprint → 이 저장소 연결 → sync:false 값 입력 → Apply
 # sync: false 항목은 Blueprint 최초 생성 때 대시보드에서 값을 묻는다. 값은 이 파일에 쓰지 않는다.
-# 배포 순서: prod 마이그레이션 먼저(통합 책임자, npm run db:push) → Render 수동 배포. 자동 배포 켬(main 커밋 시 배포).
+# 배포 순서: 마이그레이션 먼저(통합 책임자, npm run db:push) → main 병합 → 대시보드 Events 에서 그 커밋이 'Deploy live' 인지 확인
+#   (시작 안 됐으면 Manual Deploy → Deploy latest commit).
 services:
   - type: web
     name: interior-supporter

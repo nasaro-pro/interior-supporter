@@ -146,30 +146,17 @@ export default async function MembersPage({ params }: { params: Promise<{ compan
 
   return (
     <main data-screen-id="PM-62" className="flex flex-col gap-5">
-      <Panel
-        title={t('settings.screen.members')}
-        action={<MemberInviteSheet companyId={staff.companyId} canInviteManager={isOwner} />}
-      >
-        {members === null ? (
-          <ErrorState />
-        ) : members.length <= 1 ? (
-          <>
-            {memberTable}
-            <EmptyState title={t('settings.members.empty')} className="mt-3" />
-          </>
-        ) : (
-          memberTable
-        )}
-      </Panel>
-
-      {/* D-36 · CA-07: 담당자의 프로젝트 생성 권한 요청 */}
+      {/* D-36 · CA-07: 담당자의 프로젝트 생성 권한 요청 — 처리할 일이므로 구성원 표 위에 */}
       {createRequests === null ? (
         <Panel title={t('settings.createRequests.title')}>
           <ErrorState />
         </Panel>
       ) : createRequests.length > 0 ? (
         <Panel title={t('settings.createRequests.title')}>
-          <ul className="divide-y rounded-md border" data-ui-key="create-requests">
+          <ul
+            className="border-tone-attention-fg/40 divide-y rounded-md border"
+            data-ui-key="create-requests"
+          >
             {createRequests.map((r) => (
               <li
                 key={r.id}
@@ -193,6 +180,22 @@ export default async function MembersPage({ params }: { params: Promise<{ compan
           </ul>
         </Panel>
       ) : null}
+
+      <Panel
+        title={t('settings.screen.members')}
+        action={<MemberInviteSheet companyId={staff.companyId} canInviteManager={isOwner} />}
+      >
+        {members === null ? (
+          <ErrorState />
+        ) : members.length <= 1 ? (
+          <>
+            {memberTable}
+            <EmptyState title={t('settings.members.empty')} className="mt-3" />
+          </>
+        ) : (
+          memberTable
+        )}
+      </Panel>
 
       {/* D-13·D-17: 고객·시공팀 계정 — 업체 설정에서도 만든다(프로젝트 선택). 이 업체 접근을 한 번에 회수 */}
       <Panel

@@ -10,6 +10,7 @@ import {
   ArchivedBadge,
   ConfirmStateBadge,
   MainBadge,
+  MemoCountBadge,
   VisibilityBadge,
 } from '@/features/designs/components/StateBadges';
 import {
@@ -26,10 +27,13 @@ export async function DesignList({
   items,
   viewer,
   emptyAction,
+  memoCounts,
 }: {
   items: DesignListItem[];
   viewer: ProjectAccess;
   emptyAction?: ReactNode;
+  /** CU-04: 도안별 메모 수 (고객 화면이 넘긴다 — 없으면 표시 안 함) */
+  memoCounts?: Record<string, number>;
 }) {
   const t = await getTranslations('designs');
   const tc = await getTranslations('common');
@@ -119,6 +123,9 @@ export async function DesignList({
                         />
                       ) : null}
                       {d.archivedAt ? <ArchivedBadge label={tc('filter.archived')} /> : null}
+                      {memoCounts?.[d.id] ? (
+                        <MemoCountBadge label={t('list.memoCount', { count: memoCounts[d.id]! })} />
+                      ) : null}
                       <span data-numeric>{formatDate(d.updatedAt, locale)}</span>
                     </div>
                   </Link>

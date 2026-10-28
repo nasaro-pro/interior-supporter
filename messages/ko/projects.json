@@ -5,6 +5,7 @@
     "overview": "개요",
     "settings": "프로젝트 설정",
     "myProjects": "내 프로젝트",
+    "myAssigned": "내 담당 프로젝트",
     "home": "홈"
   },
   "tab": {
@@ -55,7 +56,8 @@
     "statusLabel": "진행 상태",
     "createHint": "만든 프로젝트는 기본으로 비공개입니다. 고객 홈 안내문은 업체 기본 템플릿으로 채워집니다.",
     "noPeriod": "기간 미정",
-    "unanswered": "내 미답변 요청"
+    "unanswered": "내 미답변 요청",
+    "thisWeekEvents": "이번 주 일정"
   },
   "switcher": {
     "label": "프로젝트 전환",

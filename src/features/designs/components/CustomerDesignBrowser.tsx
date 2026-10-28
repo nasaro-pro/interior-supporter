@@ -21,10 +21,13 @@ export async function CustomerDesignBrowser({
   items,
   viewer,
   spaceParam,
+  memoCounts,
 }: {
   items: DesignListItem[];
   viewer: ProjectAccess;
   spaceParam: string | undefined;
+  /** CU-04: 도안별 내 메모 수 */
+  memoCounts?: Record<string, number>;
 }) {
   const t = await getTranslations('designs');
   const tm = await getTranslations('materials');
@@ -62,7 +65,7 @@ export async function CustomerDesignBrowser({
               <span className="truncate text-lg font-semibold">{hero.title}</span>
             </span>
             <span className="text-primary text-sm font-medium group-hover:underline">
-              {t('customer.browseSpaces', { count: groups.length })}
+              {t('customer.browseSpaces', { count: items.length })}
             </span>
           </div>
         </Link>
@@ -122,7 +125,7 @@ export async function CustomerDesignBrowser({
       {shown.length === 0 ? (
         <EmptyState title={t('customer.spaceEmpty')} />
       ) : (
-        <DesignList items={shown} viewer={viewer} />
+        <DesignList items={shown} viewer={viewer} memoCounts={memoCounts} />
       )}
     </div>
   );

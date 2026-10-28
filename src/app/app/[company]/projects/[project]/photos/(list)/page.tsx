@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { requireProjectAccess } from '@/features/core';
+import { getAccessContext, requireProjectAccess } from '@/features/core';
 import { PhotoFilters } from '@/features/photos/components/PhotoFilters';
 import { PhotoGrid } from '@/features/photos/components/PhotoGrid';
 import { PhotoUploadSheet } from '@/features/photos/components/PhotoUploadSheet';
@@ -11,7 +11,11 @@ import {
   parsePhotoListParams,
   photoListHref,
 } from '@/features/photos/lib/list-params';
-import { listPhotoUploaders, listPhotos } from '@/features/photos/server/queries';
+import {
+  countPhotoComments,
+  listPhotoUploaders,
+  listPhotos,
+} from '@/features/photos/server/queries';
 import type { SearchParams } from '@/features/requests/lib/list-params';
 import { PAGE_SIZE } from '@/shared/contracts/domain';
 import { routes } from '@/shared/contracts/routes';
@@ -34,10 +38,17 @@ export default async function PmPhotoListPage({ params, searchParams }: Props) {
   const access = await requireProjectAccess(project, ['editor']);
   if (access.companySlug !== company) notFound();
   const filters = parsePhotoListParams(await searchParams, access.as);
-  const [{ items, hasMore }, { items: uploaders }] = await Promise.all([
+  const [{ items, hasMore }, { items: uploaders }, ctx] = await Promise.all([
     listPhotos(project, access, filters),
     listPhotoUploaders(project, access, { archived: filters.archived }),
+    getAccessContext(),
   ]);
+  // D-34: 카드에 고객 댓글 수
+  const commentCounts = await countPhotoComments(
+    items.map((p) => p.id),
+    access,
+    ctx.userId,
+  );
   const t = await getTranslations();
   const base = routes.app.project(company, project, 'photos');
 
@@ -77,6 +88,7 @@ export default async function PmPhotoListPage({ params, searchParams }: Props) {
           items={items}
           showVisibility
           showUploader
+          commentCounts={commentCounts}
           detailHref={(p) => routes.app.photo(company, project, p.id)}
         />
       )}

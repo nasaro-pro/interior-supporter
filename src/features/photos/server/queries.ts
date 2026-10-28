@@ -129,6 +129,33 @@ export async function getPhoto(
   return toItem(row, names);
 }
 
+/**
+ * D-34 · CU-07 목록 카드의 댓글 수 — listPhotoComments 와 같은 조건(고객은 자기 대화만, 편집자는 전체).
+ * 시공팀은 댓글을 보지 않으므로 빈 결과 (POL-005). 결과: { [photoId]: 개수 }
+ */
+export async function countPhotoComments(
+  photoIds: string[],
+  viewer: ProjectAccess,
+  userId: string,
+): Promise<Record<string, number>> {
+  if (viewer.as === 'field' || photoIds.length === 0) return {};
+  const supabase = await createServerSupabase();
+  let query = supabase
+    .from('photo_comments')
+    .select('photo_id')
+    .eq('project_id', viewer.projectId)
+    .in('photo_id', photoIds);
+  if (viewer.as !== 'editor') query = query.eq('thread_owner', userId);
+  const { data, error } = await query.limit(5000);
+  if (error) {
+    logger.warn('photos.comments.count_failed', { dbCode: error.code });
+    return {}; // 개수는 보조 표시 — 실패해도 목록은 보여 준다
+  }
+  const counts: Record<string, number> = {};
+  for (const r of data ?? []) counts[r.photo_id] = (counts[r.photo_id] ?? 0) + 1;
+  return counts;
+}
+
 export interface PhotoCommentThread {
   /** 대화의 고객 */
   ownerId: string;

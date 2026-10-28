@@ -1,7 +1,9 @@
 // schedule 조회 (CT07: PM-08·PM-30·홈 공통) — 원본은 schedule_events 하나. 권한은 RLS(row_visible_schedule_events)
 import 'server-only';
 import type { AccessContext } from '@/shared/contracts/integration';
+import { todayKst } from '@/shared/lib/dates';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
+import { weekDays } from '../lib/calendar';
 import type { RelatedType, ScheduleProgress } from '../schema';
 import type { ScheduleEvent } from '../types';
 
@@ -150,4 +152,28 @@ export async function listEditableProjects(
   }
   const { data } = await query.order('name', { ascending: true }).limit(500);
   return (data ?? []).map((p) => ({ id: p.id, name: p.name }));
+}
+
+/**
+ * PM-01 요약 '이번 주 일정' — 내가 편집할 수 있는 프로젝트의 이번 주(일~토, 한국 날짜 · 달력과 같은 주)
+ * 일정 수. 보관 제외. 조회 실패면 null (화면은 '—')
+ */
+export async function countEventsThisWeek(
+  ctx: AccessContext,
+  companyId: string,
+  today: string = todayKst(),
+): Promise<number | null> {
+  try {
+    const projects = await listEditableProjects(ctx, companyId);
+    const week = weekDays(today);
+    const events = await listEventsInRange(
+      projects.map((p) => p.id),
+      week[0]!,
+      week[6]!,
+      { archived: false, publicOnly: false },
+    );
+    return events.length;
+  } catch {
+    return null;
+  }
 }

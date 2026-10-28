@@ -7,11 +7,13 @@ import { ProjectCreateEntry } from '@/features/core/components/create-permission
 import { getCreatePermission } from '@/features/core/server/create-permission-queries';
 import { getAccessContext } from '@/features/core';
 import { countUnansweredRequests } from '@/features/requests/server/summary';
+import { countEventsThisWeek } from '@/features/schedule/server/queries';
 import { ProjectStatusBadge, VisibilityBadge } from '@/features/core/components/project-badges';
 import { listProjects, projectStatusCounts } from '@/features/core/server/project-queries';
 import { PROJECT_STATUSES, type ProjectStatus } from '@/shared/contracts/domain';
 import { routes } from '@/shared/contracts/routes';
 import { withQuery } from '@/features/core/url';
+import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { ButtonLink } from '@/shared/ui/button-link';
 import { Input } from '@/shared/ui/input';
@@ -39,14 +41,17 @@ export default async function ProjectsPage({
     : undefined;
   const archived = sp.archived === '1';
   const ctx = await getAccessContext();
-  const [list, counts, permission, unanswered] = await Promise.all([
+  const [list, counts, permission, unanswered, thisWeek] = await Promise.all([
     listProjects(staff.companyId, { q: sp.q, status, archived, cursor: sp.cursor }),
     projectStatusCounts(staff.companyId),
     // D-36: 담당자는 업체관리자가 준 생성 권한이 있을 때만 '생성', 없으면 '권한 요청'
     getCreatePermission(staff.companyId, staff.role, ctx.userId),
     // D-31: 내 미답변 요청 (같은 권한 범위 — RLS)
     countUnansweredRequests(staff.companyId),
+    // 이번 주 일정 (편집 가능한 프로젝트 · 달력과 같은 주)
+    countEventsThisWeek(ctx, staff.companyId),
   ]);
+  const hasUnanswered = (unanswered ?? 0) > 0;
   const filtered = Boolean(sp.q || status || archived);
   const listHref = routes.app.projects(slug);
   const nextHref = list.nextCursor
@@ -61,7 +66,8 @@ export default async function ProjectsPage({
   return (
     <main data-screen-id="PM-01" className="flex flex-col gap-6">
       <PageHeader
-        title={t('projects.screen.list')}
+        // 담당자는 배정된 프로젝트만 보인다 → '내 담당 프로젝트'
+        title={staff.role === 'pm' ? t('projects.screen.myAssigned') : t('projects.screen.list')}
         actions={
           <ProjectCreateEntry
             companySlug={slug}
@@ -74,7 +80,7 @@ export default async function ProjectsPage({
 
       {counts ? (
         <section aria-label={t('projects.list.summaryTitle')}>
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {PROJECT_STATUSES.map((s) => (
               <li key={s}>
                 <Link
@@ -91,14 +97,42 @@ export default async function ProjectsPage({
               </li>
             ))}
             <li>
+              {/* D-31: 답할 요청이 있으면 강조 */}
               <div
-                className="bg-card flex flex-col gap-1 rounded-lg border p-3 shadow-sm"
+                className={cn(
+                  'flex flex-col gap-1 rounded-lg border p-3 shadow-sm',
+                  hasUnanswered ? 'border-tone-attention-fg/40 bg-tone-attention-bg' : 'bg-card',
+                )}
                 data-ui-key="project-summary-unanswered"
+                data-state={hasUnanswered ? 'attention' : 'none'}
               >
-                <span className="text-muted-foreground text-meta">
+                <span
+                  className={cn(
+                    'text-meta',
+                    hasUnanswered ? 'text-tone-attention-fg' : 'text-muted-foreground',
+                  )}
+                >
                   {t('projects.list.unanswered')}
                 </span>
-                <span className="text-2xl font-semibold tabular-nums">{unanswered ?? '—'}</span>
+                <span
+                  className={cn(
+                    'text-2xl font-semibold tabular-nums',
+                    hasUnanswered && 'text-tone-attention-fg',
+                  )}
+                >
+                  {unanswered ?? '—'}
+                </span>
+              </div>
+            </li>
+            <li>
+              <div
+                className="bg-card flex flex-col gap-1 rounded-lg border p-3 shadow-sm"
+                data-ui-key="project-summary-this-week"
+              >
+                <span className="text-muted-foreground text-meta">
+                  {t('projects.list.thisWeekEvents')}
+                </span>
+                <span className="text-2xl font-semibold tabular-nums">{thisWeek ?? '—'}</span>
               </div>
             </li>
           </ul>
@@ -194,16 +228,17 @@ export default async function ProjectsPage({
           />
         )
       ) : (
-        <ul className="flex flex-col gap-2">
+        // 카드 격자 (모바일 1열 · sm 2열 · lg 3열)
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {list.items.map((p) => (
-            <li key={p.id} data-key={p.id}>
+            <li key={p.id} data-key={p.id} className="min-w-0">
               <Link
                 href={routes.app.project(slug, p.id)}
-                className="bg-card hover:bg-accent/60 flex flex-col gap-2 rounded-lg border p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                className="bg-card hover:bg-accent/60 flex h-full flex-col justify-between gap-3 rounded-lg border p-4 shadow-sm"
                 data-ui-key="project-list-open"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-base font-medium">{p.name}</p>
+                  <p className="truncate text-base font-semibold">{p.name}</p>
                   <p className="text-muted-foreground text-meta truncate">
                     {p.siteAddress || '—'} ·{' '}
                     <PeriodText
