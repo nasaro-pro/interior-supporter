@@ -65,9 +65,11 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // createServerClient 와 getUser 사이에 다른 코드를 넣지 않는다 (세션이 엉뚱하게 끊기는 원인).
-  // 권한 판단·리다이렉트는 하지 않는다 — 각 page/action 의 getAccessContext 가 담당.
-  await supabase.auth.getUser();
+  // createServerClient 와 getClaims 사이에 다른 코드를 넣지 않는다 (세션이 엉뚱하게 끊기는 원인).
+  // 권한 판단·리다이렉트는 하지 않는다 — 각 page/action 의 getAccessContext 가 getUser 로 담당.
+  // getClaims: 세션 갱신(만료 시 refresh → setAll)은 getUser 와 같고, 비대칭 서명(ES256) 토큰은
+  // 프로세스 전역에 캐시된 공개키(JWKS)로 바로 검증해 이동마다 Auth 서버 왕복을 하지 않는다 (성능 개선 ②, CR)
+  await supabase.auth.getClaims();
 
   response.headers.set('Content-Security-Policy', csp);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) response.headers.set(k, v);

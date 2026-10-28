@@ -1,4 +1,4 @@
-// src/app/app/[company]/clients/page.tsx (A · TASK-013, REQ-020) — PM-20 고객 관리 (고객 아래 업무 복제 없음)
+// src/app/app/[company]/clients/(list)/page.tsx (A · TASK-013, REQ-020) — PM-20 고객 관리 (고객 아래 업무 복제 없음)
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { requireCompanyStaff } from '@/features/core';

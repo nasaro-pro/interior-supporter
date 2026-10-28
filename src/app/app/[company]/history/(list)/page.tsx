@@ -1,4 +1,4 @@
-// src/app/app/[company]/history/page.tsx (A · TASK-014, REQ-030) — PM-40 변경이력: 기간·프로젝트·대상 종류 필터, 권한 범위만
+// src/app/app/[company]/history/(list)/page.tsx (A · TASK-014, REQ-030) — PM-40 변경이력: 기간·프로젝트·대상 종류 필터, 권한 범위만
 // 고객·시공팀에게 노출하지 않는다 (PM 영역 셸 = 업체 구성원만)
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';

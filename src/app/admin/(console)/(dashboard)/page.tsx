@@ -1,4 +1,4 @@
-// src/app/admin/(console)/page.tsx — ADM-01 대시보드 (A3). 승인·결정 대기를 맨 위에
+// src/app/admin/(console)/(dashboard)/page.tsx — ADM-01 대시보드 (A3). 승인·결정 대기를 맨 위에
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { StatGrid } from '@/features/admin/components/StatGrid';
