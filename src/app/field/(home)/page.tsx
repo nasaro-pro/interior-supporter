@@ -1,4 +1,4 @@
-// src/app/field/page.tsx — FW-00 내 현장 (통합본 7장 F1, CR-11): 배정된 현장 카드, 카드에서 현장 탭·사진으로
+// src/app/field/(home)/page.tsx — FW-00 내 현장 (통합본 7장 F1, CR-11): 배정된 현장 카드, 카드에서 현장 탭·사진으로
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { SiteCardList } from '@/features/field/components/SiteCardList';

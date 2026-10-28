@@ -1,4 +1,4 @@
-// src/app/admin/(console)/companies/page.tsx — ADM-02 업체 목록 (A4)
+// src/app/admin/(console)/companies/(list)/page.tsx — ADM-02 업체 목록 (A4)
 import { getTranslations } from 'next-intl/server';
 import { CompanyTable } from '@/features/admin/components/CompanyTable';
 import { SearchForm } from '@/features/admin/components/SearchForm';
