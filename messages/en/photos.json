@@ -57,7 +57,8 @@
     "emptyCustomer": "No photos have been shared yet.",
     "noDate": "No date",
     "label": "Site photo list",
-    "unknownUploader": "Unknown user"
+    "unknownUploader": "Unknown user",
+    "commentCount": "Comments {count}"
   },
   "crew": {
     "selectSite": "Choose a site to see its photos.",

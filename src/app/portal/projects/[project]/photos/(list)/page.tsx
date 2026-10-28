@@ -1,7 +1,7 @@
 // CL-07 사진 목록 (D3) — 공개분만, 업로드·수정 없음 (REQ-210, POL-004). 업로더 표시·필터 (C 결정 2026-10-07)
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { requireProjectAccess } from '@/features/core';
+import { getAccessContext, requireProjectAccess } from '@/features/core';
 import { PhotoFilters } from '@/features/photos/components/PhotoFilters';
 import { PhotoGrid } from '@/features/photos/components/PhotoGrid';
 import {
@@ -9,7 +9,11 @@ import {
   parsePhotoListParams,
   photoListHref,
 } from '@/features/photos/lib/list-params';
-import { listPhotoUploaders, listPhotos } from '@/features/photos/server/queries';
+import {
+  countPhotoComments,
+  listPhotoUploaders,
+  listPhotos,
+} from '@/features/photos/server/queries';
 import type { SearchParams } from '@/features/requests/lib/list-params';
 import { PAGE_SIZE } from '@/shared/contracts/domain';
 import { routes } from '@/shared/contracts/routes';
@@ -29,10 +33,17 @@ export default async function PortalPhotoListPage({ params, searchParams }: Prop
   const access = await requireProjectAccess(project, ['customer']);
   const filters = parsePhotoListParams(await searchParams, access.as);
   // 업로더 선택지도 공개·보관 조건을 목록과 같게 (C-02 이중 검증) — 비공개 사진의 업로더는 드러나지 않는다
-  const [{ items, hasMore }, { items: uploaders }] = await Promise.all([
+  const [{ items, hasMore }, { items: uploaders }, ctx] = await Promise.all([
     listPhotos(project, access, filters),
     listPhotoUploaders(project, access, { archived: filters.archived }),
+    getAccessContext(),
   ]);
+  // CU-07: 카드에 내 댓글 대화 수
+  const commentCounts = await countPhotoComments(
+    items.map((p) => p.id),
+    access,
+    ctx.userId,
+  );
   const t = await getTranslations();
   const base = routes.portal.project(project, 'photos');
 
@@ -55,6 +66,7 @@ export default async function PortalPhotoListPage({ params, searchParams }: Prop
           items={items}
           showVisibility={false}
           showUploader
+          commentCounts={commentCounts}
           detailHref={(p) => routes.portal.photo(project, p.id)}
         />
       )}

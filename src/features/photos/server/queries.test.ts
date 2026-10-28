@@ -9,7 +9,7 @@ vi.mock('@/shared/lib/logger', () => ({
 }));
 import { logger } from '@/shared/lib/logger';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
-import { getPhoto, listPhotoUploaders } from './queries';
+import { countPhotoComments, getPhoto, listPhotoUploaders } from './queries';
 
 const projectId = '7a9b8c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d';
 const viewer = (as: 'editor' | 'customer' | 'field') => ({
@@ -114,5 +114,40 @@ describe('getPhoto (C-03)', () => {
   it('권한: RLS 가 비공개 행을 돌려줘도 고객에게는 null (이중 검증)', async () => {
     useFake({ photos: [{ data: row({ is_public: false }) }] });
     expect(await getPhoto(projectId, 'ph1', viewer('customer'))).toBeNull();
+  });
+});
+
+describe('countPhotoComments (D-34 · CU-07 목록 댓글 수)', () => {
+  it('정상: 사진별로 센다 · 고객은 자기 대화만 (thread_owner 조건)', async () => {
+    const fake = useFake({
+      photo_comments: [{ data: [{ photo_id: 'ph1' }, { photo_id: 'ph1' }, { photo_id: 'ph2' }] }],
+    });
+    expect(await countPhotoComments(['ph1', 'ph2', 'ph3'], viewer('customer'), 'u1')).toEqual({
+      ph1: 2,
+      ph2: 1,
+    });
+    const ops = fake.opsOf('photo_comments');
+    expect(ops).toContainEqual({ op: 'in', args: ['photo_id', ['ph1', 'ph2', 'ph3']] });
+    expect(ops).toContainEqual({ op: 'eq', args: ['project_id', projectId] });
+    expect(ops).toContainEqual({ op: 'eq', args: ['thread_owner', 'u1'] });
+  });
+
+  it('편집자는 대화 주인 조건 없이 센다', async () => {
+    const fake = useFake({ photo_comments: [{ data: [] }] });
+    await countPhotoComments(['ph1'], viewer('editor'), 'pm1');
+    expect(fake.opsOf('photo_comments').some((o) => o.args[0] === 'thread_owner')).toBe(false);
+  });
+
+  it('시공팀이거나 사진이 없으면 조회하지 않는다', async () => {
+    const fake = useFake({});
+    expect(await countPhotoComments(['ph1'], viewer('field'), 'f1')).toEqual({});
+    expect(await countPhotoComments([], viewer('editor'), 'pm1')).toEqual({});
+    expect(fake.calls).toHaveLength(0);
+  });
+
+  it('예외: 조회 실패면 빈 결과 + 경고 로그 (목록은 그대로 보인다)', async () => {
+    useFake({ photo_comments: [{ error: { code: '42501' } }] });
+    expect(await countPhotoComments(['ph1'], viewer('editor'), 'pm1')).toEqual({});
+    expect(logger.warn).toHaveBeenCalledWith('photos.comments.count_failed', { dbCode: '42501' });
   });
 });

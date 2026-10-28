@@ -2,7 +2,7 @@
 // 촬영일 구획 머리 + 카드 격자(모바일 2열 · lg 3열). 카드 전체가 상세 링크
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { Archive } from 'lucide-react';
+import { Archive, MessageSquare } from 'lucide-react';
 import { formatCalendarDate, type DateLocale } from '@/shared/lib/dates';
 import { Section } from '@/shared/ui/section';
 import { ToneBadge } from '@/shared/ui/tone-badge';
@@ -17,12 +17,15 @@ export function PhotoGrid({
   detailHref,
   showVisibility,
   showUploader,
+  commentCounts,
 }: {
   items: PhotoItem[];
   detailHref: (photo: PhotoItem) => string;
   /** 고객 화면에는 공개 여부를 그리지 않는다 (공개분만 보이므로) */
   showVisibility: boolean;
   showUploader: boolean;
+  /** D-34 · CU-07 사진별 댓글 수 — 시공팀 화면은 넘기지 않는다 (POL-005) */
+  commentCounts?: Record<string, number>;
 }) {
   const t = useTranslations('photos');
   const tc = useTranslations('common');
@@ -75,6 +78,15 @@ export function PhotoGrid({
                       {p.archived ? (
                         <ToneBadge tone="neutral" icon={Archive}>
                           {tc('filter.archived')}
+                        </ToneBadge>
+                      ) : null}
+                      {commentCounts?.[p.id] ? (
+                        <ToneBadge
+                          tone="neutral"
+                          icon={MessageSquare}
+                          data-ui-key="photo-comment-count"
+                        >
+                          {t('list.commentCount', { count: commentCounts[p.id]! })}
                         </ToneBadge>
                       ) : null}
                     </div>

@@ -5,6 +5,7 @@
     "overview": "Overview",
     "settings": "Project settings",
     "myProjects": "My projects",
+    "myAssigned": "My assigned projects",
     "home": "Home"
   },
   "tab": {
@@ -55,7 +56,8 @@
     "statusLabel": "Status",
     "createHint": "New projects are private by default. The customer home message starts from the company template.",
     "noPeriod": "No dates",
-    "unanswered": "My unanswered requests"
+    "unanswered": "My unanswered requests",
+    "thisWeekEvents": "This week's schedule"
   },
   "switcher": {
     "label": "Switch project",

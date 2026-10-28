@@ -4,7 +4,7 @@ import { createSupabaseFake } from '@/features/requests/testing';
 
 vi.mock('@/shared/lib/supabase/server', () => ({ createServerSupabase: vi.fn() }));
 import { createServerSupabase } from '@/shared/lib/supabase/server';
-import { getRequestDetail } from './queries';
+import { countItemMemos, getRequestDetail } from './queries';
 
 const projectId = '7a9b8c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d';
 const viewer = (as: 'editor' | 'customer') => ({
@@ -78,5 +78,42 @@ describe('getRequestDetail (CL-16 · PM-16, C-01)', () => {
   it('예외: 없는 요청이면 null', async () => {
     useFake({ requests: [{ data: null }] });
     expect(await getRequestDetail(projectId, 'nope', viewer('editor'), 'pm1')).toBeNull();
+  });
+});
+
+describe('countItemMemos (CU-04 도안 카드 메모 수)', () => {
+  it('정상: 항목별로 센다 · 고객은 본인 메모만 (author_id 조건)', async () => {
+    const fake = useFake({
+      requests: [{ data: [{ target_id: 'd1' }, { target_id: 'd1' }, { target_id: 'd2' }] }],
+    });
+    expect(await countItemMemos(projectId, viewer('customer'), 'u1', 'designs')).toEqual({
+      d1: 2,
+      d2: 1,
+    });
+    const ops = fake.opsOf('requests');
+    expect(ops).toContainEqual({ op: 'eq', args: ['target_type', 'designs'] });
+    expect(ops).toContainEqual({ op: 'is', args: ['archived_at', null] });
+    expect(ops).toContainEqual({ op: 'eq', args: ['author_id', 'u1'] });
+  });
+
+  it('편집자는 작성자 조건 없이 센다', async () => {
+    const fake = useFake({ requests: [{ data: [] }] });
+    expect(await countItemMemos(projectId, viewer('editor'), 'pm1', 'designs')).toEqual({});
+    expect(fake.opsOf('requests').some((o) => o.args[0] === 'author_id')).toBe(false);
+  });
+
+  it('시공팀은 조회하지 않고 빈 결과 (POL-005)', async () => {
+    const fake = useFake({});
+    expect(
+      await countItemMemos(projectId, { ...viewer('editor'), as: 'field' }, 'f1', 'designs'),
+    ).toEqual({});
+    expect(fake.calls).toHaveLength(0);
+  });
+
+  it('예외: 조회 실패면 throw', async () => {
+    useFake({ requests: [{ error: { code: '42501' } }] });
+    await expect(countItemMemos(projectId, viewer('editor'), 'pm1', 'designs')).rejects.toThrow(
+      'requests.item_memo_counts:42501',
+    );
   });
 });
