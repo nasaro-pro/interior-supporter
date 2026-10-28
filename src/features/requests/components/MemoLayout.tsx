@@ -33,11 +33,15 @@ export function MemoLayout({
         </h3>
         {panel}
       </aside>
-      {/* 모바일 · 태블릿: 화면 아래 고정 버튼 (본문을 가리지 않게 여백 확보) */}
+      {/* 모바일 · 태블릿: 화면 아래 고정 버튼 (본문을 가리지 않게 여백 확보)
+          768px 미만은 하단 탭(BottomTabs: fixed bottom-0 · z-40 · min-h-14 + safe-area)이 덮으므로 그 위에 띄운다 */}
       <div className="h-14 lg:hidden" aria-hidden />
-      <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center p-3 lg:hidden">
+      <div
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 flex justify-center p-3 md:bottom-0 lg:hidden"
+        data-ui-key="item-memo-open-bar"
+      >
         <Button
-          className="shadow-lg"
+          className="pointer-events-auto shadow-lg"
           onClick={() => setOpen(true)}
           data-ui-key="item-memo-open"
           aria-haspopup="dialog"
