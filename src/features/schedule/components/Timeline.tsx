@@ -77,7 +77,8 @@ export function Timeline({
                         ? 'bg-tone-positive-fg'
                         : e.progress === 'in_progress'
                           ? 'bg-tone-info-fg'
-                          : 'bg-primary/50',
+                          : // 예정 = 회색 (달력 칩 테두리와 같은 색 — 진행중 파랑 · 완료 초록과 구분)
+                            'bg-muted-foreground/50',
                     )}
                     style={{ left: `${span.left}%`, width: `${span.width}%` }}
                   />
