@@ -58,7 +58,8 @@
       "loadFailed": "The image could not be loaded. Select another image or try again.",
       "denied": "This image is not available. You may not have access or it is no longer shared."
     },
-    "retry": "Try again"
+    "retry": "Try again",
+    "othersToggle": "Compare with other designs"
   },
   "summary": {
     "newVersion": "Version {no} uploaded"

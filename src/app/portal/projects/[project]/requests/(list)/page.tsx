@@ -55,15 +55,19 @@ export default async function PortalRequestListPage({ params, searchParams }: Pr
           />
         ) : (
           <EmptyState
-            title={t('requests.customer.empty')}
+            title={
+              access.preview ? t('requests.customer.emptyPreview') : t('requests.customer.empty')
+            }
             action={
-              <ButtonLink
-                href={withQuery(base, { mode: 'new' })}
-                data-ui-key="request-empty-create"
-              >
-                <Plus aria-hidden />
-                {t('requests.customer.create')}
-              </ButtonLink>
+              access.preview ? undefined : (
+                <ButtonLink
+                  href={withQuery(base, { mode: 'new' })}
+                  data-ui-key="request-empty-create"
+                >
+                  <Plus aria-hidden />
+                  {t('requests.customer.create')}
+                </ButtonLink>
+              )
             }
           />
         )

@@ -32,7 +32,10 @@ interface TargetRow {
 }
 
 /** D-32: 연결 항목 이름 — 도안 제목 · 자재 이름 (호출자 RLS 로 볼 수 있는 것만, 없으면 label null) */
-async function targetsOf(supabase: Supabase, rows: TargetRow[]): Promise<(RequestTarget | null)[]> {
+export async function targetsOf(
+  supabase: Supabase,
+  rows: TargetRow[],
+): Promise<(RequestTarget | null)[]> {
   const ids = (type: RequestTargetType) => [
     ...new Set(rows.filter((r) => r.target_type === type && r.target_id).map((r) => r.target_id!)),
   ];

@@ -12,7 +12,7 @@ import { Section } from '@/shared/ui/section';
 import { buttonVariants } from '@/shared/ui/button';
 import { FileDownloadLink, extOf } from '@/features/files';
 import { routes } from '@/shared/contracts/routes';
-import { ExternalLink } from 'lucide-react';
+import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { ComparablePreview } from '@/features/designs/server/queries';
 import { setDesignArchived, setDesignPublic } from '@/features/designs/server/actions';
 import type { DesignDetail } from '@/features/designs/types';
@@ -61,6 +61,19 @@ export async function DesignDetailView({
   const originalIsImage = !!current?.file && IMAGE_MIMES.has(current.file.mime);
   const heroFileId = ownPreview?.fileId ?? (originalIsImage ? current!.file!.id : null);
   const hasImage = heroFileId !== null;
+  const slider = (
+    <CompareSlider
+      images={candidates.map((c) => ({
+        id: c.id,
+        fileId: c.fileId,
+        label: c.label,
+        designTitle: c.designTitle,
+        versionNo: c.versionNo,
+        pdfPage: c.pdfPage,
+      }))}
+      initialA={ownPreview?.id}
+    />
+  );
 
   return (
     // D-32 · CU-05: 옆 메모 (PC 오른쪽 패널 · 모바일 하단 시트) — CR-6
@@ -285,21 +298,23 @@ export async function DesignDetailView({
               ))}
             </ul>
           )}
-          {/* 비교는 이미지가 2개 이상일 때만 — 1개면 위 '전체 이미지'로 보여 준다 */}
+          {/* 비교는 이미지가 2개 이상일 때만 — 1개면 위 '전체 이미지'로 보여 준다.
+              이 도안에 비교 이미지가 없으면 다른 도안끼리의 비교라 헷갈리지 않게 접어 둔다 */}
           {candidates.length < 2 ? (
             <p className="text-muted-foreground text-meta">{t('compare.needTwo')}</p>
+          ) : ownPreview ? (
+            slider
           ) : (
-            <CompareSlider
-              images={candidates.map((c) => ({
-                id: c.id,
-                fileId: c.fileId,
-                label: c.label,
-                designTitle: c.designTitle,
-                versionNo: c.versionNo,
-                pdfPage: c.pdfPage,
-              }))}
-              initialA={ownPreview?.id}
-            />
+            <details className="group rounded-md border" data-ui-key="design-compare-others">
+              <summary className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 flex cursor-pointer list-none items-center gap-1.5 rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-3">
+                <ChevronRight
+                  aria-hidden
+                  className="size-4 transition-transform group-open:rotate-90 motion-reduce:transition-none"
+                />
+                {t('compare.othersToggle')}
+              </summary>
+              <div className="border-t p-3">{slider}</div>
+            </details>
           )}
         </Section>
 

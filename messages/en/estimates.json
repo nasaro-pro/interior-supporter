@@ -30,7 +30,8 @@
   "list": {
     "empty": "No estimates yet. Upload an estimate PDF to get started.",
     "emptyCustomer": "No estimates have been shared yet.",
-    "versionCount": "{count} versions"
+    "versionCount": "{count} versions",
+    "emptyViewOnly": "No estimates yet. Company admins add estimates."
   },
   "toast": {
     "created": "Estimate added. Customers won’t see it until you share a version.",

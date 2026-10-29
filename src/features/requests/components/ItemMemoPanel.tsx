@@ -44,7 +44,13 @@ export async function ItemMemoSection({
     <div className="flex flex-col gap-4" data-ui-key="item-memo-list">
       {memos.length === 0 ? (
         <EmptyState
-          title={editor ? t('memo.emptyEditor') : t('memo.emptyCustomer')}
+          title={
+            editor
+              ? t('memo.emptyEditor')
+              : viewer.preview
+                ? t('memo.emptyPreview') // 담당자의 고객 화면 미리보기 — 입력칸이 없으니 안내만
+                : t('memo.emptyCustomer')
+          }
           className="py-4"
         />
       ) : (

@@ -29,7 +29,8 @@
     "changeStatus": "Change status"
   },
   "summary": {
-    "status": "{status, select, open {Received} in_progress {In progress} resolved {Resolved} other {}}"
+    "status": "{status, select, open {Received} in_progress {In progress} resolved {Resolved} other {}}",
+    "statusWithTarget": "{type, select, designs {Design: {label}} materials {Material: {label}} other {{label}}} · {status, select, open {Received} in_progress {In progress} resolved {Resolved} other {}}"
   },
   "list": {
     "empty": "No customer requests yet.",
@@ -95,7 +96,8 @@
     "placeholder": "Leave a note about this item",
     "replyPlaceholder": "Type your reply",
     "send": "Send note",
-    "sent": "Note sent. Your designer will be notified."
+    "sent": "Note sent. Your designer will be notified.",
+    "emptyPreview": "Customers can leave memos about this item here. Memos are off in preview."
   },
   "customer": {
     "title": "Notes",
@@ -107,6 +109,7 @@
     "submitTitle": "Send this note?",
     "submitBody": "You cannot edit it after sending.",
     "submit": "Send note",
-    "created": "Note sent."
+    "created": "Note sent.",
+    "emptyPreview": "Customers see only their own memos here, so none appear in preview."
   }
 }

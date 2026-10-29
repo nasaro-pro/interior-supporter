@@ -37,7 +37,11 @@ export async function PhotoComments({
         ) : null}
         {threads.length === 0 ? (
           <p className="text-muted-foreground text-sm">
-            {editor ? t('comments.emptyEditor') : t('comments.emptyCustomer')}
+            {editor
+              ? t('comments.emptyEditor')
+              : viewer.preview
+                ? t('comments.emptyPreview') // 담당자의 고객 화면 미리보기 — 입력칸 없음
+                : t('comments.emptyCustomer')}
           </p>
         ) : (
           threads.map((th) => (
