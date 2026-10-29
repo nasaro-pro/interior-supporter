@@ -11,6 +11,7 @@ import { one, parseLimit, withQuery } from '@/features/designs/lib/query';
 import { listEstimates } from '@/features/estimates/server/queries';
 import { EstimateFormSheet } from '@/features/estimates/components/EstimateFormSheet';
 import { EstimateList } from '@/features/estimates/components/EstimateList';
+import { canManageEstimates } from '@/features/estimates/server/permission';
 
 export default async function EstimatesPage({
   params,
@@ -24,7 +25,11 @@ export default async function EstimatesPage({
   const sp = await searchParams;
   const archived = one(sp.archived) === '1';
   const limit = parseLimit(sp.limit);
-  const { items, hasMore } = await listEstimates(project, access, { archived, limit });
+  const [{ items, hasMore }, manager] = await Promise.all([
+    listEstimates(project, access, { archived, limit }),
+    // D-37: 견적 등록은 업체관리자만 — 담당자에게는 등록 버튼 · '올려 시작하세요' 안내를 보이지 않는다
+    canManageEstimates(access.companyId),
+  ]);
   const t = await getTranslations('estimates');
   const tc = await getTranslations('common');
   const base = routes.app.project(access.companySlug, project, 'estimates');
@@ -39,7 +44,7 @@ export default async function EstimatesPage({
 
   return (
     <main data-screen-id="PM-09" className="flex min-w-0 flex-col gap-6">
-      <SectionHeader title={t('screen.list')} actions={archived ? undefined : create} />
+      <SectionHeader title={t('screen.list')} actions={archived || !manager ? undefined : create} />
       <SegmentedTabs
         label={t('screen.list')}
         items={[
@@ -61,8 +66,8 @@ export default async function EstimatesPage({
       />
       {items.length === 0 ? (
         <EmptyState
-          title={archived ? tc('state.empty') : t('list.empty')}
-          action={archived ? undefined : create}
+          title={archived ? tc('state.empty') : manager ? t('list.empty') : t('list.emptyViewOnly')}
+          action={archived || !manager ? undefined : create}
         />
       ) : (
         <EstimateList items={items} viewer={access} />

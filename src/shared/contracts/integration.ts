@@ -35,6 +35,11 @@ export interface ProjectAccess {
   /** 'editor' = PM 편집권(owner/manager/pm 참여자), 'customer', 'field' */
   as: 'editor' | 'customer' | 'field';
   canConfirm: boolean;
+  /**
+   * 담당자의 '고객 화면 미리보기' (as = 'customer', 읽기 전용). 실제 고객이 아니다.
+   * 화면은 입력 · 확정 · 댓글을 그리지 않고, Server Action 은 이 접근을 받지 않는다.
+   */
+  preview?: boolean;
 }
 
 /**

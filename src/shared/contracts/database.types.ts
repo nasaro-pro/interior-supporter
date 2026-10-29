@@ -2038,6 +2038,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_participant_name: {
+        Args: {
+          p_project: string
+          p_participant: string
+          p_display_name: string
+        }
+        Returns: undefined
+      }
       withdraw_me: {
         Args: never
         Returns: undefined

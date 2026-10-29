@@ -79,6 +79,64 @@ describe('requestsSummary.recent', () => {
     expect(fake.opsOf('requests')).toContainEqual({ op: 'eq', args: ['author_id', 'u1'] });
     expect(fake.opsOf('requests')).toContainEqual({ op: 'limit', args: [5] });
   });
+  it('도안 · 자재에 남긴 메모는 연결 대상을 보조 문구에 함께, 볼 수 없는 대상은 상태만', async () => {
+    const fake = useFake({
+      requests: [
+        {
+          data: [
+            {
+              id: 'r1',
+              title: '조명',
+              status: 'in_progress',
+              updated_at: 'x',
+              target_type: 'designs',
+              target_id: 'd1',
+            },
+            {
+              id: 'r2',
+              title: '타일',
+              status: 'open',
+              updated_at: 'x',
+              target_type: 'materials',
+              target_id: 'm1',
+            },
+            {
+              id: 'r3',
+              title: '일반',
+              status: 'open',
+              updated_at: 'x',
+              target_type: null,
+              target_id: null,
+            },
+            {
+              id: 'r4',
+              title: '숨김',
+              status: 'open',
+              updated_at: 'x',
+              target_type: 'designs',
+              target_id: 'd9',
+            },
+          ],
+        },
+      ],
+      designs: [{ data: [{ id: 'd1', title: '거실 아트월' }] }],
+      materials: [{ data: [{ id: 'm1', name: '포세린 타일' }] }],
+    });
+    const items = await requestsSummary.recent(projectId, viewer('customer'));
+    expect(items.map((i) => [i.subtitleKey, i.subtitleValues])).toEqual([
+      [
+        'requests.summary.statusWithTarget',
+        { type: 'designs', label: '거실 아트월', status: 'in_progress' },
+      ],
+      [
+        'requests.summary.statusWithTarget',
+        { type: 'materials', label: '포세린 타일', status: 'open' },
+      ],
+      ['requests.summary.status', { status: 'open' }],
+      ['requests.summary.status', { status: 'open' }],
+    ]);
+    expect(fake.opsOf('designs')).toContainEqual({ op: 'in', args: ['id', ['d1', 'd9']] });
+  });
   it('편집자는 PM-16, 시공팀은 빈 배열', async () => {
     useFake({
       requests: [{ data: [{ id: 'r1', title: 't', status: 'resolved', updated_at: 'x' }] }],

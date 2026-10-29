@@ -11,6 +11,7 @@ import { ProjectTabsNav } from '@/features/core/components/project-shell';
 import { getProject, getProjectHeader } from '@/features/core/server/project-queries';
 import { PORTAL_TABS } from '@/shared/contracts/screens';
 import { routes } from '@/shared/contracts/routes';
+import { CustomerPreviewBanner } from '@/features/core/components/customer-preview';
 
 export default async function PortalProjectLayout({
   children,
@@ -20,7 +21,7 @@ export default async function PortalProjectLayout({
   params: Promise<{ project: string }>;
 }) {
   const { project: projectId } = await params;
-  await requireProjectAccess(projectId, ['customer']);
+  const access = await requireProjectAccess(projectId, ['customer']);
   const [project, detail, t] = await Promise.all([
     getProjectHeader(projectId),
     getProject(projectId),
@@ -29,6 +30,9 @@ export default async function PortalProjectLayout({
   if (!project || !detail) notFound();
   return (
     <PortalPageCanvas tone={detail.pageTone} images={detail.pageImages} key={projectId}>
+      {access.preview ? (
+        <CustomerPreviewBanner projectId={projectId} isPublic={detail.isPublic} />
+      ) : null}
       <ProjectHeader
         project={project}
         breadcrumbs={[

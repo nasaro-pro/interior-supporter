@@ -30,7 +30,8 @@
   "list": {
     "empty": "등록된 견적이 없습니다. 견적 PDF를 올려 시작하세요.",
     "emptyCustomer": "공개된 견적이 아직 없습니다.",
-    "versionCount": "버전 {count}개"
+    "versionCount": "버전 {count}개",
+    "emptyViewOnly": "등록된 견적이 없습니다. 견적서는 업체관리자가 등록합니다."
   },
   "toast": {
     "created": "견적을 등록했습니다. 버전을 공개하기 전까지 고객에게 보이지 않습니다.",

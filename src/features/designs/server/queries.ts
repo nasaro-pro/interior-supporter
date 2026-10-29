@@ -12,6 +12,9 @@ import type {
   DesignPreviewItem,
 } from '@/features/designs/types';
 
+/** 브라우저에서 바로 보여 줄 수 있는 원본 이미지 형식 */
+const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
 export async function listDesigns(
   projectId: string,
   viewer: ProjectAccess,
@@ -55,6 +58,37 @@ export async function listDesigns(
     if (previewError) throw new Error(`designs.list.previews:${previewError.code}`);
     for (const p of previews ?? []) {
       if (!previewByDesign.has(p.design_id)) previewByDesign.set(p.design_id, p.file_id);
+    }
+    // 비교 이미지가 없으면 현재 버전 원본이 이미지(JPG·PNG·WebP)일 때 그 원본을 대신 보여 준다
+    const missing = rows.filter((r) => !previewByDesign.has(r.id));
+    if (missing.length) {
+      const { data: versions, error: versionError } = await supabase
+        .from('design_versions')
+        .select('design_id, version_no, file_id')
+        .in(
+          'design_id',
+          missing.map((r) => r.id),
+        );
+      if (versionError) throw new Error(`designs.list.versions:${versionError.code}`);
+      const currentNo = new Map(missing.map((r) => [r.id, r.current_version]));
+      const currentFile = new Map(
+        (versions ?? [])
+          .filter((v) => currentNo.get(v.design_id) === v.version_no)
+          .map((v) => [v.design_id, v.file_id]),
+      );
+      if (currentFile.size) {
+        const { data: files, error: fileError } = await supabase
+          .from('files')
+          .select('id, mime')
+          .in('id', [...currentFile.values()]);
+        if (fileError) throw new Error(`designs.list.files:${fileError.code}`);
+        const images = new Set(
+          (files ?? []).filter((f) => IMAGE_MIMES.has(f.mime)).map((f) => f.id),
+        );
+        for (const [designId, fileId] of currentFile) {
+          if (images.has(fileId)) previewByDesign.set(designId, fileId);
+        }
+      }
     }
   }
   return {

@@ -29,7 +29,8 @@
     "changeStatus": "처리 상태 변경"
   },
   "summary": {
-    "status": "{status, select, open {접수} in_progress {처리 중} resolved {완료} other {}}"
+    "status": "{status, select, open {접수} in_progress {처리 중} resolved {완료} other {}}",
+    "statusWithTarget": "{type, select, designs {도안: {label}} materials {자재: {label}} other {{label}}} · {status, select, open {접수} in_progress {처리 중} resolved {완료} other {}}"
   },
   "list": {
     "empty": "아직 고객 요청이 없습니다.",
@@ -95,7 +96,8 @@
     "placeholder": "이 항목에 대한 메모를 남겨 주세요",
     "replyPlaceholder": "답변을 입력하세요",
     "send": "메모 보내기",
-    "sent": "메모를 보냈습니다. 디자이너에게 알림이 갑니다."
+    "sent": "메모를 보냈습니다. 디자이너에게 알림이 갑니다.",
+    "emptyPreview": "고객은 여기에서 이 항목에 대한 메모를 남길 수 있습니다. 미리보기에서는 메모를 쓸 수 없습니다."
   },
   "customer": {
     "title": "메모 대화",
@@ -107,6 +109,7 @@
     "submitTitle": "메모를 보낼까요?",
     "submitBody": "보낸 뒤에는 내용을 고칠 수 없습니다.",
     "submit": "메모 보내기",
-    "created": "메모를 보냈습니다."
+    "created": "메모를 보냈습니다.",
+    "emptyPreview": "고객은 자기가 남긴 메모만 여기에서 봅니다. 미리보기에서는 고객 메모가 보이지 않습니다."
   }
 }

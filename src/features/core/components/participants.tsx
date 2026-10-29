@@ -1,6 +1,6 @@
 'use client';
 // src/features/core/components/participants.tsx (A · TASK-007, REQ-003·018) — PM-10 참여자 구역의 대화형 부분
-// [PM 배정] [고객 계정 만들기] [시공팀 계정 만들기](D-12) · 임시 비밀번호 재발송(D-16) · 기간·확정권 수정 · 회수
+// [PM 배정] [고객 계정 만들기] [시공팀 계정 만들기](D-12) · 임시 비밀번호 재발송(D-16) · 이름·기간·확정권 수정 · 회수
 import { useActionState, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -76,7 +76,7 @@ export function AssignPmForm({
   );
 }
 
-/** 기간·확정권 수정 (확정권은 고객만) */
+/** 이름(고객·시공팀)·기간·확정권 수정 (확정권은 고객만) */
 export function ParticipantEditSheet({ projectId, p }: { projectId: string; p: ParticipantItem }) {
   const t = useTranslations();
   const router = useRouter();
@@ -108,6 +108,24 @@ export function ParticipantEditSheet({ projectId, p }: { projectId: string; p: P
         <input type="hidden" name="projectId" value={projectId} />
         <input type="hidden" name="participantId" value={p.id} />
         <input type="hidden" name="baseVersion" value={p.version} />
+        {/* 고객 · 시공팀 이름 (PM 은 업체 구성원이라 본인이 바꾼다) */}
+        {p.role !== 'pm' ? (
+          <FormRow
+            label={t('auth.field.displayName')}
+            htmlFor={`${idp}-name`}
+            errors={fe?.displayName}
+            required
+          >
+            <Input
+              id={`${idp}-name`}
+              name="displayName"
+              defaultValue={p.displayName}
+              maxLength={80}
+              aria-describedby={`${idp}-name-error`}
+              required
+            />
+          </FormRow>
+        ) : null}
         <div className="grid grid-cols-2 gap-3">
           <FormRow
             label={t('projects.participants.validFrom')}
