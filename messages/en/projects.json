@@ -193,5 +193,12 @@
     "sage": "Sage",
     "mist": "Mist",
     "clay": "Clay"
+  },
+  "customerPreview": {
+    "open": "Preview customer view",
+    "bannerTitle": "Previewing the customer view",
+    "bannerBody": "This is exactly what customers see (public items only). Memos, comments and confirmation are off in preview, and memo threads look empty because customers only see their own.",
+    "notPublic": "Customer access is off for this project, so real customers can't open this view yet.",
+    "exit": "End preview"
   }
 }

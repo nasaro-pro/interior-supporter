@@ -75,7 +75,8 @@ export async function ItemMemoSection({
           </section>
         ))
       )}
-      {!editor && canMemo ? (
+      {/* 담당자의 고객 화면 미리보기는 읽기 전용 */}
+      {!editor && canMemo && !viewer.preview ? (
         <MemoComposer
           kind="memo"
           projectId={viewer.projectId}

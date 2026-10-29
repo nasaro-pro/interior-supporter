@@ -45,7 +45,7 @@ export default async function PortalRequestDetailPage({ params }: Props) {
         ) : null}
         {detail.archivedAt ? (
           <Notice tone="neutral">{t('requests.detail.archivedNoCorrection')}</Notice>
-        ) : (
+        ) : access.preview ? null : (
           <div className="bg-card rounded-lg border p-4">
             <RequestEntryForm kind="correction" projectId={project} requestId={requestId} />
           </div>

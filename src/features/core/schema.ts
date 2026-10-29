@@ -226,6 +226,8 @@ export const participantUpdateSchema = z
     validFrom: optionalDate,
     validUntil: optionalDate,
     canConfirm: checkbox,
+    /** 고객 · 시공팀 이름 (PM 은 보내지 않는다 — 업체 구성원 이름은 본인만) */
+    displayName: text(80, 1).optional(),
   })
   .refine(periodRefine, { message: 'field.dateOrder', path: ['validUntil'] });
 

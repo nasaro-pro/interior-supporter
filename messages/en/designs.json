@@ -129,8 +129,8 @@
     "badge": "Main",
     "hiddenShort": "Private · hidden from customers",
     "hiddenNotice": "The main design is private, so customers cannot see it. Make it public to show it large on the customer design page. Until then customers see the latest public design with an image instead.",
-    "noPreviewNotice": "The main design has no comparison image, so there is nothing to show large on the customer design page. Add a render (JPG, PNG, WebP) under comparison images below. Until then customers see the latest public design with an image instead.",
-    "setHint": "Before setting this as the main design, add a comparison image first. Customers see it large on their design page."
+    "noPreviewNotice": "This main design has no image to show large on the customer's first screen. Upload a new version with an image original (JPG, PNG, WebP) or add a comparison image. Until then customers see the latest public design that has an image.",
+    "setHint": "For a main design, pick one with an image (image original or comparison image). Customers see it large on their designs screen."
   },
   "customer": {
     "heroLabel": "Main design",
@@ -141,5 +141,10 @@
     "allSpaces": "All",
     "spaceEmpty": "No public designs in this space yet.",
     "wholeHome": "Whole home"
+  },
+  "image": {
+    "title": "Full image",
+    "openFull": "Open full size",
+    "fromOriginal": "Original image"
   }
 }

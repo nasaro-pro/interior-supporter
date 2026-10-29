@@ -26,7 +26,8 @@ export async function PhotoComments({
   const ctx = await getAccessContext();
   const threads = await listPhotoComments(photoId, viewer, ctx.userId);
   const editor = viewer.as === 'editor';
-  const open = isPublic && !archived;
+  // 담당자의 고객 화면 미리보기는 읽기 전용 (댓글 입력 없음)
+  const open = isPublic && !archived && !viewer.preview;
 
   return (
     <Section title={t('comments.title')} as="h3" variant="card">

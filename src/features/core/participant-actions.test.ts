@@ -17,7 +17,7 @@ vi.mock('next/navigation', () => ({
   },
 }));
 
-import { assignPm, revokeInvite } from './server/participant-actions';
+import { assignPm, revokeInvite, updateParticipant } from './server/participant-actions';
 
 const INV = '00000000-0000-4000-8000-0000000000d1';
 const brief = {
@@ -172,5 +172,85 @@ describe('A-10 assignPm 재활성화', () => {
     expect(
       fake.of('project_participants').filter((q) => q.calls.some(([m]) => m === 'insert')),
     ).toHaveLength(0);
+  });
+});
+
+describe('참여자 수정 — 이름(고객·시공팀)·기간·확정권', () => {
+  const PART = '00000000-0000-4000-8000-0000000000e1';
+  function setupEdit(who: Who, role: string, opts: { nameError?: unknown } = {}) {
+    const responder: Responder = (q) => {
+      if (q.table === 'rpc:project_brief') return { data: [brief] };
+      if (q.table === 'project_participants' && called(q, 'select', 'role'))
+        return { data: { role } };
+      if (q.table === 'project_participants' && q.calls.some(([m]) => m === 'update'))
+        return { data: { version: 3 } };
+      if (q.table === 'rpc:update_participant_name') return { error: opts.nameError ?? null };
+      return undefined;
+    };
+    const fake = createFakeSupabase(chain(responder, accessResponder(who)), authOf(who));
+    h.client = fake.client;
+    return fake;
+  }
+  const form = (extra: Record<string, string> = {}) => {
+    const f = new FormData();
+    f.set('projectId', P1);
+    f.set('participantId', PART);
+    f.set('baseVersion', '2');
+    f.set('validFrom', '');
+    f.set('validUntil', '');
+    for (const [k, v] of Object.entries(extra)) f.set(k, v);
+    return f;
+  };
+
+  it('정상: 고객 이름을 RPC 로 바꾸고 기간·확정권도 저장한다', async () => {
+    const fake = setupEdit(PM1, 'customer');
+    expect(
+      await updateParticipant(null, form({ displayName: ' 김고객 ', canConfirm: 'on' })),
+    ).toEqual({
+      ok: true,
+      data: { version: 3 },
+    });
+    const rpc = fake.of('rpc:update_participant_name');
+    expect(rpc).toHaveLength(1);
+    expect(rpc[0]!.calls[0]).toEqual([
+      'args',
+      { p_project: P1, p_participant: PART, p_display_name: '김고객' },
+    ]);
+  });
+
+  it('PM 참여는 이름을 보내도 RPC 를 부르지 않는다 (업체 구성원 이름은 본인만)', async () => {
+    const fake = setupEdit(PM1, 'pm');
+    expect((await updateParticipant(null, form({ displayName: '바꿈' }))).ok).toBe(true);
+    expect(fake.of('rpc:update_participant_name')).toHaveLength(0);
+  });
+
+  it('검증: 빈 이름 → VALIDATION_FAILED, 쓰기 없음', async () => {
+    const fake = setupEdit(PM1, 'customer');
+    const res = await updateParticipant(null, form({ displayName: '   ' }));
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error.code).toBe('VALIDATION_FAILED');
+    expect(fake.of('rpc:update_participant_name')).toHaveLength(0);
+  });
+
+  it('권한 거부: DB 가 forbidden 이면 FORBIDDEN, 기간 update 없음', async () => {
+    const fake = setupEdit(PM1, 'customer', {
+      nameError: { code: 'P0001', message: 'forbidden' },
+    });
+    const res = await updateParticipant(null, form({ displayName: '김고객' }));
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error.code).toBe('FORBIDDEN');
+    expect(
+      fake.of('project_participants').filter((q) => q.calls.some(([m]) => m === 'update')),
+    ).toHaveLength(0);
+  });
+
+  it('권한 거부: 편집자가 아닌 프로젝트 → NOT_FOUND, RPC 없음', async () => {
+    const fake = setupEdit(
+      { members: [{ company_id: Y, slug: 'y-co', role: 'owner' }] },
+      'customer',
+    );
+    const res = await updateParticipant(null, form({ displayName: '김고객' }));
+    expect(res.ok).toBe(false);
+    expect(fake.of('rpc:update_participant_name')).toHaveLength(0);
   });
 });

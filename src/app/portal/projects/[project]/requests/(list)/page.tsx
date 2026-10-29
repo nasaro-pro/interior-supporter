@@ -43,7 +43,7 @@ export default async function PortalRequestListPage({ params, searchParams }: Pr
         title={t('requests.customer.title')}
         description={t('requests.customer.ownOnly')}
         meta={items.length > 0 ? t('common.list.count', { count: items.length }) : undefined}
-        actions={<RequestCreateSheet projectId={project} />}
+        actions={access.preview ? undefined : <RequestCreateSheet projectId={project} />}
       />
       <RequestFilters base={base} filters={filters} showArchiveTabs={false} />
       {items.length === 0 ? (

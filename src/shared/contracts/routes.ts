@@ -50,6 +50,9 @@ export const routes = {
     historyEvent: (company: string, eventId: string | number) =>
       `/app/${enc(company)}/history/${eventId}`,
     notifications: (company: string) => `/app/${enc(company)}/notifications`,
+    /** 담당자의 고객 화면 미리보기 시작 (쿠키를 심고 고객 홈으로 보낸다) */
+    customerPreview: (company: string, project: string) =>
+      `/app/${enc(company)}/projects/${enc(project)}/customer-preview`,
     settings: (
       company: string,
       section: 'company' | 'members' | 'templates' | 'storage' = 'company',
@@ -74,6 +77,8 @@ export const routes = {
     estimate: (project: string, estimateId: string, versionNo?: number) =>
       `/portal/projects/${enc(project)}/estimates/${enc(estimateId)}${versionNo ? `?v=${versionNo}` : ''}`,
     notifications: () => '/portal/notifications',
+    /** 고객 화면 미리보기 끝내기 → 담당자 프로젝트 개요로 */
+    previewExit: (project: string) => `/portal/preview-exit?project=${enc(project)}`,
   },
 
   // 시공팀
