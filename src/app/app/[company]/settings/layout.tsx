@@ -1,4 +1,4 @@
-// src/app/app/[company]/settings/layout.tsx (A · TASK-015·016) — PM-60 설정: 업체 정보·구성원·기본 템플릿·저장공간 분류 탭
+// src/app/app/[company]/settings/layout.tsx (A · TASK-015·016) — PM-60 설정: 업체 정보·구성원·기본 템플릿·저장공간·포트폴리오(CR-PF-08) 분류 탭
 import type { ReactNode } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { requireCompanyStaff } from '@/features/core';
@@ -6,7 +6,7 @@ import { ProjectTabsNav } from '@/features/core/components/project-shell';
 import { routes } from '@/shared/contracts/routes';
 import { PageHeader } from '@/shared/ui/page-parts';
 
-const SECTIONS = ['company', 'members', 'templates', 'storage'] as const;
+const SECTIONS = ['company', 'members', 'templates', 'storage', 'portfolio'] as const;
 
 export default async function SettingsLayout({
   children,

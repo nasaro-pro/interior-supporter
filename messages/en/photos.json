@@ -134,6 +134,7 @@
     "emptyCustomer": "Ask about this photo here. Only your designer can see it.",
     "privateHint": "Customers cannot comment on private photos.",
     "threadOf": "Comments from {name}",
-    "designer": "Designer"
+    "designer": "Designer",
+    "emptyPreview": "Customers can comment on this photo here. Comments are off in preview."
   }
 }

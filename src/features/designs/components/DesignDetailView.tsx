@@ -11,6 +11,8 @@ import { Notice } from '@/shared/ui/notice';
 import { Section } from '@/shared/ui/section';
 import { buttonVariants } from '@/shared/ui/button';
 import { FileDownloadLink, extOf } from '@/features/files';
+import { routes } from '@/shared/contracts/routes';
+import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { ComparablePreview } from '@/features/designs/server/queries';
 import { setDesignArchived, setDesignPublic } from '@/features/designs/server/actions';
 import type { DesignDetail } from '@/features/designs/types';
@@ -30,6 +32,8 @@ import {
   ConfirmStateBadge,
   VisibilityBadge,
 } from '@/features/designs/components/StateBadges';
+
+const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 export async function DesignDetailView({
   design,
@@ -53,6 +57,23 @@ export async function DesignDetailView({
     currentExt !== '' && !['.pdf', '.png', '.jpg', '.jpeg', '.webp'].includes(currentExt);
   const versioned = { projectId: viewer.projectId, id: design.id, baseVersion: design.version };
   const ownPreview = candidates.find((c) => c.designId === design.id);
+  // 비교 이미지가 없어도 원본이 이미지(JPG·PNG·WebP)면 그 이미지를 크게 보여 준다
+  const originalIsImage = !!current?.file && IMAGE_MIMES.has(current.file.mime);
+  const heroFileId = ownPreview?.fileId ?? (originalIsImage ? current!.file!.id : null);
+  const hasImage = heroFileId !== null;
+  const slider = (
+    <CompareSlider
+      images={candidates.map((c) => ({
+        id: c.id,
+        fileId: c.fileId,
+        label: c.label,
+        designTitle: c.designTitle,
+        versionNo: c.versionNo,
+        pdfPage: c.pdfPage,
+      }))}
+      initialA={ownPreview?.id}
+    />
+  );
 
   return (
     // D-32 · CU-05: 옆 메모 (PC 오른쪽 패널 · 모바일 하단 시트) — CR-6
@@ -143,18 +164,50 @@ export async function DesignDetailView({
               {t('main.hiddenNotice')}
             </Notice>
           ) : null}
-          {editor && design.isMain && design.previews.length === 0 && !design.archivedAt ? (
+          {editor && design.isMain && !hasImage && !design.archivedAt ? (
             <Notice tone="attention" uiKey="design-main-no-preview">
               {t('main.noPreviewNotice')}
             </Notice>
           ) : null}
-          {editor && !design.isMain && design.previews.length === 0 && !design.archivedAt ? (
+          {editor && !design.isMain && !hasImage && !design.archivedAt ? (
             <p className="text-meta text-muted-foreground">{t('main.setHint')}</p>
           ) : null}
           {editor && design.confirmState === 'needs_reconfirm' ? (
             <Notice tone="attention">{t('state.pmNeedsReconfirm')}</Notice>
           ) : null}
         </header>
+
+        {/* 전체 이미지 — 비교 이미지가 1개뿐이거나 없어도(원본이 이미지) 그대로 크게 보여 준다 */}
+        {heroFileId ? (
+          <figure className="flex min-w-0 flex-col gap-2" data-ui-key="design-image">
+            <a
+              href={routes.file(heroFileId)}
+              target="_blank"
+              rel="noreferrer"
+              className="bg-muted focus-visible:ring-ring/50 block overflow-hidden rounded-md border outline-none focus-visible:ring-3"
+              aria-label={t('image.openFull')}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- 권한 재검사 라우트(302)라 next/image 최적화 대상이 아님 */}
+              <img
+                src={routes.file(heroFileId)}
+                alt={design.title}
+                className="mx-auto max-h-[70svh] w-full object-contain"
+              />
+            </a>
+            <figcaption className="text-meta text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+              <span>{ownPreview ? ownPreview.label : t('image.fromOriginal')}</span>
+              <a
+                href={routes.file(heroFileId)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 underline-offset-2 hover:underline"
+              >
+                <ExternalLink className="size-3.5" aria-hidden />
+                {t('image.openFull')}
+              </a>
+            </figcaption>
+          </figure>
+        ) : null}
 
         <section aria-label={t('screen.detail')} className="flex min-w-0 flex-col gap-2 text-sm">
           {design.description ? (
@@ -245,17 +298,24 @@ export async function DesignDetailView({
               ))}
             </ul>
           )}
-          <CompareSlider
-            images={candidates.map((c) => ({
-              id: c.id,
-              fileId: c.fileId,
-              label: c.label,
-              designTitle: c.designTitle,
-              versionNo: c.versionNo,
-              pdfPage: c.pdfPage,
-            }))}
-            initialA={ownPreview?.id}
-          />
+          {/* 비교는 이미지가 2개 이상일 때만 — 1개면 위 '전체 이미지'로 보여 준다.
+              이 도안에 비교 이미지가 없으면 다른 도안끼리의 비교라 헷갈리지 않게 접어 둔다 */}
+          {candidates.length < 2 ? (
+            <p className="text-muted-foreground text-meta">{t('compare.needTwo')}</p>
+          ) : ownPreview ? (
+            slider
+          ) : (
+            <details className="group rounded-md border" data-ui-key="design-compare-others">
+              <summary className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 flex cursor-pointer list-none items-center gap-1.5 rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-3">
+                <ChevronRight
+                  aria-hidden
+                  className="size-4 transition-transform group-open:rotate-90 motion-reduce:transition-none"
+                />
+                {t('compare.othersToggle')}
+              </summary>
+              <div className="border-t p-3">{slider}</div>
+            </details>
+          )}
         </Section>
 
         {/* 확정권 고객은 ConfirmButton 이 현재 확정 기록을 보여 준다 (중복 표시 없음) */}

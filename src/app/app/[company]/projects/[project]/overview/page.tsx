@@ -6,10 +6,13 @@ import { getTranslations } from 'next-intl/server';
 import { requireProjectAccess } from '@/features/core';
 import { HomeEditor } from '@/features/core/components/home-editor';
 import { PageCanvas } from '@/features/core/components/page-canvas';
-import { CustomerHomeBody, OverviewBlocks, Panel } from '@/features/core/components/summary-blocks';
+import { CustomerHome } from '@/features/core/components/customer-home';
+import { OverviewBlocks, Panel } from '@/features/core/components/summary-blocks';
 import { loadProjectSummaries } from '@/features/core/server/overview-queries';
 import { getProject } from '@/features/core/server/project-queries';
 import { withQuery } from '@/features/core/url';
+import { customerTitleVars } from '@/features/core/customer-style';
+import { brandFontClass } from '@/features/portfolio/font';
 import { routes } from '@/shared/contracts/routes';
 import { ButtonLink } from '@/shared/ui/button-link';
 
@@ -29,11 +32,8 @@ export default async function OverviewPage({
   const here = routes.app.project(access.companySlug, projectId, 'overview');
   const editing = sp.mode === 'edit';
 
-  // PM 화면용(편집자 권한) / 고객 미리보기용(고객과 같은 공개 범위 — viewer.as='customer' 로 provider 호출)
-  const [staffView, previewView] = await Promise.all([
-    loadProjectSummaries(projectId, access),
-    loadProjectSummaries(projectId, { ...access, as: 'customer', canConfirm: false }),
-  ]);
+  // PM 화면용(편집자 권한). 고객 미리보기는 CustomerHome 이 viewer.as='customer' 로 따로 부른다 (고객과 같은 공개 범위)
+  const staffView = await loadProjectSummaries(projectId, access);
 
   return (
     <main data-screen-id="PM-03" className="flex flex-col gap-5">
@@ -60,16 +60,20 @@ export default async function OverviewPage({
           )}
         </div>
         {editing ? (
-          <HomeEditor
-            projectId={project.id}
-            version={project.version}
-            homeMessage={project.homeMessage}
-            homeSections={project.homeSections}
-            homeTheme={project.homeTheme}
-            pageImages={project.pageImages}
-            pageTone={project.pageTone}
-            doneHref={here}
-          />
+          <div className={brandFontClass}>
+            <HomeEditor
+              projectId={project.id}
+              version={project.version}
+              homeMessage={project.homeMessage}
+              homeSections={project.homeSections}
+              homeTheme={project.homeTheme}
+              pageImages={project.pageImages}
+              pageTone={project.pageTone}
+              titleFont={project.titleFont}
+              titleWeight={project.titleWeight}
+              doneHref={here}
+            />
+          </div>
         ) : (
           <div className="rounded-lg border border-dashed p-3">
             <p className="text-muted-foreground text-meta mb-3 flex items-center gap-1.5">
@@ -82,7 +86,15 @@ export default async function OverviewPage({
               imageFileId={project.pageImages.home}
               variant="contained"
             >
-              <CustomerHomeBody project={project} blocks={previewView} />
+              <div
+                className={brandFontClass}
+                style={customerTitleVars(project.titleFont, project.titleWeight)}
+              >
+                <CustomerHome
+                  project={project}
+                  access={{ ...access, as: 'customer', canConfirm: false, preview: true }}
+                />
+              </div>
             </PageCanvas>
           </div>
         )}

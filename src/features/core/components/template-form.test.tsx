@@ -85,7 +85,7 @@ describe('REQ-052 TemplateForm', () => {
       baseVersion: 2,
       defaultHomeMessage: '새 안내',
       defaultHomeSections: DEFAULT_HOME_SECTIONS.map((s) =>
-        s.key === 'recent' ? { ...s, visible: false } : s,
+        s.key === 'documents' ? { ...s, visible: false } : s,
       ),
       defaultHomeTheme: 'info',
       defaultPageImages: { home: IMG, photos: IMG2 },

@@ -6,12 +6,26 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { NativeSelect } from '@/shared/ui/native-fields';
 
-export function ProjectTabsNav({ tabs }: { tabs: { key: string; label: string; href: string }[] }) {
+export function ProjectTabsNav({
+  tabs,
+  variant = 'default',
+}: {
+  tabs: { key: string; label: string; href: string }[];
+  /** 'underline': 고객 화면 — 넓은 간격 · 차콜 밑줄 (메인페이지와 같은 느낌) */
+  variant?: 'default' | 'underline';
+}) {
   const t = useTranslations('common.nav');
   const segment = useSelectedLayoutSegment();
+  const underline = variant === 'underline';
   return (
-    <nav aria-label={t('projectNav')} className="-mx-1 scrollbar-none overflow-x-auto">
-      <ul className="flex min-w-max gap-1 border-b px-1">
+    <nav
+      aria-label={t('projectNav')}
+      className={cn(
+        'scrollbar-none overflow-x-auto',
+        underline ? '-mx-5 mt-7 px-5 md:mx-0 md:mt-9 md:px-0' : '-mx-1',
+      )}
+    >
+      <ul className={cn('flex min-w-max border-b', underline ? 'gap-6 md:gap-8' : 'gap-1 px-1')}>
         {tabs.map((tab) => {
           const active = segment === tab.key;
           return (
@@ -21,8 +35,12 @@ export function ProjectTabsNav({ tabs }: { tabs: { key: string; label: string; h
                 aria-current={active ? 'page' : undefined}
                 data-ui-key={`project-tab-${tab.key}-link`}
                 className={cn(
-                  'text-muted-foreground hover:text-foreground -mb-px inline-flex h-10 items-center border-b-2 border-transparent px-3 text-sm font-medium',
-                  active && 'border-primary text-foreground',
+                  'text-muted-foreground hover:text-foreground -mb-px inline-flex items-center border-b-2 border-transparent',
+                  underline ? 'h-11 text-[15px]' : 'h-10 px-3 text-sm font-medium',
+                  active &&
+                    (underline
+                      ? 'border-foreground text-foreground font-semibold'
+                      : 'border-primary text-foreground'),
                 )}
               >
                 {tab.label}

@@ -151,7 +151,10 @@
       "company_quota_updated": "업체 한도 변경",
       "files_purged": "파일 정리",
       "notifications_purged": "알림 정리",
-      "password_reset_issued": "재설정 링크 발급"
+      "password_reset_issued": "재설정 링크 발급",
+      "portfolio_site_name_changed": "홈페이지 이름 변경",
+      "portfolio_business_locked": "사업자 정보 잠금",
+      "portfolio_business_unlocked": "사업자 정보 잠금 해제"
     }
   },
   "withdraw": {

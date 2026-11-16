@@ -91,24 +91,31 @@ export function CreatePermissionSwitch({
   }
   const [busy, start] = useTransition();
   return (
-    <Switch
-      checked={value}
-      disabled={busy}
-      aria-label={t('members.createPermissionFor', { name })}
-      data-ui-key="member-create-permission"
-      onCheckedChange={(next) =>
-        start(async () => {
-          const res = await setProjectCreatePermission({ companyId, memberId, allowed: next });
-          if (!res.ok) {
-            toast.error(errorText(res.error)); // 실패 → 서버 값 그대로
-            return;
-          }
-          setValue(next);
-          toast.success(next ? t('toast.createPermissionOn') : t('toast.createPermissionOff'));
-          router.refresh();
-        })
-      }
-    />
+    <span className="inline-flex items-center gap-2 text-sm">
+      <Switch
+        checked={value}
+        disabled={busy}
+        aria-label={t('members.createPermissionFor', { name })}
+        data-ui-key="member-create-permission"
+        onCheckedChange={(next) =>
+          start(async () => {
+            const res = await setProjectCreatePermission({ companyId, memberId, allowed: next });
+            if (!res.ok) {
+              toast.error(errorText(res.error)); // 실패 → 서버 값 그대로
+              return;
+            }
+            setValue(next);
+            toast.success(next ? t('toast.createPermissionOn') : t('toast.createPermissionOff'));
+            router.refresh();
+          })
+        }
+        className="data-unchecked:bg-muted-foreground/30 data-[size=default]:h-5 data-[size=default]:w-9"
+      />
+      {/* 켜짐·꺼짐을 글로도 (색만으로 알리지 않는다) */}
+      <span aria-hidden className={value ? 'font-medium' : 'text-muted-foreground'}>
+        {value ? t('members.createOn') : t('members.createOff')}
+      </span>
+    </span>
   );
 }
 

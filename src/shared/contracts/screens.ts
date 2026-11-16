@@ -1,6 +1,6 @@
 /**
  * 화면 레지스트리 — 기계가 읽는 원본 (docs/02_화면구조_뎁스_디자인.md 는 이 파일을 설명할 뿐이다)
- * 소유: A(박예원) · 스타터 이후 변경 요청은 진행 기록의 변경 요청(CR)으로만 (docs/00_헌법_공통규칙.md 5.9).
+ * 소유: 박예원 (2026-11 한 사람 통합).
  *
  * 규칙
  * - SCREEN_ID 는 재번호·재사용 금지. 폐기 시 status: 'retired'.
@@ -41,6 +41,29 @@ export const SCREENS = [
     reqs: ['REQ-009'],
     status: 'active',
     titleKey: 'common.screen.landing',
+  },
+  // 공개 포트폴리오 (CR-PF-01) — 업체 주소로 누구나
+  {
+    id: 'PUB-10',
+    parent: null,
+    depth: 0,
+    area: 'public',
+    route: '/c/[slug]',
+    owner: 'A',
+    reqs: ['REQ-055'],
+    status: 'active',
+    titleKey: 'portfolio.screen.publicList',
+  },
+  {
+    id: 'PUB-11',
+    parent: 'PUB-10',
+    depth: 0,
+    area: 'public',
+    route: '/c/[slug]/works/[workId]',
+    owner: 'A',
+    reqs: ['REQ-055'],
+    status: 'active',
+    titleKey: 'portfolio.screen.publicWork',
   },
   {
     id: 'AUTH-01',
@@ -110,6 +133,18 @@ export const SCREENS = [
   },
 
   // ── PM 영역 /app/[company] ──────────────────────────────────────
+  {
+    // 업체 첫 화면 (대시보드) — 오늘 확인할 일 · 진행 중 프로젝트 · 이번 주 일정 · 최근 사진
+    id: 'PM-00',
+    parent: null,
+    depth: 1,
+    area: 'app',
+    route: '/app/[company]',
+    owner: 'A',
+    reqs: ['REQ-010'],
+    status: 'active',
+    titleKey: 'projects.screen.dashboard',
+  },
   {
     id: 'PM-01',
     parent: null,
@@ -406,6 +441,17 @@ export const SCREENS = [
     reqs: ['REQ-053'],
     status: 'active',
     titleKey: 'settings.screen.storage',
+  },
+  {
+    id: 'PM-65',
+    parent: 'PM-60',
+    depth: 2,
+    area: 'app',
+    route: '/app/[company]/settings/portfolio',
+    owner: 'A',
+    reqs: ['REQ-054'],
+    status: 'active',
+    titleKey: 'settings.screen.portfolio',
   },
 
   // ── 고객 영역 /portal ───────────────────────────────────────────

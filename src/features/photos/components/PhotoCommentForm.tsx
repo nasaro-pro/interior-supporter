@@ -30,7 +30,8 @@ export function PhotoCommentForm({
   const [fieldError, setFieldError] = useState<string>();
   const [pending, start] = useTransition();
   const reply = threadOwner !== null;
-  const inputId = `photo-comment-${threadOwner ?? 'new'}`;
+  // 한 화면에 여러 사진의 입력칸이 있을 수 있다(마이홈) — 사진 id 까지 넣어 id 가 겹치지 않게
+  const inputId = `photo-comment-${photoId}-${threadOwner ?? 'new'}`;
 
   const submit = (event: FormEvent) => {
     event.preventDefault();

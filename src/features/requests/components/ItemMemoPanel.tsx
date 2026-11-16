@@ -1,6 +1,7 @@
 // D-32 · D-33 · CU-05 · CU-06 도안 · 자재 옆 메모 (서버 컴포넌트) — CR-6 메모 패널 제공 계약
 // 보고 있는 항목에 자동 연결된 메모만 보여 준다. 고객: 본인 메모 + 새 메모 입력 / 편집자: 전체 메모 + 답변
 // 사용: B 의 도안 · 자재 상세 화면이 <ItemMemoSection> 으로 감싼다 (레이아웃은 MemoLayout)
+// 2026-11: 고객은 메모 탭과 같은 대화창(MemoChat) + 자주 쓰는 말 버튼 입력줄(ChatComposer). 편집자 화면은 그대로
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
@@ -10,6 +11,8 @@ import { routes } from '@/shared/contracts/routes';
 import { EmptyState } from '@/shared/ui/states';
 import { listItemMemos } from '../server/queries';
 import type { RequestTargetType } from '../schema';
+import { ChatComposer } from './ChatComposer';
+import { MemoChat } from './MemoChat';
 import { MemoComposer } from './MemoComposer';
 import { MemoLayout } from './MemoLayout';
 import { RequestStatusBadge } from './RequestStatusBadge';
@@ -40,11 +43,45 @@ export async function ItemMemoSection({
       ? routes.app.request(viewer.companySlug, viewer.projectId, id)
       : routes.portal.request(viewer.projectId, id);
 
+  if (!editor) {
+    const chat = (
+      <div className="flex flex-col gap-4" data-ui-key="item-memo-list">
+        {memos.length === 0 ? (
+          <p className="text-muted-foreground py-4 text-sm">
+            {viewer.preview ? t('memo.emptyPreview') : t('memo.emptyCustomer')}
+          </p>
+        ) : (
+          <MemoChat memos={memos} memoHref={detailHref} compact />
+        )}
+        {canMemo && !viewer.preview ? (
+          <div className="bg-card sticky bottom-0 border-t pt-3">
+            <ChatComposer
+              projectId={viewer.projectId}
+              fixedTarget={{ type: targetType, id: targetId }}
+              chips
+            />
+          </div>
+        ) : null}
+      </div>
+    );
+    return (
+      <MemoLayout panel={chat} count={memos.length}>
+        {children}
+      </MemoLayout>
+    );
+  }
+
   const panel = (
     <div className="flex flex-col gap-4" data-ui-key="item-memo-list">
       {memos.length === 0 ? (
         <EmptyState
-          title={editor ? t('memo.emptyEditor') : t('memo.emptyCustomer')}
+          title={
+            editor
+              ? t('memo.emptyEditor')
+              : viewer.preview
+                ? t('memo.emptyPreview') // 담당자의 고객 화면 미리보기 — 입력칸이 없으니 안내만
+                : t('memo.emptyCustomer')
+          }
           className="py-4"
         />
       ) : (
@@ -75,7 +112,8 @@ export async function ItemMemoSection({
           </section>
         ))
       )}
-      {!editor && canMemo ? (
+      {/* 담당자의 고객 화면 미리보기는 읽기 전용 */}
+      {!editor && canMemo && !viewer.preview ? (
         <MemoComposer
           kind="memo"
           projectId={viewer.projectId}

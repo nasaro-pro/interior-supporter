@@ -1,6 +1,6 @@
 // src/shared/lib/supabase/server.ts (A)
 import 'server-only';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import type { Database } from '@/shared/contracts/database.types';
 
@@ -8,13 +8,43 @@ import type { Database } from '@/shared/contracts/database.types';
 const fetchWithTimeout: typeof fetch = (input, init) =>
   fetch(input, { ...init, signal: init?.signal ?? AbortSignal.timeout(10_000) });
 
+/** 담당자의 고객 화면 미리보기 쿠키 (값 = 프로젝트 id). 설정 · 해제는 features/core/server/customer-preview.ts */
+export const CUSTOMER_PREVIEW_COOKIE = 'is_customer_preview';
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * 고객 화면 미리보기 요청이면 그 프로젝트 id (아니면 null).
+ * 조건: 쿠키 · 고객 화면(/portal/projects/<같은 id>) 페이지 렌더 · Server Action 아님.
+ * 헤더를 받은 DB 는 '진짜 편집자 + 읽기 전용 조회'일 때만 고객 규칙으로 본다 (20261029000200_a_customer_preview.sql)
+ */
+export function customerPreviewTarget(
+  cookieValue: string | undefined,
+  pathname: string | null,
+  isAction: boolean,
+): string | null {
+  if (!cookieValue || !UUID.test(cookieValue) || isAction || !pathname) return null;
+  const prefix = `/portal/projects/${cookieValue}`;
+  return pathname === prefix || pathname.startsWith(`${prefix}/`) || pathname.startsWith(`${prefix}?`)
+    ? cookieValue
+    : null;
+}
+
 export async function createServerSupabase() {
   const cookieStore = await cookies(); // Next 15+ : cookies() 는 비동기
+  const h = await headers();
+  const preview = customerPreviewTarget(
+    cookieStore.get(CUSTOMER_PREVIEW_COOKIE)?.value,
+    h.get('x-pathname'),
+    h.has('next-action'),
+  );
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      global: { fetch: fetchWithTimeout },
+      global: {
+        fetch: fetchWithTimeout,
+        ...(preview ? { headers: { 'x-customer-preview': preview } } : {}),
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll();

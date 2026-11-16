@@ -72,6 +72,9 @@ const DB_MESSAGE_MAP: Record<string, ErrorCode> = {
   slug_taken: 'SLUG_TAKEN',
   owner_role_locked: 'FORBIDDEN',
   pm_must_be_member: 'VALIDATION_FAILED',
+  featured_limit: 'CONFLICT', // CR-PF-10 포트폴리오 대표 사례 수 초과
+  business_locked: 'FORBIDDEN', // CR-PF-20 사이트 관리자가 잠근 대표자·사업자등록번호
+  not_found: 'NOT_FOUND', // CR-PF-20 관리자 RPC 대상 없음
 };
 
 export function mapDbError(e: { code?: string; message?: string } | null | undefined): ErrorCode {

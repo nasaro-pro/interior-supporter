@@ -8,6 +8,7 @@ import { requireCompanyStaff, requireProjectAccess } from '@/features/core';
 import { ProjectHeader } from '@/features/core/components/project-header';
 import { ProjectSwitcher, ProjectTabsNav } from '@/features/core/components/project-shell';
 import { VisibilityBadge } from '@/features/core/components/project-badges';
+import { CustomerPreviewButton } from '@/features/core/components/customer-preview';
 import { getProject, listSwitcherProjects } from '@/features/core/server/project-queries';
 import { PROJECT_TABS } from '@/shared/contracts/screens';
 import { routes } from '@/shared/contracts/routes';
@@ -49,16 +50,19 @@ export default async function ProjectLayout({
           </>
         }
         switcher={
-          <ProjectSwitcher
-            current={projectId}
-            currentName={project.name}
-            currentArchived={Boolean(project.archivedAt)}
-            options={switcher.map((p) => ({
-              id: p.id,
-              name: p.name,
-              href: routes.app.project(slug, p.id),
-            }))}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <CustomerPreviewButton companySlug={slug} projectId={projectId} />
+            <ProjectSwitcher
+              current={projectId}
+              currentName={project.name}
+              currentArchived={Boolean(project.archivedAt)}
+              options={switcher.map((p) => ({
+                id: p.id,
+                name: p.name,
+                href: routes.app.project(slug, p.id),
+              }))}
+            />
+          </div>
         }
       />
       <ProjectTabsNav

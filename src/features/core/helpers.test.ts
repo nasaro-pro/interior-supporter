@@ -26,7 +26,7 @@ describe('REQ-014 고객 홈 영역', () => {
   });
   it('TC-014 위·아래 이동, 끝에서는 그대로', () => {
     const moved = moveSection(DEFAULT_HOME_SECTIONS, 1, -1);
-    expect(moved.map((s) => s.key)).toEqual(['recent', 'overview', 'schedule', 'documents']);
+    expect(moved.map((s) => s.key)).toEqual(['documents', 'overview', 'recent', 'schedule']);
     expect(moveSection(DEFAULT_HOME_SECTIONS, 0, -1)).toBe(DEFAULT_HOME_SECTIONS);
   });
 });

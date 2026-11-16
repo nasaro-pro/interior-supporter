@@ -21,7 +21,7 @@
     "required": "This field is required.",
     "tooLong": "Enter {max} characters or fewer.",
     "tooShort": "Enter at least {min} characters.",
-    "email": "Enter a valid email address, e.g. name@example.com.",
+    "email": "This is not a valid email.",
     "slugPattern": "Use 3–40 lowercase letters, numbers, or hyphens. It can’t start or end with a hyphen.",
     "slugReserved": "This handle is reserved. Enter a different handle.",
     "passwordLength": "Password must be 10–72 characters.",
@@ -41,6 +41,16 @@
     "slugTaken": "This company address is already in use. Enter a different one.",
     "tempPasswordExpired": "Your temporary password expired. Ask the designer to resend it.",
     "sameAsTemp": "Choose a password different from the temporary one.",
-    "staffEmail": "That's a designer account in your company. Use a different email for customers and field crews."
+    "staffEmail": "That's a designer account in your company. Use a different email for customers and field crews.",
+    "areaTooDetailed": "Neighborhood name only. Street or unit numbers are not allowed.",
+    "consentRequired": "Record client consent before publishing.",
+    "coverRequired": "Choose a cover photo first.",
+    "httpsOnly": "Only addresses starting with https:// are allowed.",
+    "featuredLimit": "The featured limit is reached. Unfeature another project or raise the limit.",
+    "featuredLimitRange": "Choose between 1 and 6.",
+    "businessRegNo": "Use the 000-00-00000 format.",
+    "portfolioOwnProject": "With project-upload access you can only add projects you manage.",
+    "snsMax": "Up to 5 social links.",
+    "snsInvalid": "A social link is not valid."
   }
 }
