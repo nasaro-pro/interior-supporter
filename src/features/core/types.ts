@@ -1,4 +1,5 @@
 // src/features/core/types.ts (A) — 화면용 타입 (camelCase)
+import type { CustomerTitleFont, CustomerTitleWeight } from './customer-style';
 import type {
   HomeSections,
   MemberRole,
@@ -27,6 +28,9 @@ export interface ProjectDetail extends ProjectListItem {
   homeTheme: HomeTheme;
   pageImages: PageImages;
   pageTone: PageTone;
+  /** 고객 화면 제목 글꼴·굵기 (customer-style.ts) */
+  titleFont: CustomerTitleFont;
+  titleWeight: CustomerTitleWeight;
   createdAt: string;
   updatedAt: string;
   version: number;

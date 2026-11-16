@@ -6,6 +6,7 @@ import type { SummaryItem, SummaryProvider } from '@/shared/contracts/integratio
 import { routes } from '@/shared/contracts/routes';
 import { createServerSupabase } from '@/shared/lib/supabase/server';
 import { isUnanswered } from '../lib/memo';
+import { targetsOf } from './queries';
 
 export const summaryProvider: SummaryProvider = {
   async recent(projectId, viewer, limit = 5) {
@@ -13,7 +14,7 @@ export const summaryProvider: SummaryProvider = {
     const supabase = await createServerSupabase();
     let query = supabase
       .from('requests')
-      .select('id, title, status, updated_at')
+      .select('id, title, status, updated_at, target_type, target_id')
       .eq('project_id', projectId)
       .is('archived_at', null);
     if (viewer.as === 'customer') {
@@ -21,19 +22,30 @@ export const summaryProvider: SummaryProvider = {
       query = query.eq('author_id', ctx.userId); // POL-018 이중 검증
     }
     const { data } = await query.order('updated_at', { ascending: false }).limit(limit);
-    return (data ?? []).map<SummaryItem>((r) => ({
-      kind: 'requests',
-      id: r.id,
-      title: r.title,
-      at: r.updated_at,
-      subtitleKey: 'requests.summary.status',
-      subtitleValues: { status: r.status },
-      screenId: viewer.as === 'editor' ? 'PM-16' : 'CL-16',
-      href:
-        viewer.as === 'editor'
-          ? routes.app.request(viewer.companySlug, projectId, r.id)
-          : routes.portal.request(projectId, r.id),
-    }));
+    const rows = data ?? [];
+    // D-32 · CU-05: 도안 · 자재에 남긴 메모는 어느 항목인지 함께 ('도안: 거실 아트월 · 처리 중')
+    const targets = rows.length ? await targetsOf(supabase, rows) : [];
+    return rows.map<SummaryItem>((r, i) => {
+      const target = targets[i];
+      const values: Record<string, string> = target?.label
+        ? { type: target.type, label: target.label, status: r.status }
+        : { status: r.status };
+      return {
+        kind: 'requests',
+        id: r.id,
+        title: r.title,
+        at: r.updated_at,
+        subtitleKey: target?.label
+          ? 'requests.summary.statusWithTarget'
+          : 'requests.summary.status',
+        subtitleValues: values,
+        screenId: viewer.as === 'editor' ? 'PM-16' : 'CL-16',
+        href:
+          viewer.as === 'editor'
+            ? routes.app.request(viewer.companySlug, projectId, r.id)
+            : routes.portal.request(projectId, r.id),
+      };
+    });
   },
 };
 

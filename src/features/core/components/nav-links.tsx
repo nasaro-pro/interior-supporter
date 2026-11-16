@@ -10,7 +10,9 @@ import {
   Eraser,
   FolderKanban,
   History,
+  House,
   LayoutDashboard,
+  MessageSquare,
   Menu,
   Settings,
   Users,
@@ -32,6 +34,9 @@ const ICONS = {
   settings: Settings,
   photos: Camera,
   more: Menu,
+  // 고객 프로젝트 안 (우리 집 · 메모)
+  home: House,
+  memo: MessageSquare,
   // 사이트 관리 (CR-3)
   dashboard: LayoutDashboard,
   companies: Building2,
@@ -45,13 +50,15 @@ export interface NavItem {
   href: string;
   icon: NavIcon;
   badge?: number;
+  /** 하위 경로에서는 켜지 않는다 (업체 첫 화면 '대시보드' 처럼 다른 메뉴의 부모 경로일 때) */
+  exact?: boolean;
   /** 모바일 '더보기' 처럼 하위 메뉴를 여는 탭 */
-  children?: { key: string; label: string; href: string }[];
+  children?: { key: string; label: string; href: string; external?: boolean }[];
 }
 
-const isActive = (pathname: string, href: string) => {
+const isActive = (pathname: string, href: string, exact = false) => {
   const base = href.split('?')[0] ?? href;
-  return pathname === base || pathname.startsWith(`${base}/`);
+  return pathname === base || (!exact && pathname.startsWith(`${base}/`));
 };
 
 export function TopNav({ items, label }: { items: NavItem[]; label: string }) {
@@ -60,7 +67,7 @@ export function TopNav({ items, label }: { items: NavItem[]; label: string }) {
     <nav aria-label={label} className="hidden md:block">
       <ul className="flex items-center gap-1">
         {items.map((it) => {
-          const active = isActive(pathname, it.href);
+          const active = isActive(pathname, it.href, it.exact);
           return (
             <li key={it.key}>
               <Link
@@ -96,7 +103,7 @@ export function BottomTabs({ items, label }: { items: NavItem[]; label: string }
       >
         {items.map((it) => {
           const Icon = ICONS[it.icon];
-          const active = isActive(pathname, it.href);
+          const active = isActive(pathname, it.href, it.exact);
           if (it.children?.length) {
             return (
               <li key={it.key}>
@@ -116,7 +123,19 @@ export function BottomTabs({ items, label }: { items: NavItem[]; label: string }
                     {it.children.map((c) => (
                       <DropdownMenuItem
                         key={c.key}
-                        render={<Link href={c.href} data-ui-key={`tab-more-${c.key}-link`} />}
+                        render={
+                          c.external ? (
+                            // 새 탭으로 여는 외부 화면 (업체 공개 홈페이지 등)
+                            <a
+                              href={c.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-ui-key={`tab-more-${c.key}-link`}
+                            />
+                          ) : (
+                            <Link href={c.href} data-ui-key={`tab-more-${c.key}-link`} />
+                          )
+                        }
                       >
                         {c.label}
                       </DropdownMenuItem>

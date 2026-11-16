@@ -26,7 +26,8 @@ export async function PhotoComments({
   const ctx = await getAccessContext();
   const threads = await listPhotoComments(photoId, viewer, ctx.userId);
   const editor = viewer.as === 'editor';
-  const open = isPublic && !archived;
+  // 담당자의 고객 화면 미리보기는 읽기 전용 (댓글 입력 없음)
+  const open = isPublic && !archived && !viewer.preview;
 
   return (
     <Section title={t('comments.title')} as="h3" variant="card">
@@ -36,7 +37,11 @@ export async function PhotoComments({
         ) : null}
         {threads.length === 0 ? (
           <p className="text-muted-foreground text-sm">
-            {editor ? t('comments.emptyEditor') : t('comments.emptyCustomer')}
+            {editor
+              ? t('comments.emptyEditor')
+              : viewer.preview
+                ? t('comments.emptyPreview') // 담당자의 고객 화면 미리보기 — 입력칸 없음
+                : t('comments.emptyCustomer')}
           </p>
         ) : (
           threads.map((th) => (

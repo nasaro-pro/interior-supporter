@@ -206,6 +206,15 @@ export async function updateParticipant(
     .eq('project_id', v.projectId)
     .maybeSingle();
   if (!row) return fail('NOT_FOUND');
+  // 고객 · 시공팀 이름 (프로필은 본인 행만 열려 있어 RPC 로만 바꾼다 — 같은 이름이면 그대로)
+  if (v.displayName !== undefined && row.role !== 'pm') {
+    const { error: nameError } = await supabase.rpc('update_participant_name', {
+      p_project: v.projectId,
+      p_participant: v.participantId,
+      p_display_name: v.displayName,
+    });
+    if (nameError) return dbFail('participant.name.failed', nameError, { projectId: v.projectId });
+  }
   const { data, error } = await supabase
     .from('project_participants')
     .update({

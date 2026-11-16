@@ -4,7 +4,8 @@
     "company": "Company",
     "members": "Members",
     "templates": "Templates",
-    "storage": "Storage"
+    "storage": "Storage",
+    "portfolio": "Portfolio"
   },
   "memberRole": {
     "owner": "Owner",
@@ -33,7 +34,10 @@
     "resetOwnerHint": "The owner’s password can only be reset through the operations procedure.",
     "empty": "No members invited yet. Invite PMs to work together.",
     "createAlways": "Always",
-    "createPermissionFor": "Project creation for {name}"
+    "createPermissionFor": "Project creation for {name}",
+    "createOn": "On",
+    "createOff": "Off",
+    "you": "You"
   },
   "storage": {
     "used": "{used} of {total} used",

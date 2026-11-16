@@ -8,6 +8,14 @@ import { cn } from '@/shared/lib/utils';
 import { moveSection } from '../home-sections';
 import { HOME_THEMES, HOME_THEME_CLASS, type HomeTheme } from '../home-theme';
 import { PAGE_TONES, PAGE_TONE_SWATCH, type PageTone } from '../page-theme';
+import {
+  CUSTOMER_TITLE_CLASS,
+  CUSTOMER_TITLE_FONTS,
+  CUSTOMER_TITLE_WEIGHTS,
+  customerTitleVars,
+  type CustomerTitleFont,
+  type CustomerTitleWeight,
+} from '../customer-style';
 
 /** 4영역 순서(위/아래)·표시 */
 export function HomeSectionsField({
@@ -181,5 +189,80 @@ export function PageToneField({
       </div>
       {hint ? <p className="text-muted-foreground text-meta">{hint}</p> : null}
     </fieldset>
+  );
+}
+
+/** 고객 화면 제목 글꼴 · 굵기 — 견본 글자를 그 글꼴 · 굵기로 보여 준다 (공개 홈페이지와 같은 선택지) */
+export function TitleStyleField({
+  font,
+  weight,
+  onFont,
+  onWeight,
+}: {
+  font: CustomerTitleFont;
+  weight: CustomerTitleWeight;
+  onFont: (next: CustomerTitleFont) => void;
+  onWeight: (next: CustomerTitleWeight) => void;
+}) {
+  const t = useTranslations('projects');
+  const option = (checked: boolean) =>
+    cn(
+      'focus-within:ring-ring/50 flex cursor-pointer flex-col items-start gap-0.5 rounded-md border px-3 py-2 text-sm focus-within:ring-[3px]',
+      checked && 'border-primary bg-accent',
+    );
+  return (
+    // 명조 견본은 --font-brand-serif 를 쓴다 — 이 칸을 감싸는 화면(개요)이 brandFontClass 를 건다
+    <div className="flex flex-col gap-4">
+      <fieldset className="flex flex-col gap-1.5">
+        <legend className="mb-1.5 text-sm font-medium">{t('home.titleFontLabel')}</legend>
+        <div className="flex flex-wrap gap-2">
+          {CUSTOMER_TITLE_FONTS.map((f) => (
+            <label key={f} className={option(f === font)}>
+              <input
+                type="radio"
+                name="home-title-font"
+                value={f}
+                checked={f === font}
+                onChange={() => onFont(f)}
+                className="sr-only"
+                data-ui-key="home-title-font-option"
+              />
+              <span
+                className={cn('text-lg', CUSTOMER_TITLE_CLASS)}
+                style={customerTitleVars(f, weight)}
+              >
+                {t('home.titleSample')}
+              </span>
+              <span className="text-muted-foreground text-meta">{t(`titleFont.${f}`)}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset className="flex flex-col gap-1.5">
+        <legend className="mb-1.5 text-sm font-medium">{t('home.titleWeightLabel')}</legend>
+        <div className="flex flex-wrap gap-2">
+          {CUSTOMER_TITLE_WEIGHTS.map((w) => (
+            <label key={w} className={option(w === weight)}>
+              <input
+                type="radio"
+                name="home-title-weight"
+                value={w}
+                checked={w === weight}
+                onChange={() => onWeight(w)}
+                className="sr-only"
+                data-ui-key="home-title-weight-option"
+              />
+              <span
+                className={cn('text-lg', CUSTOMER_TITLE_CLASS)}
+                style={customerTitleVars(font, w)}
+              >
+                {t('home.titleSample')}
+              </span>
+              <span className="text-muted-foreground text-meta">{t(`titleWeight.${w}`)}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    </div>
   );
 }

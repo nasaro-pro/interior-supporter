@@ -1,8 +1,10 @@
-// src/app/admin/(console)/companies/[companyId]/page.tsx — ADM-03 업체 상세 (A4 소유자 변경 · A6 저장공간 한도)
+// src/app/admin/(console)/companies/[companyId]/page.tsx — ADM-03 업체 상세 (A4 소유자 변경 · A6 저장공간 한도 · CR-PF-20 공개 홈페이지)
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { OwnerChangeForm } from '@/features/admin/components/OwnerChangeForm';
 import { QuotaForm } from '@/features/admin/components/QuotaForm';
+import { AdminPortfolioSection } from '@/features/portfolio/components/admin/AdminPortfolioSection';
+import { getAdminCompanyPortfolio } from '@/features/portfolio/server/admin-queries';
 import { formatBytes, usagePercent } from '@/features/admin/lib/bytes';
 import { getCompany, listCompanyMembers } from '@/features/admin/server/queries';
 import { isUuid } from '@/features/core/server/access';
@@ -19,7 +21,12 @@ export default async function AdminCompanyPage({
   if (!isUuid(companyId)) notFound();
   const company = await getCompany(companyId);
   if (!company) notFound();
-  const [members, t] = await Promise.all([listCompanyMembers(companyId), getTranslations('admin')]);
+  const [members, t, portfolio, tp] = await Promise.all([
+    listCompanyMembers(companyId),
+    getTranslations('admin'),
+    getAdminCompanyPortfolio(companyId),
+    getTranslations('portfolio.admin'),
+  ]);
   const percent = usagePercent(company.storageBytes, company.quotaBytes);
 
   return (
@@ -48,6 +55,9 @@ export default async function AdminCompanyPage({
         variant="card"
       >
         <QuotaForm companyId={company.id} quotaBytes={company.quotaBytes} />
+      </Section>
+      <Section title={tp('title')} description={tp('description')} variant="card">
+        <AdminPortfolioSection companyId={company.id} data={portfolio} />
       </Section>
     </main>
   );

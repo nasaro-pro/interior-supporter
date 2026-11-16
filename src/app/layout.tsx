@@ -1,5 +1,5 @@
 // src/app/layout.tsx (A · 스타터 기준) — 루트 레이아웃. B·C 는 수정하지 않는다.
-// A 는 TASK-001 에서 Pretendard(next/font/local)를 추가한다. 그 외 구조 변경은 CR.
+// Pretendard(next/font/local)를 기본 글꼴로 불러온다 (업체 관리 · 고객 화면은 셸에서 노토 산스로 바꾼다).
 import type { Metadata } from 'next';
 import { Suspense, type ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';

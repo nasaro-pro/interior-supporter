@@ -12,7 +12,16 @@ import { HOME_THEME_CLASS } from '../home-theme';
 import type { Block } from '../server/overview-queries';
 import type { ProjectDetail } from '../types';
 
-function SummaryList({ block, emptyText }: { block: Block; emptyText: string }) {
+function SummaryList({
+  block,
+  emptyText,
+  customer = false,
+}: {
+  block: Block;
+  emptyText: string;
+  /** 고객 홈: 요청을 '메모'로 부른다 (CU-06 — 고객 화면의 요청 탭은 '메모 대화') */
+  customer?: boolean;
+}) {
   const t = useTranslations();
   if (block.failed && block.items.length === 0) return <ErrorState />;
   if (block.items.length === 0) return <p className="text-muted-foreground py-2">{emptyText}</p>;
@@ -27,7 +36,9 @@ function SummaryList({ block, emptyText }: { block: Block; emptyText: string }) 
           >
             <span className="min-w-0">
               <span className="text-muted-foreground text-meta block">
-                {t(`history.objectType.${it.kind}`)}
+                {customer && it.kind === 'requests'
+                  ? t('requests.memo.title')
+                  : t(`history.objectType.${it.kind}`)}
               </span>
               <span className="block truncate font-medium">{it.title}</span>
               {it.subtitleKey && t.has(it.subtitleKey) ? (
@@ -123,7 +134,7 @@ export function CustomerHomeBody({
       case 'recent':
         return (
           <Panel key={key} title={t('homeSection.recent')}>
-            <SummaryList block={blocks.recent} emptyText={t('overview.recentEmpty')} />
+            <SummaryList block={blocks.recent} emptyText={t('overview.recentEmpty')} customer />
           </Panel>
         );
       case 'schedule':

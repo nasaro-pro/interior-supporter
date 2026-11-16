@@ -39,6 +39,8 @@ const project = (over: Partial<ProjectDetail> = {}): ProjectDetail => ({
   homeTheme: 'brand',
   pageImages: {},
   pageTone: 'default',
+  titleFont: 'noto_sans',
+  titleWeight: 600,
   createdAt: '2026-10-01T00:00:00Z',
   updatedAt: '2026-10-01T00:00:00Z',
   archivedAt: null,
@@ -145,6 +147,8 @@ describe('A-06 HomeEditor', () => {
         homeTheme="brand"
         pageImages={{}}
         pageTone="default"
+        titleFont="noto_sans"
+        titleWeight={600}
         doneHref="/done"
       />,
     );

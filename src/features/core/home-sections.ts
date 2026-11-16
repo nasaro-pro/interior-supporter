@@ -5,10 +5,10 @@ import {
   type HomeSections,
 } from '@/shared/contracts/domain';
 
-export const DEFAULT_HOME_SECTIONS: HomeSections = HOME_SECTION_KEYS.map((key) => ({
-  key,
-  visible: true,
-}));
+/** 기본 순서: 공사 진행 → 도안 → 최근 현장 사진 → 다음 일정 (20261116000100_a_customer_home_style 과 같다) */
+export const DEFAULT_HOME_SECTIONS: HomeSections = (
+  ['overview', 'documents', 'recent', 'schedule'] as const
+).map((key) => ({ key, visible: true }));
 
 /** DB jsonb → 4키 순열 보장 (빠진 키는 뒤에 표시 상태로 채움) */
 export function normalizeHomeSections(raw: unknown): HomeSections {

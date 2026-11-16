@@ -1,6 +1,6 @@
 /**
  * 정규 경로 빌더 — 앱 안에서 URL 문자열을 만드는 유일한 곳 (알림·캘린더·요약 카드 링크 포함)
- * 소유: A · 변경 요청은 진행 기록의 변경 요청(CR)으로만 (docs/00_헌법_공통규칙.md 5.9). 문자열 리터럴로 경로를 직접 쓰는 코드는 리뷰에서 거절한다.
+ * 소유: 박예원. 문자열 리터럴로 경로를 직접 쓰지 않는다 (경로는 여기서만 만든다).
  * 근거: 02-뎁스구조-설계안 8절, docs/02_화면구조_뎁스_디자인.md
  */
 import type { FieldTab, PortalTab, ProjectTab } from './screens';
@@ -21,6 +21,8 @@ export const routes = {
 
   // PM
   app: {
+    /** PM-00 업체 첫 화면 (대시보드) — 로그인 뒤 처음 보이는 화면 */
+    home: (company: string) => `/app/${enc(company)}`,
     projects: (company: string, q?: { q?: string; status?: string }) => {
       const s = new URLSearchParams();
       if (q?.q) s.set('q', q.q);
@@ -50,9 +52,18 @@ export const routes = {
     historyEvent: (company: string, eventId: string | number) =>
       `/app/${enc(company)}/history/${eventId}`,
     notifications: (company: string) => `/app/${enc(company)}/notifications`,
+    /** 담당자의 고객 화면 미리보기 시작 (쿠키를 심고 고객 홈으로 보낸다) */
+    customerPreview: (company: string, project: string) =>
+      `/app/${enc(company)}/projects/${enc(project)}/customer-preview`,
+    /**
+     * PM-65 포트폴리오 미리보기 (화면 상태, 비공개 사례 포함 — CR-PF-12).
+     * 업무 화면 틀(메뉴·바탕색) 없이 공개 홈페이지와 똑같이 화면 전체로 보이도록 /app 밖에 둔다 (직원 확인은 페이지가 직접)
+     */
+    portfolioPreview: (company: string, workId?: string) =>
+      `/portfolio-preview/${enc(company)}${workId ? `/works/${enc(workId)}` : ''}`,
     settings: (
       company: string,
-      section: 'company' | 'members' | 'templates' | 'storage' = 'company',
+      section: 'company' | 'members' | 'templates' | 'storage' | 'portfolio' = 'company',
     ) => `/app/${enc(company)}/settings/${section}`,
   },
 
@@ -74,6 +85,8 @@ export const routes = {
     estimate: (project: string, estimateId: string, versionNo?: number) =>
       `/portal/projects/${enc(project)}/estimates/${enc(estimateId)}${versionNo ? `?v=${versionNo}` : ''}`,
     notifications: () => '/portal/notifications',
+    /** 고객 화면 미리보기 끝내기 → 담당자 프로젝트 개요로 */
+    previewExit: (project: string) => `/portal/preview-exit?project=${enc(project)}`,
   },
 
   // 시공팀
@@ -106,6 +119,14 @@ export const routes = {
     settings: () => '/admin/settings',
     cleanup: () => '/admin/cleanup',
     audit: () => '/admin/audit',
+  },
+
+  // 공개 포트폴리오 PUB-10·11 (CR-PF-02) — 로그인 없이
+  portfolio: {
+    home: (slug: string) => `/c/${enc(slug)}`,
+    work: (slug: string, workId: string) => `/c/${enc(slug)}/works/${enc(workId)}`,
+    /** 머리의 로그인·마이홈·관리 페이지 — 로그인 상태와 관계를 보고 알맞은 화면으로 보낸다 */
+    my: (slug: string) => `/c/${enc(slug)}/my`,
   },
 
   // 약관·개인정보처리방침 (A9) · 본인 탈퇴 (A10)

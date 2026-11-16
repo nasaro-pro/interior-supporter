@@ -13,6 +13,317 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      // ── CR-PF-01 포트폴리오 (20261108000100_a_portfolio.sql) — db:types 로 다시 만들면 같은 내용이 생성된다
+      company_portfolios: {
+        Row: {
+          company_id: string
+          is_public: boolean
+          intro: string
+          contact_phone: string | null
+          contact_url: string | null
+          page_tone: string
+          logo_path: string | null
+          business_name: string
+          representative: string
+          business_reg_no: string | null
+          address: string
+          cs_hours: string
+          featured_limit: number
+          footer_slogan: string
+          contact_email: string | null
+          mail_order_no: string | null
+          sns_links: Json
+          footer_tone: string
+          works_layout: string
+          gallery_filter: boolean
+          carousel_per: number
+          business_locked_at: string | null
+          title_font: string
+          body_font: string
+          title_weight: number
+          mobile_works_layout: string | null
+          mobile_gallery_cols: number
+          site_name: string | null
+          page_labels: Json
+          custom_logo_path: string | null
+          logo_hidden: boolean
+          created_at: string
+          updated_at: string
+          version: number
+          id: string | null
+        }
+        Insert: {
+          company_id: string
+          is_public?: boolean
+          intro?: string
+          contact_phone?: string | null
+          contact_url?: string | null
+          page_tone?: string
+          logo_path?: string | null
+          business_name?: string
+          representative?: string
+          business_reg_no?: string | null
+          address?: string
+          cs_hours?: string
+          featured_limit?: number
+          footer_slogan?: string
+          contact_email?: string | null
+          mail_order_no?: string | null
+          sns_links?: Json
+          footer_tone?: string
+          works_layout?: string
+          gallery_filter?: boolean
+          carousel_per?: number
+          business_locked_at?: string | null
+          title_font?: string
+          body_font?: string
+          title_weight?: number
+          mobile_works_layout?: string | null
+          mobile_gallery_cols?: number
+          site_name?: string | null
+          page_labels?: Json
+          custom_logo_path?: string | null
+          logo_hidden?: boolean
+          created_at?: string
+          updated_at?: string
+          version?: number
+          id?: never
+        }
+        Update: {
+          company_id?: string
+          is_public?: boolean
+          intro?: string
+          contact_phone?: string | null
+          contact_url?: string | null
+          page_tone?: string
+          logo_path?: string | null
+          business_name?: string
+          representative?: string
+          business_reg_no?: string | null
+          address?: string
+          cs_hours?: string
+          featured_limit?: number
+          footer_slogan?: string
+          contact_email?: string | null
+          mail_order_no?: string | null
+          sns_links?: Json
+          footer_tone?: string
+          works_layout?: string
+          gallery_filter?: boolean
+          carousel_per?: number
+          business_locked_at?: string | null
+          title_font?: string
+          body_font?: string
+          title_weight?: number
+          mobile_works_layout?: string | null
+          mobile_gallery_cols?: number
+          site_name?: string | null
+          page_labels?: Json
+          custom_logo_path?: string | null
+          logo_hidden?: boolean
+          created_at?: string
+          updated_at?: string
+          version?: number
+          id?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_portfolios_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolio_images: {
+        Row: {
+          id: string
+          company_id: string
+          work_id: string
+          source_file_id: string
+          path: string
+          thumb_path: string
+          width: number
+          height: number
+          thumb_width: number
+          thumb_height: number
+          space: Database["public"]["Enums"]["material_space"] | null
+          space_label: string
+          caption: string
+          role: Database["public"]["Enums"]["portfolio_image_role"]
+          sort_order: number
+          created_by: string
+          created_at: string
+          updated_at: string
+          version: number
+          archived_at: string | null
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          work_id: string
+          source_file_id: string
+          path: string
+          thumb_path: string
+          width: number
+          height: number
+          thumb_width: number
+          thumb_height: number
+          space?: Database["public"]["Enums"]["material_space"] | null
+          space_label?: string
+          caption?: string
+          role?: Database["public"]["Enums"]["portfolio_image_role"]
+          sort_order?: number
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          version?: number
+          archived_at?: string | null
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          work_id?: string
+          source_file_id?: string
+          path?: string
+          thumb_path?: string
+          width?: number
+          height?: number
+          thumb_width?: number
+          thumb_height?: number
+          space?: Database["public"]["Enums"]["material_space"] | null
+          space_label?: string
+          caption?: string
+          role?: Database["public"]["Enums"]["portfolio_image_role"]
+          sort_order?: number
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          version?: number
+          archived_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_images_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_images_source_file_id_fkey"
+            columns: ["source_file_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_images_work_id_fkey"
+            columns: ["work_id"]
+            isOneToOne: false
+            referencedRelation: "portfolio_works"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolio_works: {
+        Row: {
+          id: string
+          company_id: string
+          project_id: string | null
+          title: string
+          area_label: string
+          size_pyeong: number | null
+          spaces: Database["public"]["Enums"]["material_space"][]
+          completed_on: string | null
+          duration_weeks: number | null
+          is_featured: boolean
+          summary: string
+          cover_image_id: string | null
+          status: Database["public"]["Enums"]["portfolio_status"]
+          consent_at: string | null
+          consent_by: string | null
+          consent_note: string | null
+          sort_order: number
+          created_by: string
+          created_at: string
+          updated_at: string
+          version: number
+          archived_at: string | null
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          project_id?: string | null
+          title: string
+          area_label?: string
+          size_pyeong?: number | null
+          spaces?: Database["public"]["Enums"]["material_space"][]
+          completed_on?: string | null
+          duration_weeks?: number | null
+          is_featured?: boolean
+          summary?: string
+          cover_image_id?: string | null
+          status?: Database["public"]["Enums"]["portfolio_status"]
+          consent_at?: string | null
+          consent_by?: string | null
+          consent_note?: string | null
+          sort_order?: number
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          version?: number
+          archived_at?: string | null
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          project_id?: string | null
+          title?: string
+          area_label?: string
+          size_pyeong?: number | null
+          spaces?: Database["public"]["Enums"]["material_space"][]
+          completed_on?: string | null
+          duration_weeks?: number | null
+          is_featured?: boolean
+          summary?: string
+          cover_image_id?: string | null
+          status?: Database["public"]["Enums"]["portfolio_status"]
+          consent_at?: string | null
+          consent_by?: string | null
+          consent_note?: string | null
+          sort_order?: number
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          version?: number
+          archived_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_works_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_works_cover_fk"
+            columns: ["cover_image_id"]
+            isOneToOne: false
+            referencedRelation: "portfolio_images"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_works_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_audit_events: {
         Row: {
           id: number
@@ -254,6 +565,7 @@ export type Database = {
           updated_at: string
           version: number
           can_create_projects: boolean
+          portfolio_access: string
         }
         Insert: {
           id?: string
@@ -265,6 +577,7 @@ export type Database = {
           updated_at?: string
           version?: number
           can_create_projects?: boolean
+          portfolio_access?: string
         }
         Update: {
           id?: string
@@ -276,6 +589,7 @@ export type Database = {
           updated_at?: string
           version?: number
           can_create_projects?: boolean
+          portfolio_access?: string
         }
         Relationships: [
           {
@@ -1262,6 +1576,50 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_access_requests: {
+        Row: {
+          id: string
+          company_id: string
+          user_id: string
+          level: string
+          note: string
+          status: string
+          decided_by: string | null
+          decided_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          user_id: string
+          level: string
+          note?: string
+          status?: string
+          decided_by?: string | null
+          decided_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          user_id?: string
+          level?: string
+          note?: string
+          status?: string
+          decided_by?: string | null
+          decided_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_access_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_create_requests: {
         Row: {
           id: string
@@ -1438,6 +1796,8 @@ export type Database = {
           home_theme: string
           page_images: Json
           page_tone: string
+          title_font: string
+          title_weight: number
         }
         Insert: {
           id?: string
@@ -1459,6 +1819,8 @@ export type Database = {
           home_theme?: string
           page_images?: Json
           page_tone?: string
+          title_font?: string
+          title_weight?: number
         }
         Update: {
           id?: string
@@ -1480,6 +1842,8 @@ export type Database = {
           home_theme?: string
           page_images?: Json
           page_tone?: string
+          title_font?: string
+          title_weight?: number
         }
         Relationships: [
           {
@@ -1771,6 +2135,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      portfolio_viewer: {
+        Args: {
+          p_slug: string
+        }
+        Returns: Json
+      }
+      get_public_portfolio: {
+        Args: {
+          p_slug: string
+        }
+        Returns: Json
+      }
+      get_public_portfolio_work: {
+        Args: {
+          p_slug: string
+          p_work: string
+        }
+        Returns: Json
+      }
       accept_invitation: {
         Args: {
           p_user: string
@@ -1845,6 +2228,26 @@ export type Database = {
           p_days?: number
         }
         Returns: number
+      }
+      admin_company_portfolio: {
+        Args: {
+          p_company: string
+        }
+        Returns: Json
+      }
+      admin_set_portfolio_business_lock: {
+        Args: {
+          p_company: string
+          p_locked: boolean
+        }
+        Returns: string | null
+      }
+      admin_set_portfolio_site_name: {
+        Args: {
+          p_company: string
+          p_name: string
+        }
+        Returns: undefined
       }
       admin_set_company_quota: {
         Args: {
@@ -2003,6 +2406,28 @@ export type Database = {
         }
         Returns: undefined
       }
+      request_portfolio_access: {
+        Args: {
+          p_company: string
+          p_level: string
+          p_note?: string
+        }
+        Returns: string
+      }
+      set_portfolio_access: {
+        Args: {
+          p_member: string
+          p_level: string
+        }
+        Returns: undefined
+      }
+      decide_portfolio_access_request: {
+        Args: {
+          p_request: string
+          p_approve: boolean
+        }
+        Returns: undefined
+      }
       request_project_create: {
         Args: {
           p_company: string
@@ -2038,6 +2463,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_participant_name: {
+        Args: {
+          p_project: string
+          p_participant: string
+          p_display_name: string
+        }
+        Returns: undefined
+      }
       withdraw_me: {
         Args: never
         Returns: undefined
@@ -2050,6 +2483,8 @@ export type Database = {
       material_space: "living" | "kitchen" | "bathroom" | "bedroom" | "entrance" | "balcony" | "utility" | "common" | "other"
       member_role: "owner" | "manager" | "pm"
       participant_role: "pm" | "customer" | "field"
+      portfolio_image_role: "gallery" | "before" | "after"
+      portfolio_status: "draft" | "published"
       photo_phase: "demolition" | "plumbing" | "electrical" | "carpentry" | "tile" | "paint" | "film" | "wallpaper" | "flooring" | "furniture" | "lighting" | "finishing" | "other"
       project_status: "planned" | "active" | "on_hold" | "completed"
       request_status: "open" | "in_progress" | "resolved"
@@ -2076,6 +2511,8 @@ export const Constants = {
       material_space: ["living", "kitchen", "bathroom", "bedroom", "entrance", "balcony", "utility", "common", "other"],
       member_role: ["owner", "manager", "pm"],
       participant_role: ["pm", "customer", "field"],
+      portfolio_image_role: ["gallery", "before", "after"],
+      portfolio_status: ["draft", "published"],
       photo_phase: ["demolition", "plumbing", "electrical", "carpentry", "tile", "paint", "film", "wallpaper", "flooring", "furniture", "lighting", "finishing", "other"],
       project_status: ["planned", "active", "on_hold", "completed"],
       request_status: ["open", "in_progress", "resolved"],

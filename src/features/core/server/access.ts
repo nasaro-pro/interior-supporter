@@ -227,8 +227,14 @@ export async function requireProjectAccess(
 ): Promise<ProjectAccess> {
   await getAccessContext(); // 미로그인은 로그인으로
   const access = await findProjectAccess(projectId, allowed);
-  if (!access) notFound();
-  return access;
+  if (access) return access;
+  // 담당자의 고객 화면 미리보기 (페이지 렌더 전용 · 읽기 전용) — customer-preview.ts
+  if (allowed.includes('customer')) {
+    const { findCustomerPreview } = await import('./customer-preview');
+    const preview = await findCustomerPreview(projectId);
+    if (preview) return preview;
+  }
+  notFound();
 }
 
 /** URL·폼의 업체 주소명 정규화 (대소문자·퍼센트 인코딩 무시). 잘못된 인코딩은 null */

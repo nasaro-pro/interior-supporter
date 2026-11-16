@@ -9,11 +9,12 @@ import { isWithin, todayKst } from '@/shared/lib/dates';
 import { normalizeHomeSections } from '../home-sections';
 import { normalizeHomeTheme } from '../home-theme';
 import { normalizePageImages, normalizePageTone } from '../page-theme';
+import { normalizeTitleFont, normalizeTitleWeight } from '../customer-style';
 import { decodeCursor, encodeCursor, sanitizeSearch } from './list-utils';
 import type { ProjectDetail, ProjectListItem } from '../types';
 
 const PROJECT_COLUMNS =
-  'id, company_id, name, site_address, start_date, end_date, status, current_phase, is_public, home_message, home_sections, home_theme, page_images, page_tone, created_at, updated_at, archived_at, version';
+  'id, company_id, name, site_address, start_date, end_date, status, current_phase, is_public, home_message, home_sections, home_theme, page_images, page_tone, title_font, title_weight, created_at, updated_at, archived_at, version';
 
 type ProjectRow = {
   id: string;
@@ -30,6 +31,8 @@ type ProjectRow = {
   home_theme: string;
   page_images: unknown;
   page_tone: string;
+  title_font: string;
+  title_weight: number;
   created_at: string;
   updated_at: string;
   archived_at: string | null;
@@ -51,6 +54,8 @@ const toDetail = (r: ProjectRow): ProjectDetail => ({
   homeTheme: normalizeHomeTheme(r.home_theme),
   pageImages: normalizePageImages(r.page_images),
   pageTone: normalizePageTone(r.page_tone),
+  titleFont: normalizeTitleFont(r.title_font),
+  titleWeight: normalizeTitleWeight(r.title_weight),
   createdAt: r.created_at,
   updatedAt: r.updated_at,
   archivedAt: r.archived_at,

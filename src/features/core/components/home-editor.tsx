@@ -1,6 +1,6 @@
 'use client';
 // src/features/core/components/home-editor.tsx (A · TASK-012, REQ-014) — 고객 홈 편집 (화면 상태 ?mode=edit, D4/D5 없음)
-// 안내문 2,000자 + 4영역 순서(위/아래)·표시 + 색상 테마 + 페이지 분위기·페이지 이미지 표시. 저장 실패 시 편집 내용 보존 (POL-026)
+// 안내문 2,000자 + 4영역 순서(위/아래)·표시 + 색상 테마 + 페이지 분위기 + 제목 글꼴·굵기 + 페이지 이미지 표시. 저장 실패 시 편집 내용 보존 (POL-026)
 import { useState, useTransition } from 'react';
 import { ButtonLink } from '@/shared/ui/button-link';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,13 @@ import { routes } from '@/shared/contracts/routes';
 import { PORTAL_TABS } from '@/shared/contracts/screens';
 import type { HomeTheme } from '../home-theme';
 import type { PageImages, PageTone } from '../page-theme';
-import { HomeSectionsField, HomeThemeField, PageToneField } from './home-template-fields';
+import type { CustomerTitleFont, CustomerTitleWeight } from '../customer-style';
+import {
+  HomeSectionsField,
+  HomeThemeField,
+  PageToneField,
+  TitleStyleField,
+} from './home-template-fields';
 
 export function HomeEditor({
   projectId,
@@ -27,6 +33,8 @@ export function HomeEditor({
   homeTheme,
   pageImages,
   pageTone,
+  titleFont,
+  titleWeight,
   doneHref,
 }: {
   projectId: string;
@@ -36,6 +44,8 @@ export function HomeEditor({
   homeTheme: HomeTheme;
   pageImages: PageImages;
   pageTone: PageTone;
+  titleFont: CustomerTitleFont;
+  titleWeight: CustomerTitleWeight;
   doneHref: string;
 }) {
   const t = useTranslations();
@@ -45,6 +55,8 @@ export function HomeEditor({
   const [theme, setTheme] = useState(homeTheme);
   const [tone, setTone] = useState(pageTone);
   const [images, setImages] = useState<PageImages>(pageImages);
+  const [font, setFont] = useState(titleFont);
+  const [weight, setWeight] = useState(titleWeight);
   // 템플릿에서 복사된 이미지가 있는 탭만 (여기서는 표시 여부만 고른다)
   const templateTabs = PORTAL_TABS.filter((tab) => pageImages[tab]);
   const [error, setError] = useState<AppError | null>(null);
@@ -61,6 +73,8 @@ export function HomeEditor({
         homeTheme: theme,
         pageImages: images,
         pageTone: tone,
+        titleFont: font,
+        titleWeight: weight,
       });
       if (res.ok) {
         toast.success(t('projects.home.saved'));
@@ -127,6 +141,7 @@ export function HomeEditor({
         onChange={setTone}
         label={t('projects.home.pageToneLabel')}
       />
+      <TitleStyleField font={font} weight={weight} onFont={setFont} onWeight={setWeight} />
       {templateTabs.length > 0 ? (
         <div className="flex flex-col gap-1.5">
           <span className="text-sm font-medium" id="home-page-images-label">
