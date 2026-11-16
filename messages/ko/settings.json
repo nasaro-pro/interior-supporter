@@ -4,7 +4,8 @@
     "company": "업체 정보",
     "members": "구성원",
     "templates": "기본 템플릿",
-    "storage": "저장공간"
+    "storage": "저장공간",
+    "portfolio": "포트폴리오"
   },
   "memberRole": {
     "owner": "소유자",
@@ -33,7 +34,10 @@
     "resetOwnerHint": "소유자의 비밀번호는 운영 절차로만 재설정할 수 있습니다.",
     "empty": "아직 초대한 구성원이 없습니다. PM을 초대해 함께 일하세요.",
     "createAlways": "항상 가능",
-    "createPermissionFor": "{name} 프로젝트 생성 권한"
+    "createPermissionFor": "{name} 프로젝트 생성 권한",
+    "createOn": "가능",
+    "createOff": "불가",
+    "you": "나"
   },
   "storage": {
     "used": "{used} / {total} 사용 중",

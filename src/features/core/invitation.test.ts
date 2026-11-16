@@ -142,7 +142,7 @@ describe('A-08 acceptInvitationAsCurrentUser 요청 제한 invite:user:<userId>'
           ? { data: { slug: 'studio-x' } }
           : undefined,
     );
-    expect(await accept()).toEqual({ redirect: 'REDIRECT:/app/studio-x/projects' });
+    expect(await accept()).toEqual({ redirect: 'REDIRECT:/app/studio-x' });
   });
 
   it('예외: 같은 사용자 1시간 10회 초과 → RATE_LIMITED (RPC 없음), 다른 사용자는 영향 없음', async () => {

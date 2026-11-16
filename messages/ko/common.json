@@ -85,7 +85,13 @@
     "language": "언어",
     "logout": "로그아웃",
     "mainNav": "주 메뉴",
-    "projectNav": "프로젝트 메뉴"
+    "projectNav": "프로젝트 메뉴",
+    "dashboard": "대시보드",
+    "unanswered": "답할 요청",
+    "activeProjects": "진행 중 프로젝트",
+    "newProject": "새 프로젝트",
+    "toggleProject": "{name} 메뉴 펼치기",
+    "ourHome": "우리 집"
   },
   "action": {
     "save": "저장",

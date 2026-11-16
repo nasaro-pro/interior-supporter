@@ -137,7 +137,7 @@ async function destinationAfterAccept(r: AcceptResult): Promise<string> {
     .select('slug')
     .eq('id', r.company_id)
     .maybeSingle();
-  return data ? routes.app.projects(data.slug) : routes.selectArea();
+  return data ? routes.app.home(data.slug) : routes.selectArea();
 }
 
 /** 신규 계정: 초대 이메일로 계정 생성 → 수락 RPC → 로그인 */

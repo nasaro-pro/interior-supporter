@@ -35,9 +35,12 @@ import { changePassword, logout, setLocale } from '../server/session-actions';
 export function AccountMenu({
   displayName,
   canSwitchArea,
+  variant = 'header',
 }: {
   displayName: string;
   canSwitchArea: boolean;
+  /** 'sidebar': 업체 영역 왼쪽 메뉴 맨 아래 — 첫 글자 동그라미 + 이름을 칸 너비로 */
+  variant?: 'header' | 'sidebar';
 }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -58,20 +61,40 @@ export function AccountMenu({
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant="ghost"
-              size="sm"
-              aria-label={t('common.nav.account')}
-              data-ui-key="account-menu-open"
-            />
-          }
+        {variant === 'sidebar' ? (
+          <DropdownMenuTrigger
+            aria-label={t('common.nav.account')}
+            data-ui-key="account-menu-open"
+            className="hover:bg-muted focus-visible:ring-ring/50 flex h-10 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[13.5px] outline-none focus-visible:ring-3"
+          >
+            <span
+              aria-hidden
+              className="bg-muted grid size-7 shrink-0 place-items-center rounded-full text-xs font-semibold"
+            >
+              {displayName.trim().slice(0, 1)}
+            </span>
+            <span className="min-w-0 flex-1 truncate">{displayName}</span>
+          </DropdownMenuTrigger>
+        ) : (
+          <DropdownMenuTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label={t('common.nav.account')}
+                data-ui-key="account-menu-open"
+              />
+            }
+          >
+            <CircleUserRound aria-hidden className="size-5" />
+            <span className="hidden max-w-32 truncate lg:inline">{displayName}</span>
+          </DropdownMenuTrigger>
+        )}
+        <DropdownMenuContent
+          align={variant === 'sidebar' ? 'start' : 'end'}
+          side={variant === 'sidebar' ? 'top' : undefined}
+          className="min-w-52"
         >
-          <CircleUserRound aria-hidden className="size-5" />
-          <span className="hidden max-w-32 truncate lg:inline">{displayName}</span>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-52">
           <DropdownMenuGroup>
             <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
           </DropdownMenuGroup>

@@ -13,6 +13,8 @@ import { formToObject, parseInput } from '@/shared/lib/action';
 import { logger, newRef } from '@/shared/lib/logger';
 import { changePasswordSchema, localeSchema, loginSchema, newPasswordSchema } from '../schema';
 import { loadAccessContext } from './access';
+import { getCompanyBasics } from './project-queries';
+import { getPublicPortfolio } from '@/features/portfolio/server/public-queries';
 import { readRecoveryProof } from './recovery-proof';
 import { LAST_COMPANY_COOKIE } from '../constants';
 import { firstLoginState } from '../account-utils';
@@ -69,10 +71,37 @@ export async function login(
   redirect(safeNext(next, routes.selectArea()));
 }
 
-export async function logout(): Promise<void> {
+/** 공개 홈페이지(메인페이지) 주소만 돌아갈 곳으로 받는다 — /c/{주소명}[/...] */
+const PUBLIC_SITE = /^\/c\/[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])(?:\/[A-Za-z0-9/_-]*)?$/;
+
+/**
+ * 로그아웃 뒤 갈 곳 (2026-11): 그 업체의 메인페이지(공개 홈페이지)로. 메인페이지 오른쪽 위에서 다시 로그인한다.
+ *  · 메인페이지의 계정 메뉴에서 로그아웃 → 보고 있던 메인페이지 (next)
+ *  · 업체 관리 · 고객 화면에서 로그아웃 → 마지막으로 쓴 업체(없으면 첫 업체 · 고객이면 공사 중인 업체)의 메인페이지
+ *  · 공개 홈페이지가 없으면 예전처럼 로그인 화면
+ */
+async function afterLogoutHref(next: unknown): Promise<string> {
+  const loggedOut = `${routes.login()}?loggedOut=1`;
+  if (typeof next === 'string' && PUBLIC_SITE.test(next)) return next;
+  const ctx = await loadAccessContext();
+  if (!ctx) return loggedOut;
+  const last = (await cookies()).get(LAST_COMPANY_COOKIE)?.value;
+  let slug = ctx.memberships.find((m) => m.slug === last)?.slug ?? ctx.memberships[0]?.slug ?? null;
+  if (!slug) {
+    const companyId = ctx.participations.find((p) => p.role === 'customer')?.companyId;
+    if (companyId) slug = (await getCompanyBasics(companyId))?.slug ?? null;
+  }
+  if (!slug) return loggedOut;
+  return (await getPublicPortfolio(slug)) ? routes.portfolio.home(slug) : loggedOut;
+}
+
+export async function logout(raw?: unknown): Promise<void> {
+  const next =
+    raw && typeof raw === 'object' && 'next' in raw ? (raw as { next: unknown }).next : undefined;
+  const href = await afterLogoutHref(next);
   const supabase = await createServerSupabase();
   await supabase.auth.signOut();
-  redirect(`${routes.login()}?loggedOut=1`);
+  redirect(href);
 }
 
 // ── REQ-007 영역 선택 (마지막 업체 기억) ─────────────────────────────
@@ -88,7 +117,7 @@ export async function chooseArea(area: 'app' | 'portal' | 'field', companySlug?:
       path: '/',
       maxAge: YEAR,
     });
-    redirect(routes.app.projects(m.slug));
+    redirect(routes.app.home(m.slug));
   }
   if (area === 'portal' && ctx.areas.includes('portal')) redirect(routes.portal.projects());
   if (area === 'field' && ctx.areas.includes('field')) redirect(routes.field.photos());

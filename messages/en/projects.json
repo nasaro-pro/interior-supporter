@@ -6,7 +6,8 @@
     "settings": "Project settings",
     "myProjects": "My projects",
     "myAssigned": "My assigned projects",
-    "home": "Home"
+    "home": "Home",
+    "dashboard": "Dashboard"
   },
   "tab": {
     "overview": "Overview",
@@ -32,10 +33,10 @@
     "field": "Field crew"
   },
   "homeSection": {
-    "overview": "Progress summary",
-    "recent": "Recent updates",
-    "schedule": "Upcoming schedule",
-    "documents": "Documents"
+    "overview": "Progress",
+    "recent": "Recent site photos",
+    "schedule": "Upcoming",
+    "documents": "Designs"
   },
   "field": {
     "name": "Project name",
@@ -78,7 +79,10 @@
     "pageToneLabel": "Page mood",
     "pageImagesLabel": "Images by page",
     "pageImagesHint": "Change page images in Settings > Templates. Here you only choose whether to show them.",
-    "showImage": "Show"
+    "showImage": "Show",
+    "titleFontLabel": "Title font",
+    "titleWeightLabel": "Title weight",
+    "titleSample": "Our home"
   },
   "settings": {
     "basic": "Basic information",
@@ -200,5 +204,117 @@
     "bannerBody": "This is exactly what customers see (public items only). Memos, comments and confirmation are off in preview, and memo threads look empty because customers only see their own.",
     "notPublic": "Customer access is off for this project, so real customers can't open this view yet.",
     "exit": "End preview"
+  },
+  "myHome": {
+    "progressTitle": "Your home",
+    "phaseEmpty": "Preparing",
+    "noPeriod": "Dates not set",
+    "progress": {
+      "during": "Day {day} · {left} days to completion",
+      "before": "{days} days until work starts",
+      "after": "Finishing up",
+      "done": "Work is complete",
+      "unknown": "Progress appears once dates are set"
+    },
+    "photosTitle": "Recent photos",
+    "photosAll": "All photos",
+    "photosEmpty": "No photos yet.",
+    "photosFailed": "Could not load photos. Please try again shortly.",
+    "commentCount": "{n} comments",
+    "recentComments": "Recent comments",
+    "me": "Me"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "today": "{date}",
+    "greeting": "Hello, {name}.",
+    "todoCount": "You have <em>{count} things</em> to check today.",
+    "todoNone": "You're all caught up for today.",
+    "tabsLabel": "Dashboard sections",
+    "tab": {
+      "all": "All",
+      "projects": "Projects",
+      "requests": "Requests",
+      "schedule": "Schedule",
+      "documents": "Designs & materials",
+      "photos": "Photos"
+    },
+    "kpi": {
+      "active": "Active projects",
+      "activeSub": "{count} planned",
+      "unanswered": "Requests to answer",
+      "unansweredSub": "Waiting for your reply",
+      "unansweredNone": "All answered",
+      "week": "Events this week",
+      "weekSub": "{count} today",
+      "pending": "Designs awaiting approval",
+      "pendingSub": "Waiting for the client"
+    },
+    "section": {
+      "todo": "To check today",
+      "projects": "Active projects",
+      "week": "This week",
+      "photos": "Recent site photos",
+      "requests": "Open requests",
+      "pendingDesigns": "Designs awaiting approval",
+      "recentDocuments": "Recent designs & materials",
+      "schedule": "Events this week"
+    },
+    "more": {
+      "todo": "View all",
+      "projects": "All projects",
+      "calendar": "Calendar",
+      "photos": "All photos"
+    },
+    "kind": {
+      "requests": "Request",
+      "schedule_events": "Event",
+      "designs": "Design",
+      "materials": "Material",
+      "photos": "Photo",
+      "estimate_versions": "Estimate"
+    },
+    "phase": "Current phase",
+    "phaseNone": "Not set",
+    "periodProgress": "{pct}% of the period elapsed",
+    "next": "Next: {title} · {date}",
+    "nextNone": "No upcoming events",
+    "requestMeta": "{project} · {status}",
+    "eventMeta": "{project} · {when}",
+    "designMeta": "{project} · waiting for the client",
+    "allDay": "All day",
+    "todayLabel": "Today",
+    "photosFoot": "{count} recent",
+    "doneThisWeek": "<strong>{count}</strong> events done this week",
+    "empty": {
+      "todo": "Nothing to check today.",
+      "projects": "No active projects.",
+      "week": "No events this week.",
+      "photos": "No site photos yet.",
+      "requests": "No open requests.",
+      "documents": "No recent designs or materials."
+    },
+    "partial": "Some information couldn't be loaded. Please refresh in a moment.",
+    "noCover": "No cover photo"
+  },
+  "titleFont": {
+    "noto_sans": "Sans (Noto Sans)",
+    "noto_serif": "Serif (Noto Serif)"
+  },
+  "titleWeight": {
+    "400": "Regular",
+    "500": "Medium",
+    "600": "Bold"
+  },
+  "portalHeader": {
+    "eyebrow": "My Home"
+  },
+  "customerHome": {
+    "progressEyebrow": "Progress",
+    "all": "View all",
+    "failed": "Couldn't load this. Please try again shortly.",
+    "designsEmpty": "No designs shared yet.",
+    "confirmed": "Confirmed",
+    "needsCheck": "Needs review"
   }
 }

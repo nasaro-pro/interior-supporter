@@ -88,7 +88,7 @@ report.push(
   '## 다음 단계 (00 헌법 13.3)',
   '1. npm install → npm run db:types',
   '2. npm run check · npm run db:test',
-  '3. 각 progress/<담당>.md 의 CR 검토·반영',
+  '3. 각 progress/<담당>.md 의 메모 확인',
   '4. INT-01~10 · TC-990 · 점수·G 판정 (00 헌법 14장)',
 );
 mkdirSync(join(root, '_submit'), { recursive: true });

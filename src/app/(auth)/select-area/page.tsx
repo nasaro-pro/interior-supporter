@@ -28,7 +28,7 @@ export default async function SelectAreaPage({
   // 영역 1개면 바로 그 영역 첫 화면 (재설정 직후 안내가 있을 때는 머문다)
   if (choices === 1 && !sp.reset && !sp.stay) {
     const m = ctx.memberships[0];
-    if (m) redirect(routes.app.projects(m.slug));
+    if (m) redirect(routes.app.home(m.slug));
     if (ctx.areas.includes('portal')) redirect(routes.portal.projects());
     if (ctx.areas.includes('field')) redirect(routes.field.photos());
   }
@@ -36,7 +36,7 @@ export default async function SelectAreaPage({
   const last = (await cookies()).get(LAST_COMPANY_COOKIE)?.value;
   if (!sp.stay && !sp.reset && choices === ctx.memberships.length && last) {
     const m = ctx.memberships.find((x) => x.slug === last);
-    if (m) redirect(routes.app.projects(m.slug));
+    if (m) redirect(routes.app.home(m.slug));
   }
 
   const countFor = (role: 'customer' | 'field') =>

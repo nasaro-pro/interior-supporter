@@ -111,5 +111,22 @@
     "submit": "Send note",
     "created": "Note sent.",
     "emptyPreview": "Customers see only their own memos here, so none appear in preview."
+  },
+  "chat": {
+    "notice": "Only you and your designer can see notes · Sent notes can't be edited",
+    "empty": "Leave any questions or requests here. You can also leave notes while viewing designs and materials.",
+    "emptyPreview": "Customers see their notes and designer replies here as a conversation. Customer notes are hidden in preview.",
+    "placeholder": "Write a note",
+    "placeholderItem": "Leave a note on this item",
+    "attach": "Link a design or material",
+    "unlink": "Remove link",
+    "olderLink": "See all earlier notes",
+    "targetKind": {
+      "designs": "Design",
+      "materials": "Material"
+    },
+    "itemTitle": "Notes on this item",
+    "chips": ["Can the color change?", "Can the size be adjusted?", "Please update the estimate"],
+    "backToChat": "Back to conversation"
   }
 }

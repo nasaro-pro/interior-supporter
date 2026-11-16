@@ -37,11 +37,11 @@ export function MemoLayout({
           768px 미만은 하단 탭(BottomTabs: fixed bottom-0 · z-40 · min-h-14 + safe-area)이 덮으므로 그 위에 띄운다 */}
       <div className="h-14 lg:hidden" aria-hidden />
       <div
-        className="pointer-events-none fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 flex justify-center p-3 md:bottom-0 lg:hidden"
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 flex justify-end p-4 md:bottom-0 lg:hidden"
         data-ui-key="item-memo-open-bar"
       >
         <Button
-          className="pointer-events-auto shadow-lg"
+          className="pointer-events-auto h-12 rounded-full bg-(--chat-mine,var(--primary)) px-5 text-(--chat-mine-foreground,var(--primary-foreground)) shadow-lg"
           onClick={() => setOpen(true)}
           data-ui-key="item-memo-open"
           aria-haspopup="dialog"
@@ -53,7 +53,7 @@ export function MemoLayout({
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="bottom"
-          className="max-h-[85svh] overflow-y-auto rounded-t-xl lg:hidden"
+          className="max-h-[62svh] overflow-y-auto rounded-t-[20px] lg:hidden"
           data-ui-key="item-memo-sheet"
         >
           <SheetHeader>

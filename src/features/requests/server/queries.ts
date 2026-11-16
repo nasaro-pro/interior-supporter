@@ -297,3 +297,113 @@ export async function listItemMemos(
     ),
   }));
 }
+
+export interface MemoConversationItem extends ItemMemo {
+  target: RequestTarget | null;
+}
+
+/**
+ * CL-06 메모(대화창) — 고객 본인의 메모와 그 정정 · 답변을 한 대화로 (보관 제외, 최근 limit 개를 오래된 순으로).
+ * 권한은 RLS: 고객은 본인 메모만 (POL-018 이중 검증으로 쿼리에도 author_id 조건)
+ */
+export async function listMemoConversation(
+  projectId: string,
+  viewer: ProjectAccess,
+  userId: string,
+  limit = 50,
+): Promise<{ items: MemoConversationItem[]; hasMore: boolean }> {
+  if (viewer.as === 'field') return { items: [], hasMore: false };
+  const supabase = await createServerSupabase();
+  let query = supabase
+    .from('requests')
+    .select('id, body, status, author_id, created_at, target_type, target_id')
+    .eq('project_id', projectId)
+    .is('archived_at', null);
+  if (viewer.as !== 'editor') query = query.eq('author_id', userId);
+  const { data, error } = await query
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(limit + 1);
+  if (error) throw new Error(`requests.conversation:${error.code ?? 'unknown'}`);
+  const rows = (data ?? []).slice(0, limit).reverse();
+  if (rows.length === 0) return { items: [], hasMore: false };
+  const ids = rows.map((r) => r.id);
+  const [corrections, replies, targets] = await Promise.all([
+    supabase
+      .from('request_corrections')
+      .select('id, request_id, body, author_id, created_at')
+      .in('request_id', ids)
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('request_replies')
+      .select('id, request_id, body, author_id, created_at')
+      .in('request_id', ids)
+      .order('created_at', { ascending: true }),
+    targetsOf(supabase, rows),
+  ]);
+  type Entry = {
+    id: string;
+    request_id: string;
+    body: string;
+    author_id: string;
+    created_at: string;
+  };
+  const raw = (x: Entry) => ({
+    id: x.id,
+    body: x.body,
+    authorId: x.author_id,
+    createdAt: x.created_at,
+  });
+  const cs = (corrections.data ?? []) as Entry[];
+  const rs = (replies.data ?? []) as Entry[];
+  const names = await profileNames(supabase, [
+    ...rows.map((r) => r.author_id),
+    ...cs.map((c) => c.author_id),
+    ...rs.map((c) => c.author_id),
+  ]);
+  return {
+    hasMore: (data ?? []).length > limit,
+    items: rows.map((r, i) => ({
+      id: r.id,
+      status: r.status,
+      authorId: r.author_id,
+      createdAt: r.created_at,
+      target: targets[i] ?? null,
+      entries: buildRequestThread(
+        { id: r.id, body: r.body, authorId: r.author_id, createdAt: r.created_at },
+        cs.filter((c) => c.request_id === r.id).map(raw),
+        rs.filter((c) => c.request_id === r.id).map(raw),
+        names,
+      ),
+    })),
+  };
+}
+
+/** 대화창에서 메모에 연결할 수 있는 항목 — 고객이 볼 수 있는 공개 · 미보관 도안 · 자재 (RLS) */
+export async function listMemoTargets(
+  projectId: string,
+): Promise<{ type: RequestTargetType; id: string; label: string }[]> {
+  const supabase = await createServerSupabase();
+  const [designs, materials] = await Promise.all([
+    supabase
+      .from('designs')
+      .select('id, title')
+      .eq('project_id', projectId)
+      .eq('is_public', true)
+      .is('archived_at', null)
+      .order('updated_at', { ascending: false })
+      .limit(50),
+    supabase
+      .from('materials')
+      .select('id, name')
+      .eq('project_id', projectId)
+      .eq('is_public', true)
+      .is('archived_at', null)
+      .order('updated_at', { ascending: false })
+      .limit(50),
+  ]);
+  return [
+    ...(designs.data ?? []).map((d) => ({ type: 'designs' as const, id: d.id, label: d.title })),
+    ...(materials.data ?? []).map((m) => ({ type: 'materials' as const, id: m.id, label: m.name })),
+  ];
+}

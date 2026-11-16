@@ -151,7 +151,10 @@
       "company_quota_updated": "Company limit changed",
       "files_purged": "Files cleaned up",
       "notifications_purged": "Notifications cleaned up",
-      "password_reset_issued": "Reset link issued"
+      "password_reset_issued": "Reset link issued",
+      "portfolio_site_name_changed": "Site name changed",
+      "portfolio_business_locked": "Business info locked",
+      "portfolio_business_unlocked": "Business info unlocked"
     }
   },
   "withdraw": {

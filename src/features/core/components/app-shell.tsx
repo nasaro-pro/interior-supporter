@@ -19,6 +19,7 @@ export async function AppShell({
   displayName,
   canSwitchArea,
   brandExtra,
+  headerExtra,
   children,
 }: {
   homeHref: string;
@@ -32,6 +33,8 @@ export async function AppShell({
   displayName: string;
   canSwitchArea: boolean;
   brandExtra?: ReactNode;
+  /** 알림 종 왼쪽에 놓는 추가 버튼 (예: 업체 영역의 '내 홈페이지') */
+  headerExtra?: ReactNode;
   children: ReactNode;
 }) {
   const t = await getTranslations();
@@ -63,6 +66,7 @@ export async function AppShell({
             <TopNav items={navItems} label={t('common.nav.mainNav')} />
           </div>
           <div className="flex items-center gap-1">
+            {headerExtra}
             {notificationsHref ? (
               <Link
                 href={notificationsHref}

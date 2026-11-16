@@ -8,7 +8,7 @@ export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = 'ko';
 export const LOCALE_COOKIE = 'NEXT_LOCALE';
 
-/** messages/<locale>/<ns>.json — 새 ns 추가는 CR (00 헌법 10.4) */
+/** messages/<locale>/<ns>.json — 새 ns 를 만들면 이 목록에도 넣는다 (00 헌법 10.4) */
 export const NAMESPACES = [
   'common',
   'auth',
@@ -27,6 +27,7 @@ export const NAMESPACES = [
   'schedule',
   'admin', // 2차 수정 CR-3 사이트 관리·약관·탈퇴
   'field',
+  'portfolio', // CR-PF-06 업체 포트폴리오
 ] as const;
 
 export function toLocale(value: string | undefined): Locale {

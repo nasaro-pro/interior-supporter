@@ -85,7 +85,13 @@
     "language": "Language",
     "logout": "Sign out",
     "mainNav": "Main navigation",
-    "projectNav": "Project navigation"
+    "projectNav": "Project navigation",
+    "dashboard": "Dashboard",
+    "unanswered": "Requests to answer",
+    "activeProjects": "Active projects",
+    "newProject": "New project",
+    "toggleProject": "Expand {name}",
+    "ourHome": "Our home"
   },
   "action": {
     "save": "Save",

@@ -35,7 +35,7 @@ for (const k of ['own', 'stub', 'shadcn', 'frozen', 'foreign']) {
 const bad = [...by('frozen'), ...by('foreign')];
 if (bad.length) {
   console.log(
-    `\n[check-ownership] 위반 ${bad.length}건 — 되돌리거나(스타터 원본으로 복사), STUB 이면 첫 줄에 "// STUB(${owner}): ..." 를 넣고, 공통 파일 변경이 필요하면 progress/${owner}.md 의 CR 로 적으세요.`,
+    `\n[check-ownership] 위반 ${bad.length}건 — 되돌리거나(스타터 원본으로 복사), STUB 이면 첫 줄에 "// STUB(${owner}): ..." 를 넣고.`,
   );
   process.exit(1);
 }

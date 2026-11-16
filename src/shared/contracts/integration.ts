@@ -1,6 +1,6 @@
 /**
  * 담당자 간 연동 계약 — A·B·C 가 합칠 때 맞물리는 지점 전부를 여기서 정의한다.
- * 소유: A · 스타터 고정 파일. 변경 요청은 진행 기록(progress/<담당>.md)의 변경 요청(CR) (docs/00_헌법_공통규칙.md 5.9).
+ * 소유: 박예원.
  * 근거: 01_A 세부문서 6장(AccessContext, ProjectShell, SummaryItem, AuditEvent/NotificationEvent, DecisionAuthority)
  */
 import type { ActionResult } from './errors';

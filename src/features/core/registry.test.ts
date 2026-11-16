@@ -27,10 +27,10 @@ describe('TC-907 화면 레지스트리', () => {
     expect(problems).toEqual([]);
   });
 
-  it('A-T09 제외·보류 화면(OP·대시보드·마이페이지 등)이 레지스트리에 active 로 없다', () => {
+  it('A-T09 제외·보류 화면(OP·마이페이지 등)이 레지스트리에 active 로 없다 (업체 대시보드 PM-00 은 2026-11 범위)', () => {
     const routes = SCREENS.filter((s) => s.status === 'active').map((s) => s.route);
     // '/admin' 은 2차 수정 CR-3(사이트 관리, 통합본 3장)으로 범위에 들어왔다
-    for (const bad of ['/op', '/dashboard', '/mypage', '/meeting', '/billing'])
+    for (const bad of ['/op', '/mypage', '/meeting', '/billing'])
       expect(routes.some((r) => r.includes(bad))).toBe(false);
   });
 });

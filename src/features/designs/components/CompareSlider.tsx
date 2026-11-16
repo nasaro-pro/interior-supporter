@@ -1,5 +1,7 @@
 'use client';
 // PM-14 / CL-14 A/B 비교 슬라이더 (REQ-105, 02 문서 6.1) — 선택·조작은 파일·확정 상태를 바꾸지 않는다 (B-T08)
+// CR-PF-04: 공개 포트폴리오에서도 쓰도록 이미지 주소(src)·고정 비교(fixedPair)·라벨을 밖에서 받을 수 있게 했다.
+//           넘기지 않으면 지금과 똑같이 동작한다 (도안 상세 PM-14·CL-14 는 바꿀 것 없음).
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { routes } from '@/shared/contracts/routes';
@@ -16,7 +18,10 @@ import { NativeSelect } from '@/shared/ui/native-fields';
 
 export interface CompareImage {
   id: string;
-  fileId: string;
+  /** 권한 재검사 파일 라우트(/api/files/…)로 여는 비공개 원본. src 가 있으면 쓰지 않는다 */
+  fileId?: string;
+  /** 바로 열 수 있는 주소(공개용 사본). 있으면 접근 확인(fetch)을 건너뛴다 */
+  src?: string;
   label: string;
   designTitle: string;
   versionNo: number | null;
@@ -24,6 +29,9 @@ export interface CompareImage {
 }
 
 type LoadState = 'loading' | 'ok' | 'failed' | 'denied';
+
+/** 이미지 주소: 공개 주소가 있으면 그대로, 없으면 권한 재검사 라우트 */
+export const compareSrc = (img: CompareImage) => img.src ?? routes.file(img.fileId ?? '');
 
 /** B-03: 실패한 이미지를 다시 그릴 수 있게 loading 으로 되돌린다 (denied·ok 는 유지) */
 const resetFailed = (prev: Record<string, LoadState>, ids: (string | null | undefined)[]) => {
@@ -41,15 +49,33 @@ const resetFailed = (prev: Record<string, LoadState>, ids: (string | null | unde
 export function CompareSlider({
   images,
   initialA,
+  initialB,
+  fixedPair = false,
+  sideLabels,
+  uiKey = 'design-compare',
+  fit = 'contain',
 }: {
   images: CompareImage[];
   /** 현재 도안의 이미지를 A 기본값으로 */
   initialA?: string;
+  /** B 기본값 (없으면 A 가 아닌 첫 이미지) */
+  initialB?: string;
+  /** true 면 A/B 선택 상자를 숨긴다 — 포트폴리오 비포·애프터처럼 짝이 정해진 경우 */
+  fixedPair?: boolean;
+  /** 틀 위 라벨 (기본: designs 문구의 A·B). 예: { a: '애프터', b: '비포' } */
+  sideLabels?: { a: string; b: string };
+  /** data-ui-key 접두어 (화면마다 다르게) */
+  uiKey?: string;
+  /**
+   * 틀 채우기 (CR-PF-04). contain(기본) = 도안처럼 잘리면 안 되는 그림, 비율 유지 + 여백
+   * cover = 시공 사진 — 비포·애프터 비율이 달라도 둘 다 틀을 꽉 채워 같은 자리끼리 겹친다
+   */
+  fit?: 'contain' | 'cover';
 }) {
   const t = useTranslations('designs');
   const [a, setA] = useState<string | null>(initialA ?? images[0]?.id ?? null);
   const [b, setB] = useState<string | null>(
-    images.find((i) => i.id !== (initialA ?? images[0]?.id))?.id ?? null,
+    initialB ?? images.find((i) => i.id !== (initialA ?? images[0]?.id))?.id ?? null,
   );
   const [pos, setPos] = useState(DEFAULT_POSITION);
   const [load, setLoad] = useState<Record<string, LoadState>>({});
@@ -71,7 +97,9 @@ export function CompareSlider({
     let cancelled = false;
     for (const img of targets) {
       if (load[img.id] === 'ok') continue;
-      fetch(routes.file(img.fileId), { redirect: 'manual', credentials: 'same-origin' })
+      // 공개 주소는 권한 개념이 없다 — 확인 없이 <img> 의 onLoad/onError 로만 판정
+      if (img.src) continue;
+      fetch(routes.file(img.fileId ?? ''), { redirect: 'manual', credentials: 'same-origin' })
         .then((res) => {
           if (cancelled) return;
           if (res.type === 'opaqueredirect' || res.ok) {
@@ -176,22 +204,21 @@ export function CompareSlider({
     setLoad((prev) => (prev[id] === 'denied' ? prev : { ...prev, [id]: 'failed' }));
 
   const aPct = Math.round(pos);
-  const valueText = t('compare.valueText', { a: aPct, b: 100 - aPct });
+  // 라벨을 바꿨으면(포트폴리오: 애프터/비포) 읽어 주는 값도 같은 이름으로
+  const valueText = sideLabels
+    ? `${sideLabels.a} ${aPct}% / ${sideLabels.b} ${100 - aPct}%`
+    : t('compare.valueText', { a: aPct, b: 100 - aPct });
 
   return (
-    <section
-      aria-label={t('action.compare')}
-      className="flex flex-col gap-3"
-      data-ui-key="design-compare"
-    >
-      <div className="grid gap-2 sm:grid-cols-2">
+    <section aria-label={t('action.compare')} className="flex flex-col gap-3" data-ui-key={uiKey}>
+      <div className={fixedPair ? 'hidden' : 'grid gap-2 sm:grid-cols-2'}>
         <label className="flex min-w-0 flex-col gap-1.5 text-sm">
           <span className="font-medium">{t('compare.sideA')}</span>
           <NativeSelect
             value={a ?? ''}
             onChange={(e) => selectA(e.target.value || null)}
             disabled={images.length < 2}
-            data-ui-key="design-compare-select-a"
+            data-ui-key={`${uiKey}-select-a`}
           >
             <option value="">{t('compare.choose')}</option>
             {images.map((img) => (
@@ -207,7 +234,7 @@ export function CompareSlider({
             value={b ?? ''}
             onChange={(e) => selectB(e.target.value || null)}
             disabled={images.length < 2}
-            data-ui-key="design-compare-select-b"
+            data-ui-key={`${uiKey}-select-b`}
           >
             <option value="">{t('compare.choose')}</option>
             {images.map((img) => (
@@ -233,12 +260,12 @@ export function CompareSlider({
           // eslint-disable-next-line @next/next/no-img-element -- 권한 재검사 라우트(302)라 next/image 최적화 대상이 아님
           <img
             key={`${imgB.id}:${attempt[imgB.id] ?? 0}`}
-            src={routes.file(imgB.fileId)}
+            src={compareSrc(imgB)}
             alt={imgB.label}
             draggable={false}
             onLoad={() => onImgLoad(imgB.id)}
             onError={() => onImgError(imgB.id)}
-            className="absolute inset-0 h-full w-full object-contain"
+            className={`absolute inset-0 h-full w-full ${fit === 'cover' ? 'object-cover' : 'object-contain'}`}
             data-testid="compare-b"
           />
         ) : null}
@@ -246,14 +273,14 @@ export function CompareSlider({
           // eslint-disable-next-line @next/next/no-img-element -- 위와 같음
           <img
             key={`${imgA.id}:${attempt[imgA.id] ?? 0}`}
-            src={routes.file(imgA.fileId)}
+            src={compareSrc(imgA)}
             alt={imgA.label}
             draggable={false}
             onLoad={() => onImgLoad(imgA.id)}
             onError={() => onImgError(imgA.id)}
             style={{ clipPath: clipForPosition(pos) }}
             // X1: object-contain 여백은 투명이라 아래 B 가 비친다 → 틀과 같은 불투명 배경으로 A 쪽을 덮는다
-            className="bg-muted absolute inset-0 h-full w-full object-contain"
+            className={`bg-muted absolute inset-0 h-full w-full ${fit === 'cover' ? 'object-cover' : 'object-contain'}`}
             data-testid="compare-a"
           />
         ) : null}
@@ -268,7 +295,7 @@ export function CompareSlider({
               {t(`compare.disabled.${reason}`)}
             </span>
             {reason === 'loadFailed' ? (
-              <Button variant="outline" onClick={retry} data-ui-key="design-compare-retry">
+              <Button variant="outline" onClick={retry} data-ui-key={`${uiKey}-retry`}>
                 <RefreshCw aria-hidden />
                 {t('compare.retry')}
               </Button>
@@ -277,10 +304,10 @@ export function CompareSlider({
         ) : (
           <>
             <span className="bg-background/80 absolute top-2 left-2 rounded-sm px-1.5 text-xs">
-              {t('compare.sideA')}
+              {sideLabels?.a ?? t('compare.sideA')}
             </span>
             <span className="bg-background/80 absolute top-2 right-2 rounded-sm px-1.5 text-xs">
-              {t('compare.sideB')}
+              {sideLabels?.b ?? t('compare.sideB')}
             </span>
             <div
               role="slider"
@@ -292,7 +319,7 @@ export function CompareSlider({
               aria-valuetext={valueText}
               aria-describedby={hintId}
               onKeyDown={onKeyDown}
-              data-ui-key="design-compare-handle"
+              data-ui-key={`${uiKey}-handle`}
               style={{ left: `${pos}%` }}
               className="focus-visible:ring-ring/50 absolute top-0 bottom-0 w-6 -translate-x-1/2 cursor-ew-resize rounded-sm outline-none focus-visible:ring-3"
             >
@@ -302,9 +329,13 @@ export function CompareSlider({
           </>
         )}
       </div>
-      <p className="text-meta text-muted-foreground flex justify-between">
+      <p className="text-meta text-muted-foreground flex flex-wrap justify-between gap-x-3">
         <span id={hintId}>{t('compare.keyboardHint')}</span>
-        {!disabled ? <span aria-hidden>{valueText}</span> : null}
+        {!disabled ? (
+          <span aria-hidden className="whitespace-nowrap">
+            {valueText}
+          </span>
+        ) : null}
       </p>
     </section>
   );

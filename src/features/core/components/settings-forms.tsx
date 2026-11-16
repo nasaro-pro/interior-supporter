@@ -1,16 +1,32 @@
 'use client';
 // src/features/core/components/settings-forms.tsx (A · TASK-015·016) — 업체 정보·로고·템플릿(고객 홈 전체, CR-A-10)·구성원 초대·재설정 링크
-import { useActionState, useRef, useState, useTransition } from 'react';
+import { useActionState, useRef, useState, useTransition, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { Eye, ImageOff, KeyRound, Upload, UserPlus, X } from 'lucide-react';
+import {
+  ChevronDown,
+  Eye,
+  ImageOff,
+  KeyRound,
+  MoreHorizontal,
+  Upload,
+  UserMinus,
+  UserPlus,
+  X,
+} from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
 import { FormError, FormRow, SubmitButton } from '@/shared/ui/form-parts';
 import { NativeSelect } from '@/shared/ui/native-fields';
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu';
 import { useActionErrorText } from '@/shared/ui/action-error';
 import { createBrowserSupabase } from '@/shared/lib/supabase/browser';
 import { FILE_RULES } from '@/shared/contracts/domain';
@@ -568,21 +584,24 @@ export function MemberRoleSelect({
   const label = (r: 'manager' | 'pm') => t(`settings.memberRole.${r}`);
   return (
     <>
-      <NativeSelect
-        aria-label={name ? `${t('settings.field.role')} · ${name}` : t('settings.field.role')}
-        className="w-36"
-        value={asked ?? value}
-        disabled={busy}
-        aria-busy={busy}
-        data-ui-key="member-role-select"
-        onChange={(e) => {
-          const next = e.target.value as 'manager' | 'pm';
-          if (next !== value) setAsked(next);
-        }}
-      >
-        <option value="manager">{label('manager')}</option>
-        <option value="pm">{label('pm')}</option>
-      </NativeSelect>
+      {/* 표 안에서는 테두리 없는 글자형 (2026-11 구성원 표 개선): 'PM ⌄' + 마우스 올리면 연한 바탕 */}
+      <GhostSelectWrap>
+        <NativeSelect
+          aria-label={name ? `${t('settings.field.role')} · ${name}` : t('settings.field.role')}
+          className={GHOST_SELECT}
+          value={asked ?? value}
+          disabled={busy}
+          aria-busy={busy}
+          data-ui-key="member-role-select"
+          onChange={(e) => {
+            const next = e.target.value as 'manager' | 'pm';
+            if (next !== value) setAsked(next);
+          }}
+        >
+          <option value="manager">{label('manager')}</option>
+          <option value="pm">{label('pm')}</option>
+        </NativeSelect>
+      </GhostSelectWrap>
       <ConfirmDialog
         open={asked !== null}
         onOpenChange={(open) => {
@@ -620,6 +639,22 @@ export function MemberRoleSelect({
         }}
       />
     </>
+  );
+}
+
+/** 표 안의 드롭다운 — 테두리 없이 글자 + 얇은 화살표 (구성원 표). 화살표는 select 위에 겹쳐 그린다 */
+export const GHOST_SELECT =
+  'hover:bg-muted focus-visible:bg-muted h-9 w-auto min-w-0 cursor-pointer appearance-none rounded-md border-0 bg-transparent pr-7 pl-2 text-sm font-medium';
+
+export function GhostSelectWrap({ children }: { children: ReactNode }) {
+  return (
+    <span className="relative -ml-2 inline-flex items-center">
+      {children}
+      <ChevronDown
+        aria-hidden
+        className="text-muted-foreground pointer-events-none absolute right-2 size-3.5"
+      />
+    </span>
   );
 }
 
@@ -661,6 +696,85 @@ export function ResetLinkButton({
         description={t('settings.members.resetLinkCreated')}
         onClose={() => setLink(null)}
       />
+    </>
+  );
+}
+
+/**
+ * 구성원 줄의 ⋯ 메뉴 (2026-11 구성원 표 개선) — 재설정 링크 만들기 · 구성원에서 제거를 한 버튼으로.
+ * 고른 뒤의 동작은 예전과 같다: 재설정 링크는 1회용 링크 대화상자, 제거는 확인 대화상자 (removeAction 은 페이지가 묶어 준 서버 액션)
+ */
+export function MemberActionsMenu({
+  companyId,
+  targetUserId,
+  name,
+  removeAction,
+}: {
+  companyId: string;
+  targetUserId: string;
+  name: string;
+  /** 없으면 제거 항목을 그리지 않는다 (소유자만 제거 가능) */
+  removeAction?: () => Promise<ActionResult<unknown>>;
+}) {
+  const t = useTranslations();
+  const [pending, start] = useTransition();
+  const [link, setLink] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          aria-label={`${t('common.action.moreActions')} · ${name}`}
+          disabled={pending}
+          className="text-muted-foreground hover:bg-muted hover:text-foreground inline-grid size-8 place-items-center rounded-md"
+          data-ui-key="member-actions-open"
+        >
+          <MoreHorizontal aria-hidden className="size-4" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-48">
+          <DropdownMenuItem
+            data-ui-key="member-reset-link-create"
+            onClick={() =>
+              start(async () => {
+                const res = await createPasswordResetLink({ companyId, targetUserId });
+                if (res.ok) setLink(res.data.link);
+                else toast.error(t(`errors.${res.error.code}`));
+              })
+            }
+          >
+            <KeyRound aria-hidden />
+            {t('settings.members.createResetLink')}
+          </DropdownMenuItem>
+          {removeAction ? (
+            <DropdownMenuItem
+              variant="destructive"
+              data-ui-key="member-remove-open"
+              onClick={() => setRemoving(true)}
+            >
+              <UserMinus aria-hidden />
+              {t('settings.members.remove')}
+            </DropdownMenuItem>
+          ) : null}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <OneTimeLinkDialog
+        link={link}
+        title={`${t('settings.members.createResetLink')} · ${name}`}
+        description={t('settings.members.resetLinkCreated')}
+        onClose={() => setLink(null)}
+      />
+      {removeAction ? (
+        <ConfirmDialog
+          open={removing}
+          onOpenChange={setRemoving}
+          title={t('settings.confirm.removeMember.title', { name })}
+          body={t('settings.confirm.removeMember.body')}
+          confirmLabel={t('settings.members.remove')}
+          successMessage={t('settings.toast.memberRemoved')}
+          action={removeAction}
+          uiKey="member-remove"
+        />
+      ) : null}
     </>
   );
 }

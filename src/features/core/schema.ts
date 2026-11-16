@@ -1,6 +1,7 @@
 // src/features/core/schema.ts (A) — zod 스키마. 길이는 마이그레이션 CHECK 와 같다 (20261006000100_a_foundation.sql)
 // 메시지는 errors.json 의 field.* 키. 인자가 필요한 키는 'field.tooLong|120' 처럼 | 뒤에 값을 붙인다 (FieldError 가 해석).
 import { z } from 'zod';
+import { CUSTOMER_TITLE_FONTS } from './customer-style';
 import {
   HOME_SECTION_KEYS,
   MEMBER_ROLES,
@@ -189,6 +190,11 @@ export const homeUpdateSchema = z.object({
   /** 페이지 이미지는 템플릿에서 복사된 것만 — 프로젝트 화면에서는 유지 또는 제거만 (DB 트리거가 파일 검사) */
   pageImages: pageImagesSchema,
   pageTone: z.enum(PAGE_TONES, { message: 'field.select' }),
+  /** 고객 화면 제목 글꼴·굵기 (customer-style.ts) */
+  titleFont: z.enum(CUSTOMER_TITLE_FONTS, { message: 'field.select' }),
+  titleWeight: z.union([z.literal(400), z.literal(500), z.literal(600)], {
+    message: 'field.select',
+  }),
 });
 
 export const projectArchiveSchema = z.object({
