@@ -12,7 +12,7 @@ function statusOf(u: AdminUserRow): { key: 'anonymized' | 'suspended' | 'active'
   return { key: 'active', tone: 'positive' };
 }
 
-export function UserTable({ rows }: { rows: AdminUserRow[] }) {
+export function UserTable({ rows, selfId }: { rows: AdminUserRow[]; selfId?: string | null }) {
   const t = useTranslations('admin');
   return (
     <Table data-ui-key="admin-user-table">
@@ -60,7 +60,7 @@ export function UserTable({ rows }: { rows: AdminUserRow[] }) {
                 </ToneBadge>
               </TableCell>
               <TableCell>
-                <UserActions user={u} />
+                <UserActions user={u} isSelf={u.id === selfId} />
               </TableCell>
             </TableRow>
           );

@@ -102,7 +102,14 @@
     "anonymize": "Anonymize",
     "anonymizeConfirm": "Anonymize {name}?",
     "anonymizeBody": "Removes name and contact details and blocks sign-in. Uploads and history stay. This cannot be undone.",
-    "anonymizeDone": "Account anonymized."
+    "anonymizeDone": "Account anonymized.",
+    "grantAdmin": "Make admin",
+    "grantAdminConfirm": "Make {name} a site admin?",
+    "grantAdminBody": "They will be able to use all of site admin (companies, accounts, settings, cleanup). Only choose people you trust.",
+    "grantAdminDone": "Made a site admin.",
+    "revokeAdmin": "Remove admin",
+    "revokeAdminConfirm": "Remove site admin rights from {name}?",
+    "revokeAdminDone": "Admin rights removed."
   },
   "settings": {
     "description": "Set upload limits and the default storage limit for companies. Changes apply from the next upload.",
@@ -154,7 +161,9 @@
       "password_reset_issued": "Reset link issued",
       "portfolio_site_name_changed": "Site name changed",
       "portfolio_business_locked": "Business info locked",
-      "portfolio_business_unlocked": "Business info unlocked"
+      "portfolio_business_unlocked": "Business info unlocked",
+      "admin_granted": "Admin granted",
+      "admin_revoked": "Admin removed"
     }
   },
   "withdraw": {
@@ -201,6 +210,7 @@
     "notMember": "Only a member of this company can become its owner.",
     "alreadyOwner": "Already the owner.",
     "selfTarget": "You cannot do this to your own account.",
-    "soleOwner": "This is the only owner of a company. Change the owner first."
+    "soleOwner": "This is the only owner of a company. Change the owner first.",
+    "inactiveTarget": "Suspended or anonymized accounts cannot be made admins."
   }
 }

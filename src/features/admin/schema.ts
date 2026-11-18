@@ -49,6 +49,12 @@ export const suspendSchema = z.object({
   suspended: z.boolean(),
 });
 
+/** 사이트 관리자 권한 부여·해제 (2026-11) */
+export const platformAdminSchema = z.object({
+  userId: z.uuid(),
+  admin: z.boolean(),
+});
+
 export const purgeFilesSchema = z.object({
   fileIds: z.array(z.uuid()).min(1).max(200),
 });
