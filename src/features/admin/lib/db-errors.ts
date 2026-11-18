@@ -13,6 +13,7 @@ const REASONS: Record<string, AdminDbError> = {
   already_owner: { code: 'CONFLICT', reasonKey: 'error.alreadyOwner' },
   self_target: { code: 'CONFLICT', reasonKey: 'error.selfTarget' },
   sole_owner: { code: 'CONFLICT', reasonKey: 'error.soleOwner' },
+  inactive_target: { code: 'CONFLICT', reasonKey: 'error.inactiveTarget' },
   not_found: { code: 'NOT_FOUND' },
 };
 

@@ -15,6 +15,7 @@ import { groupPathsByBucket } from '../lib/mappers';
 import {
   changeOwnerSchema,
   companyQuotaSchema,
+  platformAdminSchema,
   purgeFilesSchema,
   siteSettingsSchema,
   suspendSchema,
@@ -105,6 +106,23 @@ export async function setUserSuspended(raw: unknown): Promise<ActionResult<void>
   if (error) return rpcFail('admin.suspend.failed', error, { objectId: userId });
   const auth = await setLoginBlocked(userId, suspended);
   if (!auth.ok) return followUpFail('admin.suspend.auth_failed', auth.code, userId);
+  revalidatePath(routes.admin.users());
+  return ok(undefined);
+}
+
+// ── A5 사이트 관리자 권한 부여·해제 (2026-11) — 본인 제외, 정지·익명화 계정에는 부여 안 함 (DB 가 검사)
+export async function setPlatformAdmin(raw: unknown): Promise<ActionResult<void>> {
+  const parsed = parseInput(platformAdminSchema, raw);
+  if (!parsed.ok) return parsed.result;
+  const denied = await adminGuard();
+  if (denied) return denied;
+  const { userId, admin } = parsed.data;
+  const supabase = await createServerSupabase();
+  const { error } = await supabase.rpc('admin_set_platform_admin', {
+    p_user: userId,
+    p_admin: admin,
+  });
+  if (error) return rpcFail('admin.platform_admin.failed', error, { objectId: userId });
   revalidatePath(routes.admin.users());
   return ok(undefined);
 }

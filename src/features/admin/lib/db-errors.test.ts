@@ -9,6 +9,10 @@ describe('사이트 관리 DB 오류 문구', () => {
     });
     expect(explainAdminDbError('not_member')?.reasonKey).toBe('error.notMember');
     expect(explainAdminDbError('not_found')).toEqual({ code: 'NOT_FOUND' });
+    expect(explainAdminDbError('inactive_target')).toEqual({
+      code: 'CONFLICT',
+      reasonKey: 'error.inactiveTarget',
+    });
   });
   it('모르는 문구·빈 값은 null', () => {
     expect(explainAdminDbError('forbidden')).toBeNull();

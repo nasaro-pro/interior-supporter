@@ -2256,6 +2256,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_set_platform_admin: {
+        Args: {
+          p_admin: boolean
+          p_user: string
+        }
+        Returns: undefined
+      }
       admin_set_user_suspended: {
         Args: {
           p_user: string
