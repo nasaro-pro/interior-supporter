@@ -5,7 +5,7 @@
 import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { getAccessContext, requireProjectAccess } from '@/features/core';
+import { requireProjectAccess } from '@/features/core';
 import { customerTitleVars } from '@/features/core/customer-style';
 import { PortalProjectHeader } from '@/features/core/components/portal-project-header';
 import { PortalPageCanvas } from '@/features/core/components/portal-page-canvas';
@@ -24,24 +24,19 @@ export default async function PortalProjectLayout({
 }) {
   const { project: projectId } = await params;
   const access = await requireProjectAccess(projectId, ['customer']);
-  const [project, detail, t, ctx] = await Promise.all([
+  const [project, detail, t] = await Promise.all([
     getProjectHeader(projectId),
     getProject(projectId),
     getTranslations(),
-    getAccessContext(),
   ]);
   if (!project || !detail) notFound();
-  const homes = ctx.participations.filter((p) => p.role === 'customer').length;
   return (
     <div style={customerTitleVars(detail.titleFont, detail.titleWeight)}>
       <PortalPageCanvas tone={detail.pageTone} images={detail.pageImages} key={projectId}>
         {access.preview ? (
           <CustomerPreviewBanner projectId={projectId} isPublic={detail.isPublic} />
         ) : null}
-        <PortalProjectHeader
-          project={project}
-          projectsHref={!access.preview && homes > 1 ? routes.portal.projects() : undefined}
-        />
+        <PortalProjectHeader project={project} />
         <ProjectTabsNav
           variant="underline"
           tabs={PORTAL_TABS.map((tab) => ({

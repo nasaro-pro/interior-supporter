@@ -167,7 +167,6 @@ export async function PortalShell({
         labels={{
           home: t('ourHome'),
           memo: tp('tab.memos'),
-          projects: t('myProjects'),
           notifications: t('notifications'),
           menu: t('menu'),
         }}

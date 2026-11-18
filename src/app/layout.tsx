@@ -7,6 +7,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import localFont from 'next/font/local';
 import { Toaster } from 'sonner';
 import { NavigationProgress } from '@/features/core/components/navigation-progress';
+import { NoDrag } from '@/shared/ui/no-drag';
 import './globals.css';
 
 // TASK-001: Pretendard Variable (OFL 1.1, public/fonts/Pretendard-LICENSE.txt) — 02 문서 7.3
@@ -39,6 +40,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <NavigationProgress />
           </Suspense>
           {children}
+          <NoDrag />
           <Toaster position="top-center" closeButton richColors />
         </NextIntlClientProvider>
       </body>
