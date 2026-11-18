@@ -12,7 +12,9 @@ import { clientIp, hitRateLimit } from '@/shared/lib/rate-limit';
 import { formToObject, parseInput } from '@/shared/lib/action';
 import { logger, newRef } from '@/shared/lib/logger';
 import { changePasswordSchema, localeSchema, loginSchema, newPasswordSchema } from '../schema';
-import { loadAccessContext } from './access';
+import { loadAccessContext, normalizeSlug } from './access';
+import { parseViewer } from '@/features/portfolio/lib/viewer';
+import { portfolioDestination } from '@/features/portfolio/server/viewer-queries';
 import { getCompanyBasics } from './project-queries';
 import { getPublicPortfolio } from '@/features/portfolio/server/public-queries';
 import { readRecoveryProof } from './recovery-proof';
@@ -67,6 +69,18 @@ export async function login(
 
   // D-15: 임시 비밀번호로 처음 들어왔으면 먼저 새 비밀번호를 정한다
   if (first === 'must_change') redirect(routes.changePassword());
+  // 2026-11: 업체 사이트 [로그인]에서 왔으면(next = /c/{slug}/my) 이동 전용 경로를 거치지 않고 갈 곳을 바로 정한다.
+  // 경로 처리기를 거치면 화면 내용만 바뀌고 주소창은 /c/{slug}/my 에 머문다. 관계 조회에 실패하면 원래대로 next 로.
+  // 관계 없는 계정(현장 작업자 · 다른 업체 직원)은 자기 작업 화면으로 (portfolioDestination)
+  const site = /^\/c\/([^/?#]+)\/my$/.exec(next ?? '');
+  const siteSlug = site ? normalizeSlug(site[1] ?? '') : null;
+  if (siteSlug) {
+    const { data: rel, error: relError } = await supabase.rpc('portfolio_viewer', {
+      p_slug: siteSlug,
+    });
+    const viewer = relError ? null : parseViewer(rel);
+    if (viewer && viewer.role !== 'guest') redirect(await portfolioDestination(viewer, siteSlug));
+  }
   // next(같은 사이트 경로만) > 영역 선택(영역 1개면 그 화면이 바로 이동시킴)
   redirect(safeNext(next, routes.selectArea()));
 }

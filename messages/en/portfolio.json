@@ -376,6 +376,7 @@
     "login": "Log in",
     "myHome": "My page",
     "manage": "Dashboard",
+    "workspace": "My workspace",
     "notLinked": "This account is not linked to a home with this company yet. Log in with the account from your invitation email."
   },
   "permission": {

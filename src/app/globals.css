@@ -256,3 +256,27 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* 2026-11 사이트 전체 드래그 금지: 글자 선택·이미지 끌기를 막는다 (끌기 시작은 shared/ui/no-drag.tsx).
+   입력칸 · 글 쓰는 칸은 예외 — 입력·복사·붙여넣기는 그대로 된다 */
+@layer base {
+  html {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  input,
+  textarea,
+  select,
+  [contenteditable='true'],
+  [data-allow-drag] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+  img,
+  a,
+  svg {
+    -webkit-user-drag: none;
+  }
+}

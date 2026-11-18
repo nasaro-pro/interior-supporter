@@ -7,6 +7,7 @@ import {
   CUSTOMER_PREVIEW_MAX_AGE,
 } from '@/features/core/server/customer-preview';
 import { routes } from '@/shared/contracts/routes';
+import { redirectPath } from '@/shared/lib/redirect';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export async function GET(
   if (!access || access.companySlug.toLowerCase() !== decodeURIComponent(company).toLowerCase()) {
     return new NextResponse(null, { status: 404 });
   }
-  const res = NextResponse.redirect(new URL(routes.portal.project(project, 'home'), request.url));
+  const res = redirectPath(routes.portal.project(project, 'home'));
   res.cookies.set(CUSTOMER_PREVIEW_COOKIE, project, {
     httpOnly: true,
     sameSite: 'lax',
