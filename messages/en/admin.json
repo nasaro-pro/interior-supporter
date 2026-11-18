@@ -113,7 +113,7 @@
     "defaultQuotaHint": "Leave empty for no limit. Set per-company limits on the company page.",
     "save": "Save",
     "saved": "Saved.",
-    "updatedAt": "Last changed {date}"
+    "updatedAt": "Last changed <date></date>"
   },
   "cleanup": {
     "description": "Remove files that only take up space and old notifications. These are the only exceptions to the no-delete rule.",

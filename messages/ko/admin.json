@@ -113,7 +113,7 @@
     "defaultQuotaHint": "비우면 제한 없음. 업체별 한도는 업체 상세에서 정합니다.",
     "save": "저장",
     "saved": "저장했습니다.",
-    "updatedAt": "마지막 변경 {date}"
+    "updatedAt": "마지막 변경 <date></date>"
   },
   "cleanup": {
     "description": "저장공간만 차지하는 파일과 오래된 알림을 정리합니다. 삭제 금지 원칙의 예외는 이 두 가지뿐입니다.",
