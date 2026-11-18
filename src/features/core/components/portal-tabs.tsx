@@ -1,5 +1,5 @@
 'use client';
-// src/features/core/components/portal-tabs.tsx (A) — 고객 휴대폰 아래 탭. 프로젝트 안이면 '우리 집 · 메모 · 알림', 밖이면 '내 프로젝트 · 알림'
+// src/features/core/components/portal-tabs.tsx (A) — 고객 휴대폰 아래 탭. 프로젝트 안이면 '우리 집 · 메모 · 알림', 밖이면 '우리 집(가장 최근 집) · 알림'
 import { usePathname } from 'next/navigation';
 import { routes } from '@/shared/contracts/routes';
 import { BottomTabs, type NavItem } from './nav-links';
@@ -13,7 +13,7 @@ export function PortalTabs({
 }: {
   projectsHref: string;
   unread: number;
-  labels: { home: string; memo: string; projects: string; notifications: string; menu: string };
+  labels: { home: string; memo: string; notifications: string; menu: string };
 }) {
   const pathname = usePathname();
   const m = IN_PROJECT.exec(pathname);
@@ -42,7 +42,8 @@ export function PortalTabs({
         notifications,
       ]
     : [
-        { key: 'projects', label: labels.projects, href: projectsHref, icon: 'projects' },
+        // 2026-11: '내 프로젝트' 목록을 없앴으므로 밖에서는 '우리 집'(가장 최근 집 홈으로 이동)
+        { key: 'home', label: labels.home, href: projectsHref, icon: 'home' },
         notifications,
       ];
   return <BottomTabs items={items} label={labels.menu} />;

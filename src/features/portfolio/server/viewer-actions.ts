@@ -1,15 +1,13 @@
 'use server';
 // 공개 페이지 머리 버튼 문구용 — 페이지 자체는 로그인 정보 없이 그리고, 버튼만 나중에 채운다
 import { z } from 'zod';
-import { viewerLabelKey } from '../lib/viewer';
+import { viewerLabelKey, type ViewerLabel } from '../lib/viewer';
 import { loadPortfolioViewer } from './viewer-queries';
 import { loadAccessContext } from '@/features/core/server/access';
 
 const slugSchema = z.string().trim().min(1).max(40);
 
-export async function getPortfolioAccountLabel(
-  raw: unknown,
-): Promise<'login' | 'myHome' | 'manage'> {
+export async function getPortfolioAccountLabel(raw: unknown): Promise<ViewerLabel> {
   const slug = slugSchema.safeParse(raw);
   if (!slug.success) return 'login';
   return viewerLabelKey(await loadPortfolioViewer(slug.data));
@@ -21,7 +19,7 @@ export async function getPortfolioAccountLabel(
  */
 export async function getPortfolioAccount(
   raw: unknown,
-): Promise<{ label: 'login' | 'myHome' | 'manage'; name: string | null }> {
+): Promise<{ label: ViewerLabel; name: string | null }> {
   const label = await getPortfolioAccountLabel(raw);
   if (label === 'login') return { label, name: null };
   const ctx = await loadAccessContext();

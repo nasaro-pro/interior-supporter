@@ -1,5 +1,6 @@
 'use client';
-// 공개 포트폴리오 머리 오른쪽 끝 (2026-11) — 로그인 안 함: '로그인' 버튼 / 로그인함: 사람 아이콘 → 이름 · 마이페이지(관리 페이지) · 로그아웃
+// 공개 포트폴리오 머리 오른쪽 끝 (2026-11) — 로그인 안 함: '로그인' 버튼 / 로그인함: 사람 아이콘 → 이름 · 마이페이지(관리 페이지 · 내 작업 화면) · 로그아웃
+// 이 업체와 관계 없는 계정도 메뉴를 보여 준다 — 로그아웃하고 다른 계정으로 바꿔 들어올 수 있게
 // 마이페이지 · 관리 페이지 주소는 언제나 /c/{slug}/my 하나: 받는 쪽이 로그인 상태와 관계를 다시 확인해서 보낸다 (문구는 안내일 뿐 권한이 아니다)
 // 로그아웃하면 이 메인페이지에 그대로 머문다 (logout({ next }))
 import { useEffect, useState, useTransition } from 'react';
@@ -18,16 +19,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
+import type { ViewerLabel } from '../lib/viewer';
 import { portfolioRoutes } from '../routes';
 import { getPortfolioAccount } from '../server/viewer-actions';
-
-type Label = 'login' | 'myHome' | 'manage';
 
 export function PortfolioAccountLink({ slug }: { slug: string }) {
   const t = useTranslations('portfolio.account');
   const tc = useTranslations('common.nav');
   const pathname = usePathname();
-  const [account, setAccount] = useState<{ label: Label; name: string | null }>({
+  const [account, setAccount] = useState<{ label: ViewerLabel; name: string | null }>({
     label: 'login',
     name: null,
   });
@@ -56,7 +56,7 @@ export function PortfolioAccountLink({ slug }: { slug: string }) {
       </Link>
     );
   }
-  const Go = account.label === 'manage' ? LayoutDashboard : House;
+  const Go = account.label === 'myHome' ? House : LayoutDashboard; // 관리 페이지 · 내 작업 화면
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
