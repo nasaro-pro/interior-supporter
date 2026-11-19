@@ -6,6 +6,11 @@ create extension if not exists pgtap with schema extensions;
 set local search_path to public, extensions;
 select * from no_plan();
 
+-- 개발 시드 등 이미 있는 행이 있어도 되도록, 대시보드 수는 시험 전 개수 + 이 시험이 넣은 수로 비교한다
+select set_config('test.base_companies', (select count(*) from public.companies)::text, true);
+select set_config('test.base_users', (select count(*) from public.profiles where anonymized_at is null)::text, true);
+select set_config('test.base_projects', (select count(*) from public.projects where archived_at is null)::text, true);
+
 -- ---- 최소 시드: admin1 = 사이트 관리자 / owner1 = 업체1 소유자 / mgr1 = 업체1 매니저 / cust1 = P1 고객 ----
 insert into auth.users (id, email, raw_user_meta_data) values
   ('a0000000-0000-0000-0000-000000000001', 'admin1@test.local', '{"display_name":"관리자"}'),
@@ -46,8 +51,11 @@ select is((select count(*) from public.admin_audit_events), 0::bigint, 'A8 비�
 
 -- ===== A3 대시보드 · A4 업체 =====
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-000000000001","role":"authenticated"}', true);
-select ok((select companies = 1 and projects = 1 and users = 4 from public.admin_dashboard()), 'A3 업체·프로젝트·사용자 수');
-select ok((select owner_name = '소유자' and member_count = 2 from public.admin_companies('studio')), 'A4 업체 목록 소유자·구성원 수');
+select ok((select companies = current_setting('test.base_companies')::bigint + 1
+               and projects = current_setting('test.base_projects')::bigint + 1
+               and users = current_setting('test.base_users')::bigint + 4
+          from public.admin_dashboard()), 'A3 업체·프로젝트·사용자 수');
+select ok((select owner_name = '소유자' and member_count = 2 from public.admin_companies('studio-one')), 'A4 업체 목록 소유자·구성원 수');
 select is_empty($$ select * from public.admin_companies('없는업체') $$, 'A4 검색 불일치 0행');
 
 select lives_ok($$ select public.admin_change_company_owner('c0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000003') $$,
@@ -62,7 +70,7 @@ select throws_ok($$ select public.admin_change_company_owner('c0000000-0000-0000
 
 -- ===== A5 정지 · 익명화 =====
 select lives_ok($$ select public.admin_set_user_suspended('a0000000-0000-0000-0000-000000000004', true) $$, 'A5 정지');
-select ok((select suspended_at is not null from public.admin_users('cust1@')), 'A5 정지 표시');
+select ok((select suspended_at is not null from public.admin_users('cust1@test.local')), 'A5 정지 표시');
 select throws_ok($$ select public.admin_set_user_suspended('a0000000-0000-0000-0000-000000000001', true) $$,
   'P0001', 'self_target', 'A5 본인 정지 거부');
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-000000000004","role":"authenticated"}', true);
@@ -94,7 +102,7 @@ select lives_ok($$ select public.admin_update_site_settings(10485760, 30, 524288
 select is((select photo_batch_max from public.site_settings), 30, 'A6 변경 반영');
 select throws_ok($$ select public.admin_update_site_settings(10, 30, 52428800, null) $$, '23514', null, 'A6 범위 밖 값 거부');
 select lives_ok($$ select public.admin_set_company_quota('c0000000-0000-0000-0000-000000000001', 1073741824) $$, 'A6 업체 한도');
-select is((select quota_bytes from public.admin_companies(null)), 1073741824::bigint, 'A6 업체 한도 반영');
+select is((select quota_bytes from public.admin_companies('studio-one')), 1073741824::bigint, 'A6 업체 한도 반영');
 
 -- ===== A7 자동 정리 =====
 select ok(exists (select 1 from public.admin_cleanup_candidates() where id = 'e0000000-0000-0000-0000-000000000001'), 'A7 거부 파일은 정리 후보');

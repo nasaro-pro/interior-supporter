@@ -1,12 +1,12 @@
-// 담당자 → 고객 화면 미리보기 시작 (A) — 편집 권한 확인 후 쿠키를 심고 고객 홈으로 보낸다
+// 담당자 → 고객 화면 미리보기 시작 (A) — 편집 권한 확인 후 쿠키를 심고 고객 홈(또는 ?to= 의 같은 프로젝트 고객 화면)으로 보낸다
 // 권한이 없거나 다른 업체 경로면 404 (존재 숨김). 미리보기는 읽기 전용 (core/server/customer-preview.ts)
 import { NextResponse, type NextRequest } from 'next/server';
 import { findProjectAccess } from '@/features/core';
 import {
   CUSTOMER_PREVIEW_COOKIE,
   CUSTOMER_PREVIEW_MAX_AGE,
+  previewStartPath,
 } from '@/features/core/server/customer-preview';
-import { routes } from '@/shared/contracts/routes';
 import { redirectPath } from '@/shared/lib/redirect';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +20,8 @@ export async function GET(
   if (!access || access.companySlug.toLowerCase() !== decodeURIComponent(company).toLowerCase()) {
     return new NextResponse(null, { status: 404 });
   }
-  const res = redirectPath(routes.portal.project(project, 'home'));
+  // ?to= 는 이 프로젝트의 고객 화면 경로만 (개요 미리보기 안 링크) — 그 밖은 고객 홈
+  const res = redirectPath(previewStartPath(project, request.nextUrl.searchParams.get('to')));
   res.cookies.set(CUSTOMER_PREVIEW_COOKIE, project, {
     httpOnly: true,
     sameSite: 'lax',

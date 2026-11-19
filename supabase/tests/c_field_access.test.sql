@@ -4,6 +4,8 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path to public, extensions;
+-- 시험 데이터의 current_date 를 제품의 '오늘'(today_kst, 한국 날짜)과 맞춘다 — 안 맞추면 KST 0~9시에 F1 오늘 일정이 어긋난다
+set local timezone to 'Asia/Seoul';
 select * from no_plan();
 
 -- ---- 시드: owner(…01) 업체 소유자 / crew(…05) 배정 중 시공팀 / crew2(…06) 배정 끝난 시공팀 / cust(…04) 고객 ----

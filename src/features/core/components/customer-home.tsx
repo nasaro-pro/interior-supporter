@@ -2,6 +2,7 @@
 // 칸: 공사 진행(+업체 인사말) → 도안 → 최근 현장 사진 → 다음 일정. 순서 · 표시는 고객 홈 꾸미기 값(home_sections)
 //   overview = 공사 진행 · documents = 도안(견적은 홈에 보이지 않음 — 견적 탭에서) · recent = 최근 현장 사진 · schedule = 다음 일정
 // 고객 화면(CL-03)과 개요의 고객 화면 미리보기(PM-03)가 같은 컴포넌트를 쓴다. 공개 항목만 (B·C provider 가 고객 권한 RLS 로 조회)
+import type { ComponentProps } from 'react';
 import Link from 'next/link';
 import { ChevronRight, FileImage } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -60,6 +61,15 @@ async function confirmStates(ids: string[]): Promise<Map<string, string>> {
   return new Map((data ?? []).map((d) => [d.id, d.confirm_state]));
 }
 
+/**
+ * 고객 홈 안 링크. 실제 고객 화면에서는 next/link.
+ * 개요의 고객 화면 미리보기(PM-03)에서는 담당자에게 /portal 주소가 404 라서, 미리보기 시작 주소(쿠키를 심는 라우트 핸들러)로
+ * 보낸다 → 일반 <a> (클라이언트 이동 · prefetch 금지 — prefetch 가 쿠키를 심으면 안 된다)
+ */
+function HomeLink({ plain, ...props }: ComponentProps<'a'> & { href: string; plain?: boolean }) {
+  return plain ? <a {...props} /> : <Link {...props} />;
+}
+
 function SectionHead({
   eyebrow,
   title,
@@ -67,7 +77,7 @@ function SectionHead({
 }: {
   eyebrow: string;
   title: string;
-  more?: { href: string; label: string };
+  more?: { href: string; label: string; plain?: boolean };
 }) {
   return (
     <div className="flex items-end justify-between gap-3 border-b pb-4">
@@ -76,14 +86,15 @@ function SectionHead({
         <h2 className={cn('mt-2 text-2xl tracking-tight', CUSTOMER_TITLE_CLASS)}>{title}</h2>
       </div>
       {more ? (
-        <Link
+        <HomeLink
+          plain={more.plain}
           href={more.href}
           className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-0.5 text-sm"
           data-ui-key="customer-home-more"
         >
           {more.label}
           <ChevronRight aria-hidden className="size-4" />
-        </Link>
+        </HomeLink>
       ) : null}
     </div>
   );
@@ -117,6 +128,15 @@ export async function CustomerHome({
   const ts = await getTranslations('schedule');
   const locale = ((await getLocale()) === 'en' ? 'en' : 'ko') as DateLocale;
   const projectId = access.projectId;
+  // 미리보기면 고객 화면 주소를 '미리보기 시작 → 그 화면' 주소로 감싼다 (담당자는 /portal 에 바로 못 들어간다)
+  const preview = access.preview === true;
+  const go = (href: string) =>
+    preview ? routes.app.customerPreview(access.companySlug, projectId, href) : href;
+  const more = (tab: 'designs' | 'photos' | 'schedule') => ({
+    href: go(routes.portal.project(projectId, tab)),
+    label: tc('all'),
+    plain: preview,
+  });
   const visible = project.homeSections.filter((s) => s.visible).map((s) => s.key);
 
   const [designs, photos, schedule] = await Promise.all([
@@ -214,7 +234,7 @@ export async function CustomerHome({
             <SectionHead
               eyebrow="Designs"
               title={t('homeSection.documents')}
-              more={{ href: routes.portal.project(projectId, 'designs'), label: tc('all') }}
+              more={more('designs')}
             />
             {designs?.failed ? (
               <Empty>{tc('failed')}</Empty>
@@ -224,7 +244,12 @@ export async function CustomerHome({
               <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
                 {designs.value.map((d, i) => (
                   <li key={d.id} className={cn('min-w-0', i === 2 && 'max-md:hidden')}>
-                    <Link href={d.href} className="group block" data-ui-key="customer-home-design">
+                    <HomeLink
+                      plain={preview}
+                      href={go(d.href)}
+                      className="group block"
+                      data-ui-key="customer-home-design"
+                    >
                       <span className="bg-card text-muted-foreground grid aspect-[4/3] place-items-center overflow-hidden border">
                         {d.thumbnailFileId ? (
                           // eslint-disable-next-line @next/next/no-img-element -- /api/files 가 권한 확인 후 서명 주소로 보낸다
@@ -259,7 +284,7 @@ export async function CustomerHome({
                           {d.confirmState === 'confirmed' ? tc('confirmed') : tc('needsCheck')}
                         </span>
                       </span>
-                    </Link>
+                    </HomeLink>
                   </li>
                 ))}
               </ul>
@@ -272,7 +297,7 @@ export async function CustomerHome({
             <SectionHead
               eyebrow="Recent Photos"
               title={t('homeSection.recent')}
-              more={{ href: routes.portal.project(projectId, 'photos'), label: tc('all') }}
+              more={more('photos')}
             />
             {photos?.failed ? (
               <Empty>{tm('photosFailed')}</Empty>
@@ -282,7 +307,12 @@ export async function CustomerHome({
               <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
                 {photos.value.map((p, i) => (
                   <li key={p.id} className={cn('min-w-0', i === 2 && 'max-md:hidden')}>
-                    <Link href={p.href} className="group block" data-ui-key="customer-home-photo">
+                    <HomeLink
+                      plain={preview}
+                      href={go(p.href)}
+                      className="group block"
+                      data-ui-key="customer-home-photo"
+                    >
                       <span className="bg-muted block aspect-[4/3] overflow-hidden">
                         {p.thumbnailFileId ? (
                           // eslint-disable-next-line @next/next/no-img-element -- /api/files 가 권한 확인 후 서명 주소로 보낸다
@@ -298,7 +328,7 @@ export async function CustomerHome({
                       <span className="text-muted-foreground block text-sm" data-numeric>
                         {formatDate(p.at, locale)}
                       </span>
-                    </Link>
+                    </HomeLink>
                   </li>
                 ))}
               </ul>
@@ -311,7 +341,7 @@ export async function CustomerHome({
             <SectionHead
               eyebrow="Schedule"
               title={t('homeSection.schedule')}
-              more={{ href: routes.portal.project(projectId, 'schedule'), label: tc('all') }}
+              more={more('schedule')}
             />
             {schedule?.failed ? (
               <Empty>{tc('failed')}</Empty>
@@ -326,8 +356,9 @@ export async function CustomerHome({
                   const [, m, d] = ymd.split('-');
                   return (
                     <li key={e.id}>
-                      <Link
-                        href={e.href}
+                      <HomeLink
+                        plain={preview}
+                        href={go(e.href)}
                         className="hover:bg-muted/40 -mx-2 flex items-center gap-5 px-2 py-4"
                         data-ui-key="customer-home-event"
                       >
@@ -347,7 +378,7 @@ export async function CustomerHome({
                             ? formatCalendarTime(hm, locale)
                             : ts('field.allDay')}
                         </span>
-                      </Link>
+                      </HomeLink>
                     </li>
                   );
                 })}
