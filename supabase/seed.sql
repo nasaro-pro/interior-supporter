@@ -81,6 +81,16 @@ begin
   if not exists (select 1 from public.companies where slug = 'studio-y') then
     perform public.create_company_with_owner('00000000-0000-4000-a000-000000000009', '와이 인테리어', 'studio-y', '강타업체');
   end if;
+  -- 새 업체는 승인 대기(pending)로 생긴다(20261024000110). 승인 전에는 구성원으로 인정되지 않아
+  -- 4단계 프로젝트 생성이 pm_must_be_member 로 막히므로, 사이트 관리자 승인과 같은 상태로 바꿔 둔다
+  perform set_config('app.system_write', 'on', true);
+  update public.companies set status = 'approved'
+   where slug in ('studio-x', 'studio-y') and status <> 'approved';
+  -- 업체 X 공개 홈페이지(사례 없이 머리·소개만) — 업체 사이트(/c/studio-x) 로그인 흐름 시험용
+  insert into public.company_portfolios (company_id, is_public, intro)
+  select id, true, '시험용 업체 소개입니다.' from public.companies where slug = 'studio-x'
+  on conflict (company_id) do nothing;
+  perform set_config('app.system_write', 'off', true);
 end $$;
 
 update public.company_settings s
