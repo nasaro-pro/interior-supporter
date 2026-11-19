@@ -52,9 +52,9 @@ export const routes = {
     historyEvent: (company: string, eventId: string | number) =>
       `/app/${enc(company)}/history/${eventId}`,
     notifications: (company: string) => `/app/${enc(company)}/notifications`,
-    /** 담당자의 고객 화면 미리보기 시작 (쿠키를 심고 고객 홈으로 보낸다) */
-    customerPreview: (company: string, project: string) =>
-      `/app/${enc(company)}/projects/${enc(project)}/customer-preview`,
+    /** 담당자의 고객 화면 미리보기 시작 (쿠키를 심고 고객 홈, 또는 to 로 준 그 프로젝트의 고객 화면으로 보낸다) */
+    customerPreview: (company: string, project: string, to?: string) =>
+      `/app/${enc(company)}/projects/${enc(project)}/customer-preview${to ? `?to=${encodeURIComponent(to)}` : ''}`,
     /**
      * PM-65 포트폴리오 미리보기 (화면 상태, 비공개 사례 포함 — CR-PF-12).
      * 업무 화면 틀(메뉴·바탕색) 없이 공개 홈페이지와 똑같이 화면 전체로 보이도록 /app 밖에 둔다 (직원 확인은 페이지가 직접)

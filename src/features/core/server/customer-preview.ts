@@ -6,12 +6,28 @@
 import 'server-only';
 import { cookies, headers } from 'next/headers';
 import type { ProjectAccess } from '@/shared/contracts/integration';
+import { routes } from '@/shared/contracts/routes';
 import { CUSTOMER_PREVIEW_COOKIE } from '@/shared/lib/supabase/server';
 import { findProjectAccess } from './access';
 
 export { CUSTOMER_PREVIEW_COOKIE };
 /** 1시간 — 끝내기를 누르지 않아도 저절로 풀린다 */
 export const CUSTOMER_PREVIEW_MAX_AGE = 60 * 60;
+
+/**
+ * 미리보기 시작 뒤 갈 곳 — to 가 이 프로젝트의 고객 화면 경로(/portal/projects/<id>/...)일 때만 그대로, 아니면 고객 홈.
+ * 개요의 고객 화면 미리보기 안 링크([전체 보기]·도안·사진·일정)가 이 값을 넘긴다. 다른 프로젝트 · 바깥 주소로는 보내지 않는다
+ */
+export function previewStartPath(projectId: string, to: string | null | undefined): string {
+  const home = routes.portal.project(projectId, 'home');
+  if (!to) return home;
+  const base = `/portal/projects/${encodeURIComponent(projectId)}/`;
+  if (!to.startsWith(base)) return home;
+  const rest = to.slice(base.length);
+  // 경로 조각은 영문·숫자·-·_ 만 (.. · // · \ · 쿼리 · 조각 식별자 없음)
+  if (!/^[A-Za-z0-9_-]+(\/[A-Za-z0-9_-]+)*$/.test(rest)) return home;
+  return to;
+}
 
 /** 미리보기 중인 프로젝트 id (쿠키 · 페이지 요청일 때만). 권한 확인은 하지 않는다 */
 export async function previewProjectId(): Promise<string | null> {
